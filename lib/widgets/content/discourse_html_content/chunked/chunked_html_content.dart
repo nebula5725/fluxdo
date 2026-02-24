@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../discourse_html_content_widget.dart';
+import '../image_utils.dart';
 import '../../../../models/topic.dart';
 import 'html_chunk.dart';
 import 'html_chunk_cache.dart';
@@ -44,31 +45,9 @@ class ChunkedHtmlContent extends StatefulWidget {
     return chunks;
   }
 
-  /// 提取画廊图片列表
+  /// 提取画廊图片列表（与 GalleryInfo.fromHtml 一致，只收集 lightbox 图片）
   static List<String> extractGalleryImages(String html) {
-    final List<String> galleryImages = [];
-    final imgTagRegExp = RegExp(r'<img[^>]+>', caseSensitive: false);
-    final srcRegExp = RegExp(r'''src\s*=\s*["']?([^"'\s>]+)["']?''', caseSensitive: false);
-    final excludeClassRegExp = RegExp(
-      r'''class\s*=\s*["'][^"']*(emoji|avatar|site-icon|favicon)[^"']*["']''',
-      caseSensitive: false,
-    );
-
-    final matches = imgTagRegExp.allMatches(html);
-    for (final match in matches) {
-      final imgTag = match.group(0) ?? "";
-
-      if (excludeClassRegExp.hasMatch(imgTag)) continue;
-
-      final srcMatch = srcRegExp.firstMatch(imgTag);
-      final src = srcMatch?.group(1);
-      if (src == null) continue;
-
-      if (src.contains('/favicon') || src.contains('favicon.')) continue;
-
-      galleryImages.add(src);
-    }
-    return galleryImages;
+    return GalleryInfo.fromHtml(html).images;
   }
 
   /// 预加载 HTML 分块（在获取帖子数据后调用）

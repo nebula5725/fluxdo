@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -6,7 +7,6 @@ import '../../../services/discourse_cache_manager.dart';
 import 'builders/video_builder.dart';
 import 'image_utils.dart';
 import 'lazy_image.dart';
-import '../../common/hero_image.dart';
 
 /// 自定义 WidgetFactory，仅用于接管图片渲染
 class DiscourseWidgetFactory extends WidgetFactory {
@@ -111,8 +111,8 @@ class DiscourseWidgetFactory extends WidgetFactory {
         ? discourseImageProvider(resolvedUrl)
         : null;
 
-    // 检查是否在画廊列表中
-    final int galleryIndex = resolvedUrl != null ? galleryImages.indexOf(resolvedUrl) : -1;
+    // 检查是否在画廊列表中（使用 findIndex 支持缩略图→原图的多种 URL 变体匹配）
+    final int galleryIndex = resolvedUrl != null ? (galleryInfo?.findIndex(resolvedUrl) ?? -1) : -1;
     final bool isGalleryImage = galleryIndex != -1;
 
     // 生成唯一 Tag
@@ -186,38 +186,9 @@ class DiscourseWidgetFactory extends WidgetFactory {
                child: imageWidget,
              );
            }
-           
-           // 非 Emoji 非画廊图片：添加点击查看功能
-           if (resolvedUrl != null && imageProvider != null) {
-             // 使用 HeroImage 替代标准 Hero，支持可见性控制
-             Widget child = HeroImage(
-               heroTag: heroTag,
-               onTap: () {
-                 final originalUrl = DiscourseImageUtils.getOriginalUrl(resolvedUrl);
-                 DiscourseImageUtils.openViewer(
-                   context: context,
-                   imageUrl: originalUrl,
-                   heroTag: heroTag,
-                   thumbnailUrl: resolvedUrl,
-                   filenames: galleryInfo?.filenames,
-                 );
-               },
-               child: imageWidget,
-             );
 
-             // 如果有尺寸信息，包裹 AspectRatio 以防止宽图出现空白
-             if (width != null && height != null && width > 0 && height > 0) {
-               return ConstrainedBox(
-                 constraints: BoxConstraints(maxWidth: width),
-                 child: AspectRatio(
-                   aspectRatio: width / height,
-                   child: child,
-                 ),
-               );
-             }
-
-             return child;
-           }
+           // 非画廊图片：与 Discourse 一致，不添加点击查看功能
+           // 只有 lightbox 图片（画廊图片）才能点击打开查看器
            return imageWidget;
         }
 
@@ -276,6 +247,22 @@ class DiscourseWidgetFactory extends WidgetFactory {
         return buildGalleryImage();
       }
     );
+  }
+
+  @override
+  Widget? buildGestureDetector(
+    BuildTree tree,
+    Widget child,
+    GestureRecognizer recognizer,
+  ) {
+    // 对 a.lightbox 不包裹手势，避免与内部图片的 GestureDetector 冲突
+    // 图片的点击由 buildImage 中的 LazyImage/HeroImage 处理
+    final element = tree.element;
+    if (element.localName == 'a' &&
+        element.classes.contains('lightbox')) {
+      return child;
+    }
+    return super.buildGestureDetector(tree, child, recognizer);
   }
 
 

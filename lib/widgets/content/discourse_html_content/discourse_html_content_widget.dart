@@ -171,6 +171,13 @@ class _DiscourseHtmlContentState extends ConsumerState<DiscourseHtmlContent> {
       (match) => '${match.group(1)}\u200B',
     );
 
+    // 4. 将 lightbox-wrapper 后面紧跟的 <br> 替换为自定义占位标记
+    //    在 customWidgetBuilder 中渲染为固定高度 SizedBox，确保分块内外间距一致
+    processedHtml = processedHtml.replaceAllMapped(
+      RegExp(r'(</a>\s*</div>)\s*<br\s*/?>', caseSensitive: false),
+      (match) => '${match.group(1)}<div class="lb-spacer"></div>',
+    );
+
     // 5. 注入链接点击数（顶层处理或分块子块处理，避免嵌套重复）
     // - fullHtml == null: 顶层渲染
     // - isChunkChild: 分块子块（需要注入，因为分块时顶层没有处理 HTML）
@@ -275,9 +282,9 @@ class _DiscourseHtmlContentState extends ConsumerState<DiscourseHtmlContent> {
           parent = parent.parent;
         }
 
-        // 修复 Emoji 垂直居中问题
-        if (element.classes.contains('emoji')) {
-           return {'vertical-align': 'middle'};
+        // img 垂直居中（与 Discourse 一致：img { vertical-align: middle }）
+        if (element.localName == 'img') {
+          return {'vertical-align': 'middle'};
         }
 
         // 内联代码样式：回归文档流，支持自然换行
@@ -338,6 +345,30 @@ class _DiscourseHtmlContentState extends ConsumerState<DiscourseHtmlContent> {
         return {};
       },
       onTapUrl: (url) async {
+        // 兜底拦截 lightbox 链接：如果 URL 对应画廊中的图片，打开查看器
+        // buildGestureDetector 已从源头阻止 a.lightbox 的手势包裹，
+        // 但 inline span 的 recognizer 传递不经过 buildGestureDetector，需要这里兜底
+        final galleryIndex = _galleryInfo.findIndex(url);
+        if (galleryIndex != null) {
+          final galleryImages = _galleryInfo.images;
+          final originalGalleryImages = galleryImages
+              .map((e) => DiscourseImageUtils.getOriginalUrl(e))
+              .toList();
+          final heroTags = DiscourseImageUtils.generateGalleryHeroTags(galleryImages);
+
+          DiscourseImageUtils.openViewer(
+            context: context,
+            imageUrl: DiscourseImageUtils.getOriginalUrl(url),
+            heroTag: heroTags[galleryIndex],
+            galleryImages: originalGalleryImages,
+            heroTags: heroTags,
+            initialIndex: galleryIndex,
+            thumbnailUrls: galleryImages,
+            filenames: _galleryInfo.filenames,
+          );
+          return true;
+        }
+
         // 追踪链接点击（fire-and-forget）
         _trackClick(url);
 
@@ -371,6 +402,12 @@ class _DiscourseHtmlContentState extends ConsumerState<DiscourseHtmlContent> {
 
   Widget? _buildCustomWidget(BuildContext context, dynamic element) {
     final theme = Theme.of(context);
+
+    // lightbox 图片间距占位：固定高度，确保分块内外一致
+    if (element.localName == 'div' && element.classes.contains('lb-spacer')) {
+      final fontSize = widget.textStyle?.fontSize ?? 14.0;
+      return SizedBox(height: fontSize * 0.5);
+    }
 
     // 处理 iframe：统一使用 InAppWebView 渲染
     // flutter_widget_from_html 的实现全屏退出后高度异常

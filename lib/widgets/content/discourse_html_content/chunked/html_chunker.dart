@@ -101,6 +101,25 @@ class HtmlChunker {
 
     flushPending();
 
+    // 后处理：将 chunk 开头的孤立 <br> 替换为 lb-spacer 占位标记
+    // 分块切割可能把 lightbox 之间的 <br> 切到下一个 chunk 开头，
+    // 预处理无法匹配到它（前面没有 </a></div>），需要在这里替换。
+    for (int i = 1; i < chunks.length; i++) {
+      final chunk = chunks[i];
+      if (chunk.type == HtmlChunkType.paragraph &&
+          chunk.html.startsWith('<br')) {
+        final replaced = chunk.html.replaceFirst(
+          RegExp(r'^<br\s*/?>'),
+          '<div class="lb-spacer"></div>',
+        );
+        chunks[i] = HtmlChunk(
+          html: replaced,
+          type: chunk.type,
+          index: chunk.index,
+        );
+      }
+    }
+
     // 如果只有一个块，直接返回原 HTML（避免不必要的拆分）
     if (chunks.length == 1) {
       return [

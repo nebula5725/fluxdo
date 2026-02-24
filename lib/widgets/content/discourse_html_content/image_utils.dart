@@ -29,68 +29,72 @@ class GalleryInfo {
   }
 
   /// 从 HTML 提取画廊信息
+  /// 与 Discourse 官方一致：只收集 a.lightbox 内的图片（排除 spoiler 内的）
   static GalleryInfo fromHtml(String html) {
-    // 第一步：解析 lightbox 锚点，建立 href → filename 映射
-    // Discourse 生成格式：<a class="lightbox" href="...原图..." title="文件名.jpg" ...>
-    final Map<String, String> hrefToFilename = {};
-    final lightboxAnchorRe = RegExp(
-      r'''<a\s[^>]*class\s*=\s*["'][^"']*\blightbox\b[^"']*["'][^>]*>''',
-      caseSensitive: false,
-    );
-    final hrefRe = RegExp(r'''href\s*=\s*["']([^"']+)["']''', caseSensitive: false);
-    final titleRe = RegExp(r'''title\s*=\s*["']([^"']+)["']''', caseSensitive: false);
-
-    for (final m in lightboxAnchorRe.allMatches(html)) {
-      final tag = m.group(0)!;
-      final href = hrefRe.firstMatch(tag)?.group(1);
-      final title = titleRe.firstMatch(tag)?.group(1);
-      if (href == null || title == null) continue;
-      var resolvedHref = href;
-      if (resolvedHref.startsWith('/') && !resolvedHref.startsWith('//')) {
-        resolvedHref = '${AppConstants.baseUrl}$resolvedHref';
-      }
-      hrefToFilename[resolvedHref] = title;
-    }
-
-    // 第二步：解析 img 标签
     final List<String> originalUrls = [];
     final List<String?> filenames = [];
     final Map<String, int> thumbnailToIndex = {};
 
-    final imgTagRegExp = RegExp(r'<img[^>]+>', caseSensitive: false);
-    final srcRegExp = RegExp(r'''src\s*=\s*["']?([^"'\s>]+)["']?''', caseSensitive: false);
-    final excludeClassRegExp = RegExp(
-      r'''class\s*=\s*["'][^"']*(emoji|avatar|site-icon|favicon)[^"']*["']''',
+    // 匹配 a.lightbox 锚点标签及其内部内容
+    // Discourse 后端生成格式：
+    //   <a class="lightbox" href="原图URL" title="文件名" data-download-href="...">
+    //     <img src="缩略图URL" ...>
+    //     <div class="meta">...</div>
+    //   </a>
+    // Discourse 前端选择器：*:not(.spoiler):not(.spoiled) .lightbox
+    final lightboxRe = RegExp(
+      r'<a\s[^>]*class\s*=\s*"[^"]*\blightbox\b[^"]*"[^>]*>[\s\S]*?</a>',
+      caseSensitive: false,
+    );
+    final hrefRe = RegExp(r'''href\s*=\s*["']([^"']+)["']''', caseSensitive: false);
+    final titleRe = RegExp(r'''title\s*=\s*["']([^"']+)["']''', caseSensitive: false);
+    final srcRe = RegExp(r'''<img[^>]+src\s*=\s*["']([^"']+)["']''', caseSensitive: false);
+    // 检查 lightbox 是否在 spoiler 内（向前查找最近的未关闭 spoiler 标签）
+    final spoilerOpenRe = RegExp(
+      r'class\s*=\s*"[^"]*\b(?:spoiler|spoiled)\b[^"]*"',
       caseSensitive: false,
     );
 
-    final matches = imgTagRegExp.allMatches(html);
-    for (final match in matches) {
-      final imgTag = match.group(0) ?? "";
-      if (excludeClassRegExp.hasMatch(imgTag)) continue;
+    for (final m in lightboxRe.allMatches(html)) {
+      // 排除 spoiler 内的 lightbox（与 Discourse 前端行为一致）
+      final before = html.substring((m.start - 200).clamp(0, m.start), m.start);
+      if (spoilerOpenRe.hasMatch(before)) continue;
 
-      final srcMatch = srcRegExp.firstMatch(imgTag);
-      var src = srcMatch?.group(1);
-      if (src == null) continue;
-      if (src.contains('/favicon') || src.contains('favicon.')) continue;
-      if (src.startsWith('upload://')) continue;
+      final tag = m.group(0)!;
+      final anchorTag = tag.substring(0, tag.indexOf('>') + 1);
 
-      // 将相对路径转换为绝对路径
-      if (src.startsWith('/') && !src.startsWith('//')) {
-        src = '${AppConstants.baseUrl}$src';
+      // 原图 URL：从 a.lightbox 的 href 获取
+      final href = hrefRe.firstMatch(anchorTag)?.group(1);
+      if (href == null) continue;
+
+      var originalUrl = href;
+      if (originalUrl.startsWith('/') && !originalUrl.startsWith('//')) {
+        originalUrl = '${AppConstants.baseUrl}$originalUrl';
       }
 
-      final thumbnailUrl = src;
-      final originalUrl = DiscourseImageUtils.getOriginalUrl(src);
+      // 文件名：从 a.lightbox 的 title 获取
+      final filename = titleRe.firstMatch(anchorTag)?.group(1);
 
-      // 从 lightbox 锚点映射中查找文件名
-      final filename = hrefToFilename[originalUrl] ?? hrefToFilename[thumbnailUrl];
+      // 缩略图 URL：从内部 img 的 src 获取
+      final imgSrcMatch = srcRe.firstMatch(tag);
+      var thumbnailUrl = imgSrcMatch?.group(1);
+      if (thumbnailUrl != null && thumbnailUrl.startsWith('/') && !thumbnailUrl.startsWith('//')) {
+        thumbnailUrl = '${AppConstants.baseUrl}$thumbnailUrl';
+      }
 
       final index = originalUrls.length;
       originalUrls.add(originalUrl);
       filenames.add(filename);
-      thumbnailToIndex[thumbnailUrl] = index;
-      // 也用原图 URL 作为 key，方便匹配
+
+      // 用缩略图和原图 URL 都作为索引 key
+      if (thumbnailUrl != null) {
+        thumbnailToIndex[thumbnailUrl] = index;
+        // 缩略图转原图后的 URL 也加入（处理 optimized → original 的情况）
+        final thumbOriginal = DiscourseImageUtils.getOriginalUrl(thumbnailUrl);
+        if (thumbOriginal != thumbnailUrl) {
+          thumbnailToIndex[thumbOriginal] = index;
+        }
+      }
       thumbnailToIndex[originalUrl] = index;
     }
 
