@@ -200,6 +200,7 @@ class _MainPageState extends ConsumerState<MainPage> with WidgetsBindingObserver
   int? _lastTappedIndex;
   DateTime? _lastTapTime;
   Timer? _resumeDebounceTimer;
+  DateTime? _lastBackPressTime;
 
   final List<Widget> _pages = const [
     TopicsScreen(),
@@ -354,11 +355,25 @@ class _MainPageState extends ConsumerState<MainPage> with WidgetsBindingObserver
     final user = currentUserAsync.value;
 
     // 首页的 FAB 由 TopicsScreen 内部处理，避免切换时闪烁
-    return AdaptiveScaffold(
-      selectedIndex: _currentIndex,
-      onDestinationSelected: _onDestinationSelected,
-      destinations: _buildDestinations(user),
-      body: _pages[_currentIndex],
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, dynamic result) {
+        if (didPop) return;
+        final now = DateTime.now();
+        if (_lastBackPressTime != null &&
+            now.difference(_lastBackPressTime!).inMilliseconds < 2000) {
+          SystemNavigator.pop();
+        } else {
+          _lastBackPressTime = now;
+          ToastService.showInfo('再按一次返回键退出');
+        }
+      },
+      child: AdaptiveScaffold(
+        selectedIndex: _currentIndex,
+        onDestinationSelected: _onDestinationSelected,
+        destinations: _buildDestinations(user),
+        body: _pages[_currentIndex],
+      ),
     );
   }
 
