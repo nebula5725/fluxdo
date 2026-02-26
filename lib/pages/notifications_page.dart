@@ -43,6 +43,10 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+    // 用户打开通知页面时，通知服务端"已查看"以清除计数
+    ref.read(discourseServiceProvider).bumpSeenNotification().catchError((e) {
+      debugPrint('Bump seen notification failed: $e');
+    });
   }
 
   @override

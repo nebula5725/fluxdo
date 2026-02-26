@@ -18,10 +18,6 @@ class NotificationListNotifier extends AsyncNotifier<List<DiscourseNotification>
   @override
   Future<List<DiscourseNotification>> build() async {
     final service = ref.read(discourseServiceProvider);
-    // 先触发 seen 更新以清除通知计数，不阻塞列表加载
-    service.bumpSeenNotification().catchError((e) {
-      debugPrint('Bump seen notification failed: $e');
-    });
     final response = await service.getNotifications();
     _totalRows = response.totalRowsNotifications;
     return response.notifications;
@@ -32,10 +28,6 @@ class NotificationListNotifier extends AsyncNotifier<List<DiscourseNotification>
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final service = ref.read(discourseServiceProvider);
-      // 先触发 seen 更新以清除通知计数，不阻塞列表加载
-      service.bumpSeenNotification().catchError((e) {
-        debugPrint('Bump seen notification failed: $e');
-      });
       final response = await service.getNotifications();
       _totalRows = response.totalRowsNotifications;
       return response.notifications;
