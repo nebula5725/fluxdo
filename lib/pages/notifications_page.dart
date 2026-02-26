@@ -148,8 +148,26 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
 
             return ListView.builder(
               controller: _scrollController,
-              itemCount: notifications.length,
+              itemCount: notifications.length + 1,
               itemBuilder: (context, index) {
+                if (index == notifications.length) {
+                  final hasMore = ref.read(notificationListProvider.notifier).hasMore;
+                  if (!hasMore) {
+                    return const Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Center(
+                        child: Text('没有更多了', style: TextStyle(color: Colors.grey)),
+                      ),
+                    );
+                  }
+                  if (notificationsAsync.isLoading) {
+                    return const Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }
+                  return const SizedBox();
+                }
                 final notification = notifications[index];
                 return _NotificationItem(
                   notification: notification,
