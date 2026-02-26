@@ -198,30 +198,7 @@ class _AiChatPageState extends ConsumerState<AiChatPage> {
         ),
         centerTitle: false,
         actions: [
-          // 模型选择器
-          Consumer(
-            builder: (context, ref, _) {
-              final allModels = ref.watch(allAvailableAiModelsProvider);
-              final selected =
-                  ref.watch(topicSelectedAiModelProvider(widget.topicId));
-              final defaultModel = ref.watch(defaultAiModelProvider);
-              final current = selected ?? defaultModel;
-              if (allModels.length <= 1 || current == null) {
-                return const SizedBox.shrink();
-              }
-              return _AiModelSelector(
-                allModels: allModels,
-                current: current,
-                onChanged: (model) {
-                  ref
-                      .read(topicSelectedAiModelProvider(widget.topicId)
-                          .notifier)
-                      .state = model;
-                },
-              );
-            },
-          ),
-          // 用 Consumer 隔离 contextScope 的变化，避免消息列表重建
+          // 上下文范围选择器
           Consumer(
             builder: (context, ref, _) {
               final scope =
@@ -267,6 +244,28 @@ class _AiChatPageState extends ConsumerState<AiChatPage> {
                   selectedModel: model);
             },
             onStop: chatNotifier.stopGeneration,
+            bottomLeading: Consumer(
+              builder: (context, ref, _) {
+                final allModels = ref.watch(allAvailableAiModelsProvider);
+                final selected =
+                    ref.watch(topicSelectedAiModelProvider(widget.topicId));
+                final defaultModel = ref.watch(defaultAiModelProvider);
+                final current = selected ?? defaultModel;
+                if (allModels.length <= 1 || current == null) {
+                  return const SizedBox.shrink();
+                }
+                return _AiModelSelector(
+                  allModels: allModels,
+                  current: current,
+                  onChanged: (model) {
+                    ref
+                        .read(topicSelectedAiModelProvider(widget.topicId)
+                            .notifier)
+                        .state = model;
+                  },
+                );
+              },
+            ),
           ),
         ],
       ),
@@ -433,8 +432,8 @@ class _AiModelSelector extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            Icon(Icons.arrow_drop_down,
-                size: 18, color: theme.colorScheme.onSurfaceVariant),
+            Icon(Icons.unfold_more,
+                size: 14, color: theme.colorScheme.onSurfaceVariant),
           ],
         ),
       ),
