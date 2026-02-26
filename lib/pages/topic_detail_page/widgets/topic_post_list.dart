@@ -4,6 +4,7 @@ import '../../../models/topic.dart';
 import '../../../providers/message_bus_providers.dart';
 import '../../../services/toast_service.dart';
 import '../../../utils/responsive.dart';
+import '../../../utils/time_utils.dart';
 import '../../../widgets/post/post_item/post_item.dart';
 import '../../../widgets/post/post_item_skeleton.dart';
 import 'topic_detail_header.dart';
@@ -358,10 +359,36 @@ class _TopicPostListState extends State<TopicPostList> {
     );
   }
 
+  /// 判断是否需要显示日期分割线
+  bool _shouldShowDateSeparator(int postIndex) {
+    final posts = detail.postStream.posts;
+    if (postIndex <= 0) return false;
+
+    final currentDate = posts[postIndex].createdAt;
+    final previousDate = posts[postIndex - 1].createdAt;
+
+    final currentDay = DateTime(currentDate.year, currentDate.month, currentDate.day);
+    final previousDay = DateTime(previousDate.year, previousDate.month, previousDate.day);
+
+    return currentDay != previousDay;
+  }
+
   /// 构建单个帖子 Widget（供 SliverList.builder 的 itemBuilder 使用）
   Widget _buildPostItem(BuildContext context, ThemeData theme, Post post, int postIndex) {
     final showDivider = dividerPostIndex == postIndex;
-
+    // 日期分割线：上下卡片各渲染一份，确保不同绘制顺序下都有一个可见
+    final posts_ = detail.postStream.posts;
+    // 顶部：当前帖子与前一帖跨天时
+    final showTopSeparator = _shouldShowDateSeparator(postIndex);
+    final dateSeparatorLabel = showTopSeparator
+        ? TimeUtils.formatSmartDate(post.createdAt)
+        : null;
+    // 底部：下一帖与当前帖跨天时
+    final nextPostIndex = postIndex + 1;
+    final showBottomSeparator = nextPostIndex < posts_.length && _shouldShowDateSeparator(nextPostIndex);
+    final bottomDateSeparatorLabel = showBottomSeparator
+        ? TimeUtils.formatSmartDate(posts_[nextPostIndex].createdAt)
+        : null;
     return _wrapContent(
       context,
       AutoScrollTag(
@@ -391,6 +418,8 @@ class _TopicPostListState extends State<TopicPostList> {
               isTopicOwner: detail.createdBy?.username == post.username,
               topicHasAcceptedAnswer: detail.hasAcceptedAnswer,
               acceptedAnswerPostNumber: detail.acceptedAnswerPostNumber,
+              dateSeparatorLabel: dateSeparatorLabel,
+              bottomDateSeparatorLabel: bottomDateSeparatorLabel,
               onLike: () => ToastService.showInfo('点赞功能开发中...'),
               onReply: isLoggedIn ? () => onReply(post.postNumber == 1 ? null : post) : null,
               onEdit: isLoggedIn && post.canEdit ? () => onEdit(post) : null,

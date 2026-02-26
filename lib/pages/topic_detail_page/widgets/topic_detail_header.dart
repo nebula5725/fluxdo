@@ -6,6 +6,7 @@ import '../../../utils/font_awesome_helper.dart';
 import '../../../widgets/topic/topic_summary_widget.dart';
 import '../../../widgets/common/emoji_text.dart';
 import '../../../utils/time_utils.dart';
+import '../../../widgets/common/relative_time_text.dart';
 import '../../../utils/number_utils.dart';
 import '../../../widgets/topic/topic_notification_button.dart';
 import 'topic_vote_button.dart';
@@ -151,10 +152,26 @@ class TopicDetailHeader extends ConsumerWidget {
                       NumberUtils.formatCount(detail.views),
                       label: '浏览'
                     ),
-                    _buildMetadataItem(
-                      context,
-                      Icons.schedule_rounded,
-                      TimeUtils.formatRelativeTime(detail.createdAt),
+                    Tooltip(
+                      message: TimeUtils.formatTooltipTime(detail.createdAt),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.schedule_rounded,
+                            size: 14,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                          ),
+                          const SizedBox(width: 4),
+                          RelativeTimeText(
+                            dateTime: detail.createdAt,
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),

@@ -8,6 +8,7 @@ import '../models/user_action.dart';
 import '../providers/discourse_providers.dart';
 import '../services/discourse_cache_manager.dart';
 import '../utils/time_utils.dart';
+import '../widgets/common/relative_time_text.dart';
 import '../utils/number_utils.dart';
 import '../utils/pagination_helper.dart';
 import '../services/emoji_handler.dart';
@@ -902,8 +903,8 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
                             children: [
                               const Icon(Icons.flash_on_rounded, size: 12, color: Colors.white70),
                               const SizedBox(width: 4),
-                              Text(
-                                TimeUtils.formatRelativeTime(_user?.lastSeenAt ?? _user!.lastPostedAt!),
+                              RelativeTimeText(
+                                dateTime: _user?.lastSeenAt ?? _user!.lastPostedAt!,
                                 style: const TextStyle(color: Colors.white70, fontSize: 11),
                               ),
                             ],
@@ -1699,8 +1700,8 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
                   ),
                   const Spacer(),
                   if (action.actingAt != null)
-                    Text(
-                      TimeUtils.formatRelativeTime(action.actingAt!),
+                    RelativeTimeText(
+                      dateTime: action.actingAt,
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: theme.colorScheme.outline,
                       ),
@@ -1800,8 +1801,8 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
                   ),
                   const Spacer(),
                   if (reaction.createdAt != null)
-                    Text(
-                      TimeUtils.formatRelativeTime(reaction.createdAt!),
+                    RelativeTimeText(
+                      dateTime: reaction.createdAt,
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: theme.colorScheme.outline,
                       ),

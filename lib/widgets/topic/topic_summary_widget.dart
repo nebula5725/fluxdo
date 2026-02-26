@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/topic.dart';
 import '../../providers/discourse_providers.dart';
-import '../../utils/time_utils.dart';
+import '../common/relative_time_text.dart';
 
 /// 话题 AI 摘要组件
 class TopicSummaryWidget extends ConsumerWidget {
@@ -216,8 +216,10 @@ class TopicSummaryWidget extends ConsumerWidget {
           Row(
             children: [
               if (summary.updatedAt != null)
-                Text(
-                  '更新于 ${TimeUtils.formatRelativeTime(summary.updatedAt!)}',
+                RelativeTimeText(
+                  dateTime: summary.updatedAt,
+                  displayStyle: TimeDisplayStyle.prefixed,
+                  prefix: '更新于 ',
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),

@@ -9,7 +9,7 @@ import '../../../providers/discourse_providers.dart';
 import '../../../providers/preferences_provider.dart';
 import '../../../services/discourse/discourse_service.dart';
 import '../../../services/toast_service.dart';
-import '../../../utils/time_utils.dart';
+import '../../common/relative_time_text.dart';
 import '../../content/discourse_html_content/chunked/chunked_html_content.dart';
 import '../small_action_item.dart';
 import '../post_links.dart';
@@ -42,6 +42,8 @@ class PostItem extends ConsumerStatefulWidget {
   final bool isTopicOwner;
   final bool topicHasAcceptedAnswer;
   final int? acceptedAnswerPostNumber;
+  final String? dateSeparatorLabel;
+  final String? bottomDateSeparatorLabel;
 
   const PostItem({
     super.key,
@@ -58,6 +60,8 @@ class PostItem extends ConsumerStatefulWidget {
     this.isTopicOwner = false,
     this.topicHasAcceptedAnswer = false,
     this.acceptedAnswerPostNumber,
+    this.dateSeparatorLabel,
+    this.bottomDateSeparatorLabel,
   });
 
   @override
@@ -284,6 +288,11 @@ class _PostItemState extends ConsumerState<PostItem> {
             ? theme.colorScheme.errorContainer.withValues(alpha: 0.15)
             : backgroundColor;
 
+    final borderColor = theme.colorScheme.outlineVariant.withValues(alpha: 0.5);
+    final hasTopDateSeparator = widget.dateSeparatorLabel != null;
+    final hasBottomDateSeparator = widget.bottomDateSeparatorLabel != null;
+    final borderSide = BorderSide(color: borderColor, width: 0.5);
+
     return RepaintBoundary(
         child: Opacity(
           opacity: post.isDeleted ? 0.6 : 1.0,
@@ -292,14 +301,11 @@ class _PostItemState extends ConsumerState<PostItem> {
           decoration: BoxDecoration(
             color: targetColor,
             border: Border(
-              bottom: BorderSide(
-                color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
-                width: 0.5,
-              ),
+              bottom: borderSide,
             ),
           ),
           child: Stack(
-            clipBehavior: Clip.hardEdge,
+            clipBehavior: Clip.none,
             children: [
               // 背景水印印章
               if (_isAcceptedAnswer || widget.post.canAcceptAnswer)
@@ -367,8 +373,8 @@ class _PostItemState extends ConsumerState<PostItem> {
                 Stack(
                   clipBehavior: Clip.none,
                   children: [
-                    Text(
-                      TimeUtils.formatRelativeTime(post.createdAt),
+                    RelativeTimeText(
+                      dateTime: post.createdAt,
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
                         fontSize: 11,
@@ -521,6 +527,53 @@ class _PostItemState extends ConsumerState<PostItem> {
                   ],
                 ),
               ),
+              // 日期分隔：上下两张卡片各渲染一份，位置完全重叠
+              // SliverList 绘制顺序不确定（before-center 和 after-center 相反），
+              // 双份渲染确保无论哪个 layer 在上面，总有一个可见
+              if (hasTopDateSeparator)
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: FractionalTranslation(
+                    translation: const Offset(0, -0.5),
+                    child: Center(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 1),
+                        color: targetColor,
+                        child: Text(
+                          widget.dateSeparatorLabel!,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                            fontSize: 11,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              if (hasBottomDateSeparator)
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: FractionalTranslation(
+                    translation: const Offset(0, 0.5),
+                    child: Center(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 1),
+                        color: targetColor,
+                        child: Text(
+                          widget.bottomDateSeparatorLabel!,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                            fontSize: 11,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
             ],
           ),
         ),

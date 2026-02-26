@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../constants.dart';
 import '../../models/topic.dart';
-import '../../utils/time_utils.dart';
+import '../common/relative_time_text.dart';
 import '../common/smart_avatar.dart';
 
 /// 帖子类型常量
@@ -153,8 +153,8 @@ class SmallActionItem extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 2),
-                Text(
-                  TimeUtils.formatRelativeTime(post.createdAt),
+                RelativeTimeText(
+                  dateTime: post.createdAt,
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
                   ),

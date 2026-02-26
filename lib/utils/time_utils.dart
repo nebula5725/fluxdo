@@ -62,6 +62,30 @@ class TimeUtils {
     return '${time.year}年${time.month}月${time.day}日';
   }
 
+  /// 格式化时间为 Tooltip 精确时间
+  /// 格式：2024年1月15日 14:30:25
+  /// 适用于长按显示精确时间的场景
+  static String formatTooltipTime(DateTime? time) {
+    if (time == null) return '';
+
+    return '${time.year}年${time.month}月${time.day}日 ${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}:${time.second.toString().padLeft(2, '0')}';
+  }
+
+  /// 格式化时间为智能日期标签
+  /// 今天显示"今天"、昨天显示"昨天"、同年显示"1月15日"、跨年显示"2024年1月15日"
+  static String formatSmartDate(DateTime? time) {
+    if (time == null) return '';
+
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final date = DateTime(time.year, time.month, time.day);
+
+    if (date == today) return '今天';
+    if (date == today.subtract(const Duration(days: 1))) return '昨天';
+    if (time.year == now.year) return '${time.month}月${time.day}日';
+    return '${time.year}年${time.month}月${time.day}日';
+  }
+
   /// 格式化时间为紧凑格式
   /// 格式：01-15 14:30
   /// 适用于聊天引用等空间有限的场景

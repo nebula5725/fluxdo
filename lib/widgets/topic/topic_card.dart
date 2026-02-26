@@ -9,7 +9,7 @@ import '../../utils/font_awesome_helper.dart';
 import '../common/topic_badges.dart';
 import '../common/smart_avatar.dart';
 import '../../services/discourse_cache_manager.dart';
-import '../../utils/time_utils.dart';
+import '../common/relative_time_text.dart';
 import '../../utils/number_utils.dart';
 import '../common/emoji_text.dart';
 
@@ -217,8 +217,8 @@ class TopicCard extends ConsumerWidget {
                                 ),
                                 const SizedBox(width: 6),
                               ],
-                              Text(
-                                TimeUtils.formatRelativeTime(topic.lastPostedAt),
+                              RelativeTimeText(
+                                dateTime: topic.lastPostedAt,
                                 style: theme.textTheme.labelSmall?.copyWith(
                                   color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
                                 ),

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../models/badge.dart';
 import '../services/discourse/discourse_service.dart';
-import '../utils/time_utils.dart';
+import '../widgets/common/relative_time_text.dart';
 import '../utils/font_awesome_helper.dart';
 import '../services/discourse_cache_manager.dart';
 import '../utils/url_helper.dart';
@@ -447,8 +447,10 @@ class _UserBadgeItem extends StatelessWidget {
                   const SizedBox(height: 4),
                   
                   // Date
-                  Text(
-                    '${TimeUtils.formatRelativeTime(userBadge.grantedAt)} 获得',
+                  RelativeTimeText(
+                    dateTime: userBadge.grantedAt,
+                    displayStyle: TimeDisplayStyle.suffixed,
+                    suffix: ' 获得',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.outline,
                     ),

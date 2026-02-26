@@ -7,7 +7,7 @@ import '../widgets/common/skeleton.dart';
 import '../widgets/common/error_view.dart';
 import '../widgets/post/reply_sheet.dart';
 import '../services/toast_service.dart';
-import '../utils/time_utils.dart';
+import '../widgets/common/relative_time_text.dart';
 import 'topic_detail_page/topic_detail_page.dart';
 import 'create_topic_page.dart';
 
@@ -289,8 +289,8 @@ class _DraftCard extends StatelessWidget {
                   const SizedBox(width: 8),
                   // 更新时间
                   if (draft.updatedAt != null)
-                    Text(
-                      TimeUtils.formatRelativeTime(draft.updatedAt!),
+                    RelativeTimeText(
+                      dateTime: draft.updatedAt,
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),

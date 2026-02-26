@@ -10,7 +10,7 @@ import '../widgets/common/emoji_text.dart';
 import '../widgets/common/smart_avatar.dart';
 import '../widgets/notification/notification_list_skeleton.dart';
 import '../widgets/common/error_view.dart';
-import '../utils/time_utils.dart';
+import '../widgets/common/relative_time_text.dart';
 
 /// 通知列表页面
 class NotificationsPage extends ConsumerStatefulWidget {
@@ -382,8 +382,8 @@ class _NotificationItem extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          Text(
-            TimeUtils.formatRelativeTime(notification.createdAt),
+          RelativeTimeText(
+            dateTime: notification.createdAt,
             style: TextStyle(
               color: colorScheme.onSurfaceVariant,
               fontSize: 12,

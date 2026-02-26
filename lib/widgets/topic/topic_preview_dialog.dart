@@ -11,7 +11,7 @@ import '../../constants.dart';
 import '../../utils/font_awesome_helper.dart';
 import '../../utils/share_utils.dart';
 import '../../services/discourse_cache_manager.dart';
-import '../../utils/time_utils.dart';
+import '../common/relative_time_text.dart';
 import '../../utils/number_utils.dart';
 import '../common/emoji_text.dart';
 import '../common/smart_avatar.dart';
@@ -265,8 +265,10 @@ class TopicPreviewDialog extends ConsumerWidget {
               ),
             ),
           ),
-          Text(
-            '创建于 ${TimeUtils.formatRelativeTime(topic.createdAt)}',
+          RelativeTimeText(
+            dateTime: topic.createdAt,
+            displayStyle: TimeDisplayStyle.prefixed,
+            prefix: '创建于 ',
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -478,14 +480,37 @@ class TopicPreviewDialog extends ConsumerWidget {
               ),
             ),
             Expanded(
-              child: _buildStatItem(
+              child: _buildStatWidgetItem(
                 context,
                 Icons.access_time,
-                '最后回复 ${TimeUtils.formatRelativeTime(topic.lastPostedAt)}',
+                RelativeTimeText(
+                  dateTime: topic.lastPostedAt,
+                  displayStyle: TimeDisplayStyle.prefixed,
+                  prefix: '最后回复 ',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
               ),
             ),
           ],
         ),
+      ],
+    );
+  }
+
+  Widget _buildStatWidgetItem(BuildContext context, IconData icon, Widget child) {
+    final theme = Theme.of(context);
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          icon,
+          size: 16,
+          color: theme.colorScheme.onSurfaceVariant,
+        ),
+        const SizedBox(width: 4),
+        child,
       ],
     );
   }
