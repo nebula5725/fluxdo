@@ -180,6 +180,31 @@ class PreferencesPage extends ConsumerWidget {
               ),
             ),
           ),
+          const SizedBox(height: 12),
+          Card(
+            elevation: 0,
+            color: theme.colorScheme.surfaceContainerLow,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+              side: BorderSide(color: theme.colorScheme.outlineVariant.withValues(alpha:0.2)),
+            ),
+            margin: EdgeInsets.zero,
+            clipBehavior: Clip.antiAlias,
+            child: SwitchListTile(
+              title: const Text('阅读混排优化'),
+              subtitle: const Text('浏览帖子时自动优化中英文间距'),
+              secondary: Icon(
+                Icons.auto_fix_high_rounded,
+                color: preferences.displayPanguSpacing
+                    ? theme.colorScheme.primary
+                    : theme.colorScheme.onSurfaceVariant,
+              ),
+              value: preferences.displayPanguSpacing,
+              onChanged: (value) {
+                ref.read(preferencesProvider.notifier).setDisplayPanguSpacing(value);
+              },
+            ),
+          ),
           const SizedBox(height: 24),
           _buildSectionHeader(theme, '编辑器'),
           const SizedBox(height: 12),

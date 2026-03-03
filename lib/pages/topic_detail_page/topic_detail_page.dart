@@ -32,6 +32,7 @@ import '../../widgets/topic/topic_notification_button.dart';
 import '../../widgets/common/emoji_text.dart';
 import '../../widgets/common/error_view.dart';
 import '../../widgets/content/discourse_html_content/chunked/chunked_html_content.dart';
+import '../../widgets/content/discourse_html_content/discourse_html_content_widget.dart';
 import 'controllers/topic_detail_controller.dart';
 import 'widgets/topic_detail_overlay.dart';
 import 'widgets/topic_post_list.dart';
@@ -610,6 +611,11 @@ class _TopicDetailPageState extends ConsumerState<TopicDetailPage> with WidgetsB
       if (posts != null && posts.isNotEmpty) {
         final htmlList = posts.map((p) => p.cooked).toList();
         ChunkedHtmlContent.preloadAll(htmlList);
+
+        // 预热 Pangu 混排处理（在 isolate 中执行）
+        if (ref.read(preferencesProvider).displayPanguSpacing) {
+          DiscourseHtmlContent.preloadPangu(htmlList);
+        }
 
         final hasFirstPost = posts.first.postNumber == 1;
         if (_hasFirstPost != hasFirstPost) {

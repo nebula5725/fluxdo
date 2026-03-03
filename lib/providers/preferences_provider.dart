@@ -5,6 +5,8 @@ import 'theme_provider.dart';
 
 class AppPreferences {
   final bool autoPanguSpacing;
+  /// 阅读时自动优化中英文混排间距
+  final bool displayPanguSpacing;
   final bool anonymousShare;
   final bool longPressPreview;
   final bool openExternalLinksInAppBrowser;
@@ -17,6 +19,7 @@ class AppPreferences {
 
   const AppPreferences({
     required this.autoPanguSpacing,
+    required this.displayPanguSpacing,
     required this.anonymousShare,
     required this.longPressPreview,
     required this.openExternalLinksInAppBrowser,
@@ -27,6 +30,7 @@ class AppPreferences {
 
   AppPreferences copyWith({
     bool? autoPanguSpacing,
+    bool? displayPanguSpacing,
     bool? anonymousShare,
     bool? longPressPreview,
     bool? openExternalLinksInAppBrowser,
@@ -36,6 +40,7 @@ class AppPreferences {
   }) {
     return AppPreferences(
       autoPanguSpacing: autoPanguSpacing ?? this.autoPanguSpacing,
+      displayPanguSpacing: displayPanguSpacing ?? this.displayPanguSpacing,
       anonymousShare: anonymousShare ?? this.anonymousShare,
       longPressPreview: longPressPreview ?? this.longPressPreview,
       openExternalLinksInAppBrowser:
@@ -49,6 +54,7 @@ class AppPreferences {
 
 class PreferencesNotifier extends StateNotifier<AppPreferences> {
   static const String _autoPanguSpacingKey = 'pref_auto_pangu_spacing';
+  static const String _displayPanguSpacingKey = 'pref_display_pangu_spacing';
   static const String _anonymousShareKey = 'pref_anonymous_share';
   static const String _longPressPreviewKey = 'pref_long_press_preview';
   static const String _openExternalLinksInAppBrowserKey =
@@ -61,6 +67,7 @@ class PreferencesNotifier extends StateNotifier<AppPreferences> {
       : super(
           AppPreferences(
             autoPanguSpacing: _prefs.getBool(_autoPanguSpacingKey) ?? false,
+            displayPanguSpacing: _prefs.getBool(_displayPanguSpacingKey) ?? false,
             anonymousShare: _prefs.getBool(_anonymousShareKey) ?? false,
             longPressPreview: _prefs.getBool(_longPressPreviewKey) ?? true,
             openExternalLinksInAppBrowser:
@@ -76,6 +83,11 @@ class PreferencesNotifier extends StateNotifier<AppPreferences> {
   Future<void> setAutoPanguSpacing(bool enabled) async {
     state = state.copyWith(autoPanguSpacing: enabled);
     await _prefs.setBool(_autoPanguSpacingKey, enabled);
+  }
+
+  Future<void> setDisplayPanguSpacing(bool enabled) async {
+    state = state.copyWith(displayPanguSpacing: enabled);
+    await _prefs.setBool(_displayPanguSpacingKey, enabled);
   }
 
   Future<void> setAnonymousShare(bool enabled) async {
