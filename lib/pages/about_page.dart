@@ -11,6 +11,7 @@ import '../services/toast_service.dart';
 import '../services/update_service.dart';
 import '../widgets/download_progress_dialog.dart';
 import '../widgets/update_dialog.dart';
+import 'app_logs_page.dart';
 
 class AboutPage extends StatefulWidget {
   const AboutPage({super.key});
@@ -299,6 +300,15 @@ class _AboutPageState extends State<AboutPage> {
             onTap: () => launchUrl(
               Uri.parse('https://github.com/Lingyan000/fluxdo'),
               mode: LaunchMode.externalApplication,
+            ),
+          ),
+          _buildListTile(
+            context,
+            icon: Icons.article_outlined,
+            title: '应用日志',
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const AppLogsPage()),
             ),
           ),
           _buildListTile(

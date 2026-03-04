@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:catcher_2/catcher_2.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -31,6 +33,8 @@ import 'services/update_checker_helper.dart';
 import 'services/deep_link_service.dart';
 import 'services/background/background_notification_service.dart';
 import 'services/message_bus_service.dart';
+import 'services/log/json_file_handler.dart';
+import 'services/log/logger_utils.dart';
 import 'models/user.dart';
 import 'constants.dart';
 
@@ -100,6 +104,9 @@ Future<void> main() async {
   // PreheatGate 中的 ensureLoaded() 会复用这个已在进行的请求
   PreloadedDataService().ensureLoaded().ignore();
 
+  // 清理过期日志（14 天前）
+  LoggerUtils.cleanExpiredLogs().ignore();
+
   // 注入 AI 模型管理包的消息提示实现
   AiToastDelegate.configure((message, {type = AiToastType.info}) {
     switch (type) {
@@ -112,17 +119,41 @@ Future<void> main() async {
     }
   });
 
-  runApp(ProviderScope(
-    // 禁用 Riverpod 3 默认的自动重试机制
-    // 默认会对所有失败的异步 provider 指数退避重试 10 次，
-    // 在网络不通时会造成大量无意义的重复请求
-    retry: (_, __) => null,
-    overrides: [
-      sharedPreferencesProvider.overrideWithValue(prefs),
-      aiSharedPreferencesProvider.overrideWithValue(prefs),
+  // 配置 Catcher2 全局异常捕获
+  final debugConfig = Catcher2Options(
+    SilentReportMode(),
+    [
+      ConsoleHandler(),
+      JsonFileHandler(),
     ],
-    child: const MainApp(),
-  ));
+    handlerTimeout: 10000,
+  );
+  final releaseConfig = Catcher2Options(
+    SilentReportMode(),
+    [
+      JsonFileHandler(),
+    ],
+    handlerTimeout: 10000,
+  );
+
+  Catcher2(
+    navigatorKey: navigatorKey,
+    rootWidget: ProviderScope(
+      // 禁用 Riverpod 3 默认的自动重试机制
+      // 默认会对所有失败的异步 provider 指数退避重试 10 次，
+      // 在网络不通时会造成大量无意义的重复请求
+      retry: (_, __) => null,
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(prefs),
+        aiSharedPreferencesProvider.overrideWithValue(prefs),
+      ],
+      child: const MainApp(),
+    ),
+    debugConfig: debugConfig,
+    releaseConfig: releaseConfig,
+    profileConfig: releaseConfig,
+    enableLogger: kDebugMode,
+  );
 }
 
 class MainApp extends ConsumerWidget {

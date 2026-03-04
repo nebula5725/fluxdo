@@ -10,6 +10,7 @@ import 'cookie/cookie_sync_service.dart';
 import 'interceptors/cf_challenge_interceptor.dart';
 import 'interceptors/cronet_fallback_interceptor.dart';
 import 'interceptors/error_interceptor.dart';
+import 'interceptors/network_log_interceptor.dart';
 import 'interceptors/redirect_interceptor.dart';
 import 'interceptors/request_header_interceptor.dart';
 
@@ -71,6 +72,9 @@ class DiscourseDio {
       dio: dio,
       cookieJarService: cookieJarService,
     ));
+
+    // 8. 网络日志拦截器（最后一个，记录最终结果）
+    dio.interceptors.add(NetworkLogInterceptor());
 
     return dio;
   }
