@@ -130,9 +130,6 @@ class TrustLevelSkeleton extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: colorScheme.outlineVariant.withValues(alpha: 0.3),
-        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

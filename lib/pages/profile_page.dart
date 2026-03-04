@@ -353,13 +353,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 return Column(
                   children: [
                     Card(
-                      elevation: 0,
-                      color: theme.colorScheme.surfaceContainerLow,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
-                        side: BorderSide(color: theme.colorScheme.outlineVariant.withValues(alpha: 0.2)),
                       ),
-                      margin: EdgeInsets.zero,
                       clipBehavior: Clip.antiAlias,
                       child: Column(
                         children: [
@@ -399,12 +395,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   
   Widget _buildError(ThemeData theme, String error) {
     return Card(
-      elevation: 0,
       color: theme.colorScheme.errorContainer.withValues(alpha:0.3),
-      margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: theme.colorScheme.error.withValues(alpha:0.2)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -426,14 +419,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   /// 社区表现 - 使用 Card 保持一致性
   Widget _buildStatsRow(ThemeData theme, UserSummary summary) {
     return Card(
-      elevation: 0,
-       // 使用 surfaceContainerLow 与其他列表卡片区分或一致，这里选择稍微突出一点
-      color: theme.colorScheme.surfaceContainerLow,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: theme.colorScheme.outlineVariant.withValues(alpha:0.2)),
       ),
-      margin: EdgeInsets.zero,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
         child: Row(
@@ -487,13 +475,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
   Widget _buildOptionsCard(ThemeData theme) {
     return Card(
-      elevation: 0,
-      color: theme.colorScheme.surfaceContainerLow,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: theme.colorScheme.outlineVariant.withValues(alpha:0.2)),
       ),
-      margin: EdgeInsets.zero,
       clipBehavior: Clip.antiAlias,
       child: Column(
         children: [
@@ -547,13 +531,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   
   Widget _buildAboutCard(ThemeData theme) {
     return Card(
-      elevation: 0,
-      color: theme.colorScheme.surfaceContainerLow,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: theme.colorScheme.outlineVariant.withValues(alpha:0.2)),
       ),
-      margin: EdgeInsets.zero,
       clipBehavior: Clip.antiAlias,
       child: Column(
         children: [

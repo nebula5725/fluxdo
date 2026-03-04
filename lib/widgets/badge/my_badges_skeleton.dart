@@ -108,9 +108,6 @@ class MyBadgesSkeleton extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
-        ),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

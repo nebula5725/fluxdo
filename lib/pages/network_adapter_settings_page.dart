@@ -76,11 +76,8 @@ class _NetworkAdapterSettingsPageState extends State<NetworkAdapterSettingsPage>
     final isNative = displayType == AdapterType.native;
 
     return Card(
-      elevation: 0,
-      color: theme.colorScheme.surfaceContainerLow,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: theme.colorScheme.outlineVariant.withValues(alpha:0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -123,11 +120,8 @@ class _NetworkAdapterSettingsPageState extends State<NetworkAdapterSettingsPage>
 
   Widget _buildControlCard(ThemeData theme, bool forceFallback, CronetFallbackService fallbackService) {
     return Card(
-      elevation: 0,
-      color: theme.colorScheme.surfaceContainerLow,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: theme.colorScheme.outlineVariant.withValues(alpha:0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -167,11 +161,9 @@ class _NetworkAdapterSettingsPageState extends State<NetworkAdapterSettingsPage>
 
   Widget _buildFallbackStatusCard(ThemeData theme, String? failureReason, CronetFallbackService fallbackService) {
     return Card(
-      elevation: 0,
       color: theme.colorScheme.errorContainer.withValues(alpha:0.3),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: theme.colorScheme.error.withValues(alpha:0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -222,11 +214,9 @@ class _NetworkAdapterSettingsPageState extends State<NetworkAdapterSettingsPage>
 
   Widget _buildTestCard(ThemeData theme, CronetFallbackService fallbackService) {
     return Card(
-      elevation: 0,
       color: theme.colorScheme.tertiaryContainer.withValues(alpha:0.3),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: theme.colorScheme.tertiary.withValues(alpha:0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

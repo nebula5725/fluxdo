@@ -261,12 +261,9 @@ class _MetaversePageState extends ConsumerState<MetaversePage> {
 
     // 未开启状态：展示连接卡片
     return Card(
-      elevation: 0,
       color: theme.colorScheme.surfaceContainerHigh,
-      margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(24),
-        side: BorderSide(color: theme.colorScheme.outlineVariant.withValues(alpha: 0.2)),
       ),
       child: InkWell(
         onTap: _ldcProcessing ? null : () => _toggleLdc(true),
@@ -342,12 +339,9 @@ class _MetaversePageState extends ConsumerState<MetaversePage> {
 
     // 未开启状态：展示连接卡片
     return Card(
-      elevation: 0,
       color: theme.colorScheme.surfaceContainerHigh,
-      margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(24),
-        side: BorderSide(color: theme.colorScheme.outlineVariant.withValues(alpha: 0.2)),
       ),
       child: InkWell(
         onTap: _cdkProcessing ? null : () => _toggleCdk(true),
@@ -415,15 +409,9 @@ class _MetaversePageState extends ConsumerState<MetaversePage> {
 
   Widget _buildComingSoonItem(ThemeData theme) {
     return Card(
-      elevation: 0,
       color: theme.colorScheme.surfaceContainerLow.withValues(alpha: 0.5),
-      margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(
-          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.2),
-          style: BorderStyle.solid
-        ),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),

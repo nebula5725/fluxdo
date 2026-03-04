@@ -221,10 +221,26 @@ class MainApp extends ConsumerWidget {
           theme: ThemeData(
             colorScheme: lightScheme,
             useMaterial3: true,
+            cardTheme: CardThemeData(
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              color: lightScheme.surfaceContainerLow,
+              margin: EdgeInsets.zero,
+            ),
           ),
           darkTheme: ThemeData(
             colorScheme: darkScheme,
             useMaterial3: true,
+            cardTheme: CardThemeData(
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              color: darkScheme.surfaceContainerLow,
+              margin: EdgeInsets.zero,
+            ),
           ),
           builder: (context, child) {
             final brightness = Theme.of(context).brightness;

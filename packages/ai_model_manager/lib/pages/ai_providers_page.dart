@@ -125,14 +125,9 @@ class _ProviderCard extends StatelessWidget {
     final totalCount = provider.models.length;
 
     return Card(
-      elevation: 0,
-      color: theme.colorScheme.surfaceContainerLow,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(
-            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.2)),
       ),
-      margin: EdgeInsets.zero,
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,

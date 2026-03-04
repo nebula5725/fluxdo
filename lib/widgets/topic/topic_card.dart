@@ -57,16 +57,12 @@ class TopicCard extends ConsumerWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       clipBehavior: Clip.antiAlias,
-      elevation: 0,
       color: isSelected ? theme.colorScheme.primaryContainer.withValues(alpha: 0.4) : null,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
-        side: BorderSide(
-          color: isSelected
-              ? theme.colorScheme.primary.withValues(alpha: 0.5)
-              : theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
-          width: 1,
-        ),
+        side: isSelected
+            ? BorderSide(color: theme.colorScheme.primary.withValues(alpha: 0.5))
+            : BorderSide.none,
       ),
       child: InkWell(
         onTap: onTap,
@@ -380,18 +376,14 @@ class CompactTopicCard extends ConsumerWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 6),
       clipBehavior: Clip.antiAlias,
-      elevation: 0,
       color: isSelected
           ? theme.colorScheme.primaryContainer.withValues(alpha: 0.4)
           : theme.colorScheme.surfaceContainerLow.withValues(alpha: 0.5),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
-        side: BorderSide(
-          color: isSelected
-              ? theme.colorScheme.primary.withValues(alpha: 0.5)
-              : theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
-          width: 1,
-        ),
+        side: isSelected
+            ? BorderSide(color: theme.colorScheme.primary.withValues(alpha: 0.5))
+            : BorderSide.none,
       ),
       child: InkWell(
         onTap: onTap,

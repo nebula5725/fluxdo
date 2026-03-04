@@ -1452,14 +1452,6 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
   Widget _buildSummaryTopicItem(ThemeData theme, SummaryTopic topic) {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
-      elevation: 0,
-      color: theme.colorScheme.surfaceContainerLow,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(
-          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
-        ),
-      ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () => Navigator.push(
@@ -1506,14 +1498,6 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
-      elevation: 0,
-      color: theme.colorScheme.surfaceContainerLow,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(
-          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
-        ),
-      ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: targetTopicId != null
@@ -1562,14 +1546,6 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
   Widget _buildSummaryLinkItem(ThemeData theme, SummaryLink link) {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
-      elevation: 0,
-      color: theme.colorScheme.surfaceContainerLow,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(
-          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
-        ),
-      ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () {
@@ -1653,9 +1629,6 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
           decoration: BoxDecoration(
             color: theme.colorScheme.surfaceContainerLow,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
-            ),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -1702,14 +1675,6 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
-      elevation: 0,
-      color: theme.colorScheme.surfaceContainerLow,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(
-          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
-        ),
-      ),
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Row(
@@ -1855,13 +1820,8 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      elevation: 0,
-      color: theme.colorScheme.surfaceContainerLow,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(
-          color: theme.colorScheme.outlineVariant.withValues(alpha:0.5),
-        ),
       ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -1950,13 +1910,8 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      elevation: 0,
-      color: theme.colorScheme.surfaceContainerLow,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(
-          color: theme.colorScheme.outlineVariant.withValues(alpha:0.5),
-        ),
       ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(

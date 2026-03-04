@@ -47,13 +47,9 @@ class AppearancePage extends ConsumerWidget {
           _buildSectionHeader(theme, '阅读', Icons.chrome_reader_mode_outlined),
           const SizedBox(height: 16),
           Card(
-            elevation: 0,
-            color: theme.colorScheme.surfaceContainerLow,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
-              side: BorderSide(color: theme.colorScheme.outlineVariant.withValues(alpha:0.2)),
             ),
-            margin: EdgeInsets.zero,
             clipBehavior: Clip.antiAlias,
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -131,13 +127,9 @@ class AppearancePage extends ConsumerWidget {
           ),
           const SizedBox(height: 12),
           Card(
-            elevation: 0,
-            color: theme.colorScheme.surfaceContainerLow,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
-              side: BorderSide(color: theme.colorScheme.outlineVariant.withValues(alpha:0.2)),
             ),
-            margin: EdgeInsets.zero,
             clipBehavior: Clip.antiAlias,
             child: SwitchListTile(
               title: const Text('阅读混排优化'),

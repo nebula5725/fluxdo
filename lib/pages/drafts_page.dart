@@ -241,15 +241,7 @@ class _DraftCard extends StatelessWidget {
     final content = data.reply;
 
     return Card(
-      elevation: 0,
       margin: const EdgeInsets.only(bottom: 8),
-      color: theme.colorScheme.surfaceContainerLow,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(
-          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.2),
-        ),
-      ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
@@ -362,18 +354,8 @@ class _DraftCardSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Card(
-      elevation: 0,
       margin: const EdgeInsets.only(bottom: 8),
-      color: theme.colorScheme.surfaceContainerLow,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(
-          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.2),
-        ),
-      ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

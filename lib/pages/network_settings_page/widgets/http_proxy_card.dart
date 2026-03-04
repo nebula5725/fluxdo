@@ -23,17 +23,14 @@ class HttpProxyCard extends StatelessWidget {
 
     return Card(
       clipBehavior: Clip.antiAlias,
-      elevation: 0,
       color: proxySettings.enabled
           ? theme.colorScheme.tertiaryContainer.withValues(alpha: 0.3)
-          : theme.colorScheme.surfaceContainerLow,
+          : null,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(
-          color: proxySettings.enabled
-              ? theme.colorScheme.tertiary.withValues(alpha: 0.3)
-              : theme.colorScheme.outlineVariant.withValues(alpha: 0.2),
-        ),
+        side: proxySettings.enabled
+            ? BorderSide(color: theme.colorScheme.tertiary.withValues(alpha: 0.3))
+            : BorderSide.none,
       ),
       child: Column(
         children: [

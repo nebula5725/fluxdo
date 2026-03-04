@@ -91,15 +91,7 @@ class _FollowListPageState extends ConsumerState<FollowListPage> {
                           final user = _users![index];
                           return Card(
                             margin: const EdgeInsets.only(bottom: 12),
-                            elevation: 0,
-                            color: theme.colorScheme.surfaceContainerLow,
                             clipBehavior: Clip.antiAlias,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              side: BorderSide(
-                                color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
-                              ),
-                            ),
                             child: ListTile(
                               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                               leading: SmartAvatar(

@@ -41,17 +41,14 @@ class _DohSettingsCardState extends State<DohSettingsCard> {
 
     return Card(
       clipBehavior: Clip.antiAlias,
-      elevation: 0,
       color: settings.dohEnabled
           ? theme.colorScheme.primaryContainer.withValues(alpha: 0.3)
-          : theme.colorScheme.surfaceContainerLow,
+          : null,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(
-          color: settings.dohEnabled
-              ? theme.colorScheme.primary.withValues(alpha: 0.3)
-              : theme.colorScheme.outlineVariant.withValues(alpha: 0.2),
-        ),
+        side: settings.dohEnabled
+            ? BorderSide(color: theme.colorScheme.primary.withValues(alpha: 0.3))
+            : BorderSide.none,
       ),
       child: Column(
         children: [

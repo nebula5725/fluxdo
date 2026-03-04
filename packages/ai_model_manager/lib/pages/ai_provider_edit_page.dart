@@ -340,14 +340,9 @@ class _AiProviderEditPageState extends ConsumerState<AiProviderEditPage> {
 
   Widget _buildBasicConfigCard(ThemeData theme) {
     return Card(
-      elevation: 0,
-      color: theme.colorScheme.surfaceContainerLow,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(
-            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.2)),
       ),
-      margin: EdgeInsets.zero,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -467,14 +462,9 @@ class _AiProviderEditPageState extends ConsumerState<AiProviderEditPage> {
 
   Widget _buildModelsCard(ThemeData theme) {
     return Card(
-      elevation: 0,
-      color: theme.colorScheme.surfaceContainerLow,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(
-            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.2)),
       ),
-      margin: EdgeInsets.zero,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
