@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+
 import 'log_writer.dart';
 
 /// 日志文件管理工具
@@ -13,10 +16,125 @@ class LoggerUtils {
   /// 获取日志文件
   static Future<File> getLogFile() => LogWriter.getLogFile();
 
-  /// 获取日志文件路径（用于分享文件）
-  static Future<String> getLogFilePath() async {
-    final file = await getLogFile();
-    return file.path;
+  /// 生成带设备/APP 头信息的分享文件，返回临时文件路径
+  static Future<String> getShareFilePath() async {
+    final header = await _buildShareHeader();
+    final logFile = await getLogFile();
+    final logContent =
+        logFile.existsSync() ? await logFile.readAsString() : '';
+
+    final dir = logFile.parent;
+    final shareFile = File('${dir.path}/app_log_share.jsonl');
+    await shareFile.writeAsString('$header$logContent');
+    return shareFile.path;
+  }
+
+  /// 获取人类可读的设备和应用信息文本（用于复制）
+  static Future<String> getDeviceInfoText() async {
+    final buf = StringBuffer();
+
+    try {
+      final pkg = await PackageInfo.fromPlatform();
+      buf.writeln('应用: ${pkg.appName}');
+      buf.writeln('版本: ${pkg.version} (${pkg.buildNumber})');
+      buf.writeln('包名: ${pkg.packageName}');
+    } catch (_) {}
+
+    try {
+      final deviceInfo = DeviceInfoPlugin();
+      if (Platform.isAndroid) {
+        final info = await deviceInfo.androidInfo;
+        buf.writeln('平台: Android ${info.version.release} (SDK ${info.version.sdkInt})');
+        buf.writeln('设备: ${info.brand} ${info.model}');
+      } else if (Platform.isIOS) {
+        final info = await deviceInfo.iosInfo;
+        buf.writeln('平台: iOS ${info.systemVersion}');
+        buf.writeln('设备: ${info.utsname.machine}');
+      } else if (Platform.isMacOS) {
+        final info = await deviceInfo.macOsInfo;
+        buf.writeln('平台: macOS ${info.majorVersion}.${info.minorVersion}.${info.patchVersion}');
+        buf.writeln('设备: ${info.model} (${info.arch})');
+      } else if (Platform.isLinux) {
+        final info = await deviceInfo.linuxInfo;
+        buf.writeln('平台: ${info.prettyName}');
+      } else if (Platform.isWindows) {
+        final info = await deviceInfo.windowsInfo;
+        buf.writeln('平台: Windows (${info.buildNumber})');
+        buf.writeln('设备: ${info.computerName}');
+      }
+    } catch (_) {}
+
+    return buf.toString().trimRight();
+  }
+
+  /// 构建分享文件头部的设备和应用信息（JSONL 格式）
+  static Future<String> _buildShareHeader() async {
+    final buf = StringBuffer();
+
+    try {
+      final pkg = await PackageInfo.fromPlatform();
+      buf.writeln(jsonEncode({
+        '_header': 'app_info',
+        'appName': pkg.appName,
+        'version': pkg.version,
+        'buildNumber': pkg.buildNumber,
+        'packageName': pkg.packageName,
+      }));
+    } catch (_) {}
+
+    try {
+      final deviceInfo = DeviceInfoPlugin();
+      Map<String, dynamic> device;
+      if (Platform.isAndroid) {
+        final info = await deviceInfo.androidInfo;
+        device = {
+          '_header': 'device_info',
+          'platform': 'Android',
+          'brand': info.brand,
+          'model': info.model,
+          'sdkInt': info.version.sdkInt,
+          'release': info.version.release,
+        };
+      } else if (Platform.isIOS) {
+        final info = await deviceInfo.iosInfo;
+        device = {
+          '_header': 'device_info',
+          'platform': 'iOS',
+          'model': info.utsname.machine,
+          'systemVersion': info.systemVersion,
+        };
+      } else if (Platform.isMacOS) {
+        final info = await deviceInfo.macOsInfo;
+        device = {
+          '_header': 'device_info',
+          'platform': 'macOS',
+          'model': info.model,
+          'osVersion':
+              '${info.majorVersion}.${info.minorVersion}.${info.patchVersion}',
+          'arch': info.arch,
+        };
+      } else if (Platform.isLinux) {
+        final info = await deviceInfo.linuxInfo;
+        device = {
+          '_header': 'device_info',
+          'platform': 'Linux',
+          'prettyName': info.prettyName,
+        };
+      } else if (Platform.isWindows) {
+        final info = await deviceInfo.windowsInfo;
+        device = {
+          '_header': 'device_info',
+          'platform': 'Windows',
+          'computerName': info.computerName,
+          'buildNumber': info.buildNumber,
+        };
+      } else {
+        device = {'_header': 'device_info', 'platform': Platform.operatingSystem};
+      }
+      buf.writeln(jsonEncode(device));
+    } catch (_) {}
+
+    return buf.toString();
   }
 
   /// 读取并解析 JSONL，逆序返回（最新在前）

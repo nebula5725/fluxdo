@@ -49,6 +49,12 @@ class _AppLogsPageState extends State<AppLogsPage> {
     }
   }
 
+  Future<void> _copyDeviceInfo() async {
+    final text = await LoggerUtils.getDeviceInfoText();
+    await Clipboard.setData(ClipboardData(text: text));
+    ToastService.showSuccess('已复制到剪贴板');
+  }
+
   Future<void> _copyAll() async {
     final content = await LoggerUtils.readLogContent();
     if (content.trim().isEmpty) {
@@ -60,7 +66,7 @@ class _AppLogsPageState extends State<AppLogsPage> {
   }
 
   Future<void> _shareLog() async {
-    final path = await LoggerUtils.getLogFilePath();
+    final path = await LoggerUtils.getShareFilePath();
     await SharePlus.instance.share(
       ShareParams(files: [XFile(path)], subject: '应用日志'),
     );
@@ -368,6 +374,8 @@ class _AppLogsPageState extends State<AppLogsPage> {
           PopupMenuButton<String>(
             onSelected: (value) {
               switch (value) {
+                case 'deviceInfo':
+                  _copyDeviceInfo();
                 case 'copy':
                   _copyAll();
                 case 'share':
@@ -377,6 +385,15 @@ class _AppLogsPageState extends State<AppLogsPage> {
               }
             },
             itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'deviceInfo',
+                child: ListTile(
+                  leading: Icon(Icons.smartphone),
+                  title: Text('复制设备信息'),
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
               const PopupMenuItem(
                 value: 'copy',
                 child: ListTile(
