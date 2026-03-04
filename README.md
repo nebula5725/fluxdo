@@ -7,6 +7,8 @@
 
 FluxDO 是为 [Linux.do](https://linux.do/) 社区打造的现代化移动和桌面客户端，基于 Flutter 开发，致力于为用户提供流畅、优雅的论坛浏览体验。
 
+![FluxDO 预览](screenshots/preview.png)
+
 ## 特性
 
 ### 核心功能
