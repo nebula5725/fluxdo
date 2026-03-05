@@ -157,8 +157,22 @@ class _TopicsScreenState extends ConsumerState<TopicsScreen> {
     if (topicId != null && context.mounted) {
       // 刷新当前 tab 的列表
       ref.invalidate(topicListProvider(null));
-      // 在 Master-Detail 模式下，选中新话题
-      ref.read(selectedTopicProvider.notifier).select(topicId: topicId);
+
+      final canShowDetailPane = MasterDetailLayout.canShowBothPanesFor(context);
+      if (canShowDetailPane) {
+        // 双栏模式：选中新话题，在右侧详情面板显示
+        ref.read(selectedTopicProvider.notifier).select(topicId: topicId);
+      } else {
+        // 单栏模式：push 全屏详情页查看新话题
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => TopicDetailPage(
+              topicId: topicId,
+              autoSwitchToMasterDetail: true,
+            ),
+          ),
+        );
+      }
     }
   }
 }
