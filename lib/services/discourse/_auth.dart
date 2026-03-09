@@ -138,7 +138,13 @@ mixin _AuthMixin on _DiscourseServiceBase {
     return true;
   }
 
-  /// 登录成功后更新内存状态并通知监听者。
+  /// 仅设置 token，不触发状态广播（登录流程中先设置 token，等数据就绪后再广播）
+  void setToken(String tToken) {
+    _tToken = tToken;
+    _credentialsLoaded = false;
+  }
+
+  /// 登录成功后通知监听者（应在预加载数据就绪后调用）
   /// Cookie 写入由 syncFromWebView() 统一处理。
   void onLoginSuccess(String tToken) {
     _tToken = tToken;
@@ -154,6 +160,14 @@ mixin _AuthMixin on _DiscourseServiceBase {
 
   /// 登出
   Future<void> logout({bool callApi = true, bool refreshPreload = true}) async {
+    // ===== 第一步：切断所有旧请求 =====
+    AuthSession().advance();
+
+    // ===== 第二步：主动停止后台 Service =====
+    MessageBusService().stopAll();
+    CfClearanceRefreshService().stop();
+
+    // ===== 第三步：调用登出 API（可选，用新的 generation） =====
     if (callApi) {
       final usernameForLogout = _username ?? await _storage.read(key: DiscourseService._usernameKey);
       try {
@@ -165,27 +179,31 @@ mixin _AuthMixin on _DiscourseServiceBase {
       }
     }
 
+    // ===== 第四步：清除内存状态 =====
     _tToken = null;
     _username = null;
     _cachedUserSummary = null;
     _cachedUserSummaryUsername = null;
     _userSummaryCacheTime = null;
     await _storage.delete(key: DiscourseService._usernameKey);
-    currentUserNotifier.value = null;
-    await _cookieSync.reset();
     _credentialsLoaded = false;
 
-    PreloadedDataService().reset();
-    // 保留 cf_clearance 避免清除 cookie 后触发 Cloudflare 盾
+    // ===== 第五步：清除 Cookie（保留 cf_clearance）=====
+    await _cookieSync.reset();
     final cfClearanceCookie = await _cookieJar.getCfClearanceCookie();
     await _cookieJar.clearAll();
     if (cfClearanceCookie != null) {
       await _cookieJar.restoreCfClearance(cfClearanceCookie);
     }
 
+    // ===== 第六步：刷新预加载数据（确保新状态就绪后再广播）=====
+    PreloadedDataService().reset();
     if (refreshPreload) {
       await PreloadedDataService().refresh();
     }
+
+    // ===== 第七步：广播状态变更（此时一切已就绪）=====
+    currentUserNotifier.value = null;
     _authStateController.add(null);
   }
 }

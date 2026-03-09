@@ -20,6 +20,43 @@ class CfChallengeInterceptor extends Interceptor {
   final Dio dio;
   final CookieJarService cookieJarService;
 
+  /// 共享的 cookie 同步 Future：验证成功后只执行一次 sync
+  static Future<bool>? _activeSyncFuture;
+
+  /// 验证成功后的共享 Cookie 同步（只执行一次）
+  Future<bool> _syncCookiesOnce() async {
+    // 如果已有同步任务在进行，复用结果
+    if (_activeSyncFuture != null) return _activeSyncFuture!;
+
+    _activeSyncFuture = _doSync();
+    try {
+      return await _activeSyncFuture!;
+    } finally {
+      _activeSyncFuture = null;
+    }
+  }
+
+  Future<bool> _doSync() async {
+    await Future.delayed(const Duration(milliseconds: 1500));
+    await cookieJarService.syncFromWebView();
+
+    String? cfClearance;
+    for (var i = 0; i < 3; i++) {
+      cfClearance = await cookieJarService.getCfClearance();
+      if (cfClearance != null && cfClearance.isNotEmpty) break;
+      debugPrint('[Dio] cf_clearance not found, retry ${i + 1}/3...');
+      await Future.delayed(const Duration(milliseconds: 500));
+      await cookieJarService.syncFromWebView();
+    }
+
+    if (cfClearance == null || cfClearance.isEmpty) {
+      CfChallengeLogger.log('[INTERCEPTOR] cf_clearance not found after sync');
+      return false;
+    }
+    CfChallengeLogger.log('[INTERCEPTOR] cf_clearance verified: ${cfClearance.length} chars');
+    return true;
+  }
+
   @override
   Future<void> onError(
     DioException err,
@@ -58,37 +95,20 @@ class CfChallengeInterceptor extends Interceptor {
       final isSilent = err.requestOptions.extra['isSilent'] == true;
       // 默认为前台强制验证，除非明确标记为静默
       final forceForeground = !isSilent;
-      
+
       final result = await cfService.showManualVerify(null, forceForeground);
 
       if (result == true) {
-        // 等待 Cookie 从 WebView 引擎 flush 到系统 HTTPCookieStorage
-        // iOS/macOS 的 WKWebView 异步写入，需要足够时间
-        await Future.delayed(const Duration(milliseconds: 1500));
-
-        // CF 验证成功后从 WebView 同步 Cookie 回 CookieJar
-        await cookieJarService.syncFromWebView();
-
-        // 验证 cf_clearance 是否真的保存成功，最多重试 3 次
-        String? cfClearance;
-        for (var i = 0; i < 3; i++) {
-          cfClearance = await cookieJarService.getCfClearance();
-          if (cfClearance != null && cfClearance.isNotEmpty) break;
-          debugPrint('[Dio] cf_clearance not found, retry ${i + 1}/3...');
-          await Future.delayed(const Duration(milliseconds: 500));
-          await cookieJarService.syncFromWebView();
-        }
-
-        if (cfClearance == null || cfClearance.isEmpty) {
+        // 共享 cookie 同步（多个 403 请求只执行一次）
+        final syncOk = await _syncCookiesOnce();
+        if (!syncOk) {
           debugPrint('[Dio] cf_clearance not found after sync, entering cooldown');
-          CfChallengeLogger.log('[INTERCEPTOR] cf_clearance not found after sync');
           cfService.startCooldown();
           CfChallengeService.showGlobalMessage('验证未生效，请稍后重试');
           throw CfChallengeException();
         }
-        CfChallengeLogger.log('[INTERCEPTOR] cf_clearance verified: ${cfClearance.length} chars');
 
-        // 重试请求，并标记跳过 CF 验证拦截（防止循环）
+        // 各自重试自己的原始请求（每个请求 URL/参数不同，无法共享）
         try {
           final retryOptions = err.requestOptions;
           retryOptions.extra['skipCfChallenge'] = true;
@@ -109,9 +129,7 @@ class CfChallengeInterceptor extends Interceptor {
             success: false,
             error: e.toString(),
           );
-          // 重试仍然失败，说明验证可能没有真正成功，进入冷却期
-          cfService.startCooldown();
-          CfChallengeService.showGlobalMessage('验证后请求失败，请稍后重试');
+          // 重试失败不再 startCooldown，cookie 已验证有效，失败是其他原因
           throw CfChallengeException();
         }
       } else if (result == null) {
