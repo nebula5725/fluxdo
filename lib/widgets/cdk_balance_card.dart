@@ -619,10 +619,9 @@ class CdkBalanceCard extends ConsumerWidget {
                     ),
                   ),
                 ),
-                const SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2),
+                LoadingSpinner(
+                  size: 16,
+                  color: theme.colorScheme.tertiary,
                 ),
               ],
             ),
@@ -673,10 +672,9 @@ class CdkBalanceCard extends ConsumerWidget {
                 ),
               ),
               const Spacer(),
-              const SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(strokeWidth: 2),
+              LoadingSpinner(
+                size: 16,
+                color: theme.colorScheme.tertiary,
               ),
             ],
           ),
@@ -720,11 +718,7 @@ class CdkBalanceCard extends ConsumerWidget {
                 ),
               ),
             ),
-            const SizedBox(
-              width: 16,
-              height: 16,
-              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-            ),
+            const LoadingSpinner(size: 16, color: Colors.white),
           ],
         ),
       ),
