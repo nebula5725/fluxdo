@@ -102,6 +102,22 @@ class ExtendedImageSlidePageHandlerState
     _extendedImageSlidePageState?.resetIfNeeded();
   }
 
+  @override
+  void dispose() {
+    // 如果正在驱动滑动关闭时被销毁（如图片加载完成导致 widget 树重建），
+    // 需要通知 SlidePageState 结束滑动，避免页面卡在中间位置
+    if (_extendedImageSlidePageState != null &&
+        _extendedImageSlidePageState!.isSliding) {
+      final slidePageState = _extendedImageSlidePageState!;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (slidePageState.mounted && slidePageState.isSliding) {
+          slidePageState.endSlide(ScaleEndDetails());
+        }
+      });
+    }
+    super.dispose();
+  }
+
   void slide() {
     if (mounted) {
       setState(() {});

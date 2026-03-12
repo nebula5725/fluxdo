@@ -159,6 +159,19 @@ class ExtendedImageGestureState extends State<ExtendedImageGesture>
     _gestureAnimation.stop();
     _gestureAnimation.dispose();
     _pageViewState?.extendedImageGestureStates.remove(this);
+
+    // 如果正在驱动滑动关闭时被销毁（如图片加载状态变化导致 widget 树重建），
+    // 需要通知 SlidePageState 结束滑动，避免页面卡在中间位置
+    if (extendedImageSlidePageState != null &&
+        extendedImageSlidePageState!.isSliding) {
+      final slidePageState = extendedImageSlidePageState!;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (slidePageState.mounted && slidePageState.isSliding) {
+          slidePageState.endSlide(ScaleEndDetails());
+        }
+      });
+    }
+
     super.dispose();
   }
 
