@@ -289,3 +289,68 @@ jobs:
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update AltStore Source
+        if: env.IS_STABLE == 'true'
+        run: |
+          VERSION="${GITHUB_REF#refs/tags/v}"
+          VERSION_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          DOWNLOAD_URL="https://github.com/lingyan000/fluxdo/releases/download/v${VERSION}/fluxdo-unsigned.ipa"
+          IPA_SIZE=$(stat -c%s "./dist/fluxdo-unsigned.ipa" 2>/dev/null || stat -f%z "./dist/fluxdo-unsigned.ipa")
+          VERSION_DESC=$(cat release_notes.md | head -50)
+
+          # 尝试从 gh-pages 获取已有的 source.json（保留历史版本）
+          EXISTING_SOURCE=""
+          if git fetch origin gh-pages 2>/dev/null; then
+            EXISTING_SOURCE=$(git show origin/gh-pages:source.json 2>/dev/null || echo "")
+          fi
+
+          if [ -n "$EXISTING_SOURCE" ]; then
+            # 基于已有的 source.json，追加新版本
+            echo "$EXISTING_SOURCE" | jq \
+              --arg ver "$VERSION" \
+              --arg date "$VERSION_DATE" \
+              --arg url "$DOWNLOAD_URL" \
+              --argjson size "$IPA_SIZE" \
+              --arg desc "$VERSION_DESC" \
+              '.apps[0].versions = [{
+                "version": $ver,
+                "date": $date,
+                "downloadURL": $url,
+                "size": $size,
+                "localizedDescription": $desc
+              }] + [.apps[0].versions[] | select(.version != $ver)]' \
+              > altstore/source.json
+          else
+            # 首次生成，基于模板
+            jq \
+              --arg ver "$VERSION" \
+              --arg date "$VERSION_DATE" \
+              --arg url "$DOWNLOAD_URL" \
+              --argjson size "$IPA_SIZE" \
+              --arg desc "$VERSION_DESC" \
+              '.apps[0].versions = [{
+                "version": $ver,
+                "date": $date,
+                "downloadURL": $url,
+                "size": $size,
+                "localizedDescription": $desc
+              }]' \
+              altstore/source.json > altstore/source_tmp.json
+            mv altstore/source_tmp.json altstore/source.json
+          fi
+
+      - name: Prepare GitHub Pages
+        if: env.IS_STABLE == 'true'
+        run: |
+          mkdir -p gh-pages-deploy
+          cp altstore/source.json gh-pages-deploy/
+          cp ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-1024x1024@1x.png gh-pages-deploy/icon.png
+
+      - name: Deploy to GitHub Pages
+        if: env.IS_STABLE == 'true'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./gh-pages-deploy
+          keep_files: false
