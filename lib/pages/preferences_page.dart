@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/preferences_provider.dart';
+import '../providers/sticker_provider.dart';
+import '../services/sticker_market_service.dart';
 
 class PreferencesPage extends ConsumerWidget {
   const PreferencesPage({super.key});
@@ -132,19 +134,42 @@ class PreferencesPage extends ConsumerWidget {
               borderRadius: BorderRadius.circular(16),
             ),
             clipBehavior: Clip.antiAlias,
-            child: SwitchListTile(
-              title: const Text('自动混排优化'),
-              subtitle: const Text('输入时自动插入中英文混排空格'),
-              secondary: Icon(
-                Icons.auto_fix_high_rounded,
-                color: preferences.autoPanguSpacing
-                    ? theme.colorScheme.primary
-                    : theme.colorScheme.onSurfaceVariant,
-              ),
-              value: preferences.autoPanguSpacing,
-              onChanged: (value) {
-                ref.read(preferencesProvider.notifier).setAutoPanguSpacing(value);
-              },
+            child: Column(
+              children: [
+                SwitchListTile(
+                  title: const Text('自动混排优化'),
+                  subtitle: const Text('输入时自动插入中英文混排空格'),
+                  secondary: Icon(
+                    Icons.auto_fix_high_rounded,
+                    color: preferences.autoPanguSpacing
+                        ? theme.colorScheme.primary
+                        : theme.colorScheme.onSurfaceVariant,
+                  ),
+                  value: preferences.autoPanguSpacing,
+                  onChanged: (value) {
+                    ref.read(preferencesProvider.notifier).setAutoPanguSpacing(value);
+                  },
+                ),
+                Divider(height: 1, indent: 56, color: theme.colorScheme.outlineVariant.withValues(alpha:0.3)),
+                ListTile(
+                  leading: Icon(
+                    Icons.collections_outlined,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                  title: const Text('表情包数据源'),
+                  subtitle: Text(
+                    ref.watch(stickerMarketServiceProvider).baseUrl,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  trailing: Icon(Icons.chevron_right, color: theme.colorScheme.onSurfaceVariant),
+                  onTap: () => _showStickerBaseUrlDialog(context, ref),
+                ),
+              ],
             ),
           ),
           if (Platform.isAndroid) ...[
@@ -203,6 +228,59 @@ class PreferencesPage extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  void _showStickerBaseUrlDialog(BuildContext context, WidgetRef ref) {
+    final service = ref.read(stickerMarketServiceProvider);
+    final controller = TextEditingController(text: service.baseUrl);
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('表情包数据源'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: controller,
+              decoration: const InputDecoration(
+                hintText: '输入 URL',
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.url,
+              autofocus: true,
+            ),
+            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: () {
+                  controller.text = StickerMarketService.defaultBaseUrl;
+                },
+                child: const Text('恢复默认'),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('取消'),
+          ),
+          FilledButton(
+            onPressed: () async {
+              final url = controller.text.trim();
+              if (url.isNotEmpty) {
+                await service.setBaseUrl(url);
+                ref.invalidate(stickerGroupsProvider);
+              }
+              if (dialogContext.mounted) Navigator.pop(dialogContext);
+            },
+            child: const Text('确定'),
+          ),
+        ],
+      ),
+    ).then((_) => controller.dispose());
   }
 
   Widget _buildSectionHeader(ThemeData theme, String title) {

@@ -60,6 +60,7 @@ class CookieSyncService {
           'skipCsrf': true,
           'skipAuthCheck': true,
           'isSilent': true,
+          'skipScheduler': true, // 绕过并发调度，避免与调用方的并发槽位死锁
         }),
       );
       final csrf = (response.data as Map<String, dynamic>?)?['csrf'] as String?;

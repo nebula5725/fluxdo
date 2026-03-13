@@ -134,7 +134,7 @@ class EmojiCacheManager extends CacheManager with ImageCacheManager {
     Config(
       key,
       stalePeriod: const Duration(days: 30), // emoji 很少变化，长期缓存
-      maxNrOfCacheObjects: 500,
+      maxNrOfCacheObjects: 5000,
       repo: JsonCacheInfoRepository(databaseName: key),
       fileService: HttpFileService(httpClient: DioHttpClient()),
     ),

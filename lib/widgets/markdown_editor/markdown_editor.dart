@@ -14,7 +14,7 @@ import 'package:super_clipboard/super_clipboard.dart';
 import '../../providers/preferences_provider.dart';
 import '../../services/emoji_handler.dart';
 import '../mention/mention_autocomplete.dart';
-import 'emoji_picker.dart';
+import 'emoji_sticker_panel.dart';
 import 'markdown_renderer.dart';
 import 'markdown_toolbar.dart';
 import 'package:pangutext/pangutext.dart';
@@ -568,7 +568,7 @@ class MarkdownEditorState extends ConsumerState<MarkdownEditor> {
     return TextFieldTapRegion(
       child: SizedBox(
         height: height,
-        child: EmojiPicker(
+        child: EmojiStickerPanel(
           onEmojiSelected: (emoji) {
             // 确保编辑器有焦点（搜索弹窗关闭后焦点可能丢失）
             if (!_focusNode.hasFocus) {
@@ -578,6 +578,16 @@ class MarkdownEditorState extends ConsumerState<MarkdownEditor> {
               });
             } else {
               _toolbarKey.currentState?.insertText(':${emoji.name}:');
+            }
+          },
+          onStickerSelected: (markdown) {
+            if (!_focusNode.hasFocus) {
+              _focusNode.requestFocus();
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                _toolbarKey.currentState?.insertText(markdown);
+              });
+            } else {
+              _toolbarKey.currentState?.insertText(markdown);
             }
           },
         ),

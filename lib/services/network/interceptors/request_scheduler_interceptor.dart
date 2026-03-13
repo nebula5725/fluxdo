@@ -156,6 +156,12 @@ class RequestSchedulerInterceptor extends Interceptor {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
+    // 内部请求（如 CSRF 刷新）跳过调度，避免与调用方死锁
+    if (options.extra['skipScheduler'] == true) {
+      handler.next(options);
+      return;
+    }
+
     final priority = _inferPriority(options);
 
     // cancelToken 已取消，直接拒绝
