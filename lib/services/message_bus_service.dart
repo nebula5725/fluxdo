@@ -255,9 +255,8 @@ class MessageBusService {
         if (_sharedSessionKey != null) {
           extraHeaders['X-Shared-Session-Key'] = _sharedSessionKey;
         }
-        if (_baseUrl != null) {
-          extraHeaders['X-Silence-Logger'] = 'true';
-        }
+        extraHeaders['X-SILENCE-LOGGER'] = 'true';
+        extraHeaders['Discourse-Background'] = 'true';
 
         final response = await _dio.post<ResponseBody>(
           '/message-bus/$_clientId/poll',

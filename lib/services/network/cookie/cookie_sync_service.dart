@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 /// Cookie 同步服务
-/// 简化版：只管理 CSRF token
+/// 管理 CSRF token，支持自动刷新（对齐 Discourse 官方前端策略）
 class CookieSyncService {
   static final CookieSyncService _instance = CookieSyncService._internal();
   factory CookieSyncService() => _instance;
@@ -15,6 +17,9 @@ class CookieSyncService {
   );
 
   String? _csrfToken;
+
+  /// 正在进行的 CSRF 刷新请求（防止并发重复请求，与 Discourse 前端的 activeCsrfRequest 对齐）
+  Future<void>? _activeCsrfRequest;
 
   String? get csrfToken => _csrfToken;
 
@@ -30,6 +35,41 @@ class CookieSyncService {
     if (token == null || token.isEmpty) return;
     _csrfToken = token;
     unawaited(_storage.write(key: _csrfTokenKey, value: token));
+  }
+
+  /// 清空 CSRF token（BAD CSRF 时调用，下次 POST 前会自动刷新）
+  void clearCsrfToken() {
+    _csrfToken = null;
+    unawaited(_storage.delete(key: _csrfTokenKey));
+  }
+
+  /// 从 /session/csrf 获取新的 CSRF token
+  /// 带去重：多个并发调用共享同一个请求（对齐 Discourse 前端的 updateCsrfToken）
+  Future<void> updateCsrfToken(Dio dio) {
+    _activeCsrfRequest ??= _fetchCsrfToken(dio).whenComplete(() {
+      _activeCsrfRequest = null;
+    });
+    return _activeCsrfRequest!;
+  }
+
+  Future<void> _fetchCsrfToken(Dio dio) async {
+    try {
+      final response = await dio.get(
+        '/session/csrf',
+        options: Options(extra: {
+          'skipCsrf': true,
+          'skipAuthCheck': true,
+          'isSilent': true,
+        }),
+      );
+      final csrf = (response.data as Map<String, dynamic>?)?['csrf'] as String?;
+      if (csrf != null && csrf.isNotEmpty) {
+        setCsrfToken(csrf);
+        debugPrint('[CookieSyncService] CSRF token 已刷新');
+      }
+    } catch (e) {
+      debugPrint('[CookieSyncService] CSRF token 刷新失败: $e');
+    }
   }
 
   /// 重置（登出时调用）

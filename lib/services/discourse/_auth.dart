@@ -75,6 +75,27 @@ mixin _AuthMixin on _DiscourseServiceBase {
         final data = error.response?.data;
         debugPrint('[DIO] Error: ${error.response?.statusCode}');
 
+        // BAD CSRF 处理：清空 token → 刷新 → 重试原请求
+        // 用 extra 标记防止无限循环，只重试一次
+        if (error.response?.statusCode == 403 &&
+            _isBadCsrfResponse(data) &&
+            error.requestOptions.extra['_csrfRetried'] != true) {
+          debugPrint('[DIO] BAD CSRF detected, refreshing csrfToken and retrying');
+          _cookieSync.clearCsrfToken();
+          await _cookieSync.updateCsrfToken(_dio);
+          // 用新 token 重试原请求
+          final options = error.requestOptions;
+          options.extra['_csrfRetried'] = true;
+          final csrf = _cookieSync.csrfToken;
+          options.headers['X-CSRF-Token'] = (csrf == null || csrf.isEmpty) ? 'undefined' : csrf;
+          try {
+            final response = await _dio.fetch(options);
+            return handler.resolve(response);
+          } on DioException catch (e) {
+            return handler.next(e);
+          }
+        }
+
         final loggedOut = error.response?.headers.value('discourse-logged-out');
         if (!skipAuthCheck && loggedOut != null && loggedOut.isNotEmpty && !_isLoggingOut) {
           final jarTToken = await _cookieJar.getTToken();
@@ -130,6 +151,14 @@ mixin _AuthMixin on _DiscourseServiceBase {
     ));
   }
 
+  /// 判断响应是否为 BAD CSRF
+  /// Discourse 返回 403 + '["BAD CSRF"]' 表示 CSRF token 校验失败
+  bool _isBadCsrfResponse(dynamic data) {
+    if (data is String) return data == '["BAD CSRF"]';
+    if (data is List) return data.length == 1 && data.first == 'BAD CSRF';
+    return false;
+  }
+
   /// 设置导航 context
   void setNavigatorContext(BuildContext context) {
     _cfChallenge.setContext(context);
@@ -143,6 +172,10 @@ mixin _AuthMixin on _DiscourseServiceBase {
     if (_isLoggingOut) return;
     _isLoggingOut = true;
 
+    // 收集 _t cookie 诊断信息（不含实际值，仅状态）
+    final jarTToken = await _cookieJar.getTToken();
+    final csrfToken = _cookieSync.csrfToken;
+
     // 记录被动退出日志（含触发来源，方便排查）
     LogWriter.instance.write({
       'timestamp': DateTime.now().toIso8601String(),
@@ -153,6 +186,11 @@ mixin _AuthMixin on _DiscourseServiceBase {
       'reason': message,
       if (source != null) 'source': source,
       if (triggerInfo != null) 'trigger': triggerInfo,
+      // _t cookie 诊断（仅记录有无和长度，不记录实际值）
+      'memHasToken': _tToken != null && _tToken!.isNotEmpty,
+      'jarHasToken': jarTToken != null && jarTToken.isNotEmpty,
+      'jarTokenLen': jarTToken?.length,
+      'hasCsrf': csrfToken != null && csrfToken.isNotEmpty,
     });
 
     await logout(callApi: false, refreshPreload: true);

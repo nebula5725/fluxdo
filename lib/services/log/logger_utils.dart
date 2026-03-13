@@ -148,6 +148,9 @@ class LoggerUtils {
         device = {'_header': 'device_info', 'platform': Platform.operatingSystem};
       }
 
+      // User-Agent
+      device['userAgent'] = AppConstants.userAgent;
+
       // WebView 版本
       final webViewVersion = _parseWebViewVersion();
       if (webViewVersion != null) {

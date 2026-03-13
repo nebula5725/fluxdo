@@ -21,6 +21,10 @@ mixin _PresenceMixin on _DiscourseServiceBase {
         data: data,
         options: Options(
           contentType: Headers.formUrlEncodedContentType,
+          headers: {
+            'X-SILENCE-LOGGER': 'true',
+            'Discourse-Background': 'true',
+          },
           extra: {'isSilent': true},
         ),
       );
@@ -67,6 +71,10 @@ mixin _PresenceMixin on _DiscourseServiceBase {
         data: data,
         options: Options(
           contentType: Headers.formUrlEncodedContentType,
+          headers: {
+            'X-SILENCE-LOGGER': 'true',
+            'Discourse-Background': 'true',
+          },
           extra: {'isSilent': true},
         ),
       );
