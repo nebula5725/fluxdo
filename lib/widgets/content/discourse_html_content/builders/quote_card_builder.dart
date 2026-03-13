@@ -25,6 +25,15 @@ Widget buildQuoteCard({
     if (trimmedTitle.isNotEmpty) {
       titleHtml = trimmedTitle;
     }
+  } else {
+    // 兼容旧版 Discourse 格式：标题链接直接在 .title 下
+    final titleDiv = element.querySelector('.title');
+    if (titleDiv != null) {
+      final titleLink = titleDiv.querySelector('a');
+      if (titleLink != null) {
+        titleHtml = titleLink.outerHtml;
+      }
+    }
   }
 
   final blockquoteElement = element.querySelector('blockquote');
