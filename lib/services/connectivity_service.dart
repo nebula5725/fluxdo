@@ -63,7 +63,6 @@ class ConnectivityService {
   Future<void> _checkInitial() async {
     try {
       final result = await _connectivity.checkConnectivity();
-      VpnAutoToggleService.instance.handleConnectivityChanged(result);
       await _onConnectivityChanged(result);
     } catch (e) {
       debugPrint('[Connectivity] 初始检查失败: $e');

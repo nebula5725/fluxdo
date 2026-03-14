@@ -159,7 +159,7 @@ class NetworkHttpAdapter implements HttpClientAdapter {
         _cachedVersion != currentVersion ||
         _cachedProxyVersion != currentProxyVersion ||
         _cachedProxyCaEnabled != proxyCaEnabled) {
-      _cachedClient?.close(force: true);
+      _cachedClient?.close(force: false);
       _cachedClient = _createHttpClient();
       _cachedVersion = currentVersion;
       _cachedProxyVersion = currentProxyVersion;

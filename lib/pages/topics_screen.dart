@@ -130,6 +130,7 @@ class _TopicsScreenState extends ConsumerState<TopicsScreen> {
           ? TopicDetailPane(
               key: ValueKey(selectedTopic.topicId),
               topicId: selectedTopic.topicId!,
+              parentActive: widget.isActive,
               instanceId: _getOrCreateInstanceId(
                 selectedTopic.topicId!,
                 existingInstanceId: selectedTopic.instanceId,
@@ -402,12 +403,14 @@ class TopicDetailPane extends ConsumerWidget {
   const TopicDetailPane({
     super.key,
     required this.topicId,
+    required this.parentActive,
     this.instanceId,
     this.initialTitle,
     this.scrollToPostNumber,
   });
 
   final int topicId;
+  final bool parentActive;
   final String? instanceId;
   final String? initialTitle;
   final int? scrollToPostNumber;
@@ -420,6 +423,7 @@ class TopicDetailPane extends ConsumerWidget {
       initialTitle: initialTitle,
       scrollToPostNumber: scrollToPostNumber,
       embeddedMode: true, // 嵌入模式，不显示返回按钮
+      parentActive: parentActive,
     );
   }
 }

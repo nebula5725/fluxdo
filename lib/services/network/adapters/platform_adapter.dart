@@ -149,7 +149,8 @@ class _DynamicAdapter implements HttpClientAdapter {
       return _delegate!;
     }
 
-    _delegate?.close(force: true);
+    // 不要强杀旧 delegate，避免进行中的 Cronet 请求触发 native 崩溃。
+    _delegate?.close(force: false);
     if (desiredType == AdapterType.network) {
       _delegate = NetworkHttpAdapter(_settings, _proxySettings);
       debugPrint('[DIO] Dynamic adapter -> NetworkHttpAdapter');

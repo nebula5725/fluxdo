@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:catcher_2/catcher_2.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -41,6 +42,7 @@ import 'services/connectivity_service.dart';
 import 'services/log/json_file_handler.dart';
 import 'services/log/log_writer.dart';
 import 'services/log/logger_utils.dart';
+import 'services/navigation/app_route_observer.dart';
 import 'models/user.dart';
 import 'constants.dart';
 import 'providers/connectivity_provider.dart';
@@ -98,6 +100,12 @@ Future<void> main() async {
   ]);
   await NetworkSettingsService.instance.initialize(prefs);
   VpnAutoToggleService.instance.initialize(prefs);
+  try {
+    final initialConnectivity = await Connectivity().checkConnectivity();
+    await VpnAutoToggleService.instance.syncInitialState(initialConnectivity);
+  } catch (e) {
+    debugPrint('[Main] 初始 VPN 状态同步失败: $e');
+  }
 
   // 冷启动自动清除图片缓存（如果用户开启了该选项）
   if (prefs.getBool('pref_clear_cache_on_exit') == true) {
@@ -234,6 +242,7 @@ class MainApp extends ConsumerWidget {
 
         return MaterialApp(
           navigatorKey: navigatorKey,
+          navigatorObservers: [appRouteObserver],
           title: 'FluxDO',
           // 配置中文本地化
           locale: const Locale('zh', 'CN'),

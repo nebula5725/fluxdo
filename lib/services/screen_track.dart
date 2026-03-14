@@ -23,6 +23,7 @@ class ScreenTrack {
 
   final DiscourseService _service;
   final OnTimingsSent? onTimingsSent;
+  final String? debugSourceId;
 
   int? _topicId;
   Timer? _tickTimer;
@@ -42,7 +43,7 @@ class ScreenTrack {
   bool _inProgress = false;
   bool _hasFocus = true;
 
-  ScreenTrack(this._service, {this.onTimingsSent});
+  ScreenTrack(this._service, {this.onTimingsSent, this.debugSourceId});
 
   void start(int topicId) {
     if (_topicId != null && _topicId != topicId) {
@@ -195,6 +196,11 @@ class ScreenTrack {
         topicId: next.topicId,
         topicTime: next.topicTime,
         timings: next.timings,
+        logContext: {
+          if (debugSourceId != null) 'screenTrackSourceId': debugSourceId,
+          'visiblePostCount': _onscreen.length,
+          'readOnscreenCount': _readOnscreen.length,
+        },
       );
       
       // 上报成功后调用回调，同步本地状态

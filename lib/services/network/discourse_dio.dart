@@ -79,8 +79,8 @@ class DiscourseDio {
       ));
     }
 
-    // 7. 请求头拦截器（传入 dio 用于 CSRF token 自动刷新）
-    dio.interceptors.add(RequestHeaderInterceptor(CookieSyncService(), dio));
+    // 7. 请求头拦截器
+    dio.interceptors.add(RequestHeaderInterceptor(CookieSyncService()));
 
     // 8. 重定向拦截器
     dio.interceptors.add(RedirectInterceptor(dio));

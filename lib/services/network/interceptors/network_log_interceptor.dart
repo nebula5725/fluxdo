@@ -46,7 +46,7 @@ class NetworkLogInterceptor extends Interceptor {
     final uri = options.uri;
     final sanitizedUrl = '${uri.scheme}://${uri.host}${uri.path}';
 
-    LogWriter.instance.write({
+    final entry = <String, dynamic>{
       'timestamp': DateTime.now().toIso8601String(),
       'level': level,
       'type': 'request',
@@ -55,6 +55,11 @@ class NetworkLogInterceptor extends Interceptor {
       'url': sanitizedUrl,
       'statusCode': statusCode,
       'duration': duration,
-    });
+    };
+    final extraFields = options.extra['_networkLogFields'];
+    if (extraFields is Map) {
+      entry.addAll(extraFields.cast<String, dynamic>());
+    }
+    LogWriter.instance.write(entry);
   }
 }

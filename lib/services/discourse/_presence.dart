@@ -7,6 +7,7 @@ mixin _PresenceMixin on _DiscourseServiceBase {
     required int topicId,
     required int topicTime,
     required Map<int, int> timings,
+    Map<String, dynamic>? logContext,
   }) async {
     try {
       if (!isAuthenticated) return null;
@@ -25,7 +26,15 @@ mixin _PresenceMixin on _DiscourseServiceBase {
             'X-SILENCE-LOGGER': 'true',
             'Discourse-Background': 'true',
           },
-          extra: {'isSilent': true},
+          extra: {
+            'isSilent': true,
+            '_networkLogFields': {
+              'topicId': topicId,
+              'topicTime': topicTime,
+              'timingsCount': timings.length,
+              if (logContext != null) ...logContext,
+            },
+          },
         ),
       );
       return response.statusCode;

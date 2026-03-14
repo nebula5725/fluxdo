@@ -71,6 +71,20 @@ class VpnAutoToggleService {
     }
   }
 
+  /// 启动时同步一次 VPN 状态，避免首个请求发出后再切换网络配置。
+  Future<void> syncInitialState(List<ConnectivityResult> results) async {
+    final hasVpn = results.contains(ConnectivityResult.vpn);
+    vpnActiveNotifier.value = hasVpn;
+
+    if (!enabled) return;
+
+    if (hasVpn) {
+      await _suppress();
+    } else {
+      await _restore();
+    }
+  }
+
   /// VPN 开启时压制 DOH 和代理
   Future<void> _suppress() async {
     if (_isSuppressing) return;

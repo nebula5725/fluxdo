@@ -82,7 +82,7 @@ mixin _AuthMixin on _DiscourseServiceBase {
             error.requestOptions.extra['_csrfRetried'] != true) {
           debugPrint('[DIO] BAD CSRF detected, refreshing csrfToken and retrying');
           _cookieSync.clearCsrfToken();
-          await _cookieSync.updateCsrfToken(_dio);
+          await _cookieSync.updateCsrfToken();
           // 用新 token 重试原请求
           final options = error.requestOptions;
           options.extra['_csrfRetried'] = true;

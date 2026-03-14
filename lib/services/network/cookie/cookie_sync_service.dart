@@ -3,6 +3,11 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import '../../../constants.dart';
+import '../adapters/platform_adapter.dart';
+import 'app_cookie_manager.dart';
+import 'cookie_jar_service.dart';
+
 /// Cookie 同步服务
 /// 管理 CSRF token，支持自动刷新（对齐 Discourse 官方前端策略）
 class CookieSyncService {
@@ -17,6 +22,7 @@ class CookieSyncService {
   );
 
   String? _csrfToken;
+  Dio? _mainSiteDio;
 
   /// 正在进行的 CSRF 刷新请求（防止并发重复请求，与 Discourse 前端的 activeCsrfRequest 对齐）
   Future<void>? _activeCsrfRequest;
@@ -43,17 +49,40 @@ class CookieSyncService {
     unawaited(_storage.delete(key: _csrfTokenKey));
   }
 
-  /// 从 /session/csrf 获取新的 CSRF token
+  /// 从主站 /session/csrf 获取新的 CSRF token
   /// 带去重：多个并发调用共享同一个请求（对齐 Discourse 前端的 updateCsrfToken）
-  Future<void> updateCsrfToken(Dio dio) {
-    _activeCsrfRequest ??= _fetchCsrfToken(dio).whenComplete(() {
+  Future<void> updateCsrfToken() {
+    _activeCsrfRequest ??= _fetchCsrfToken().whenComplete(() {
       _activeCsrfRequest = null;
     });
     return _activeCsrfRequest!;
   }
 
-  Future<void> _fetchCsrfToken(Dio dio) async {
+  Future<Dio> _getMainSiteDio() async {
+    if (_mainSiteDio != null) return _mainSiteDio!;
+
+    final cookieJarService = CookieJarService();
+    if (!cookieJarService.isInitialized) {
+      await cookieJarService.initialize();
+    }
+
+    final dio = Dio(BaseOptions(
+      baseUrl: AppConstants.baseUrl,
+      connectTimeout: const Duration(seconds: 30),
+      receiveTimeout: const Duration(seconds: 30),
+      followRedirects: false,
+      validateStatus: (status) => status != null && status >= 200 && status < 400,
+    ));
+
+    configurePlatformAdapter(dio);
+    dio.interceptors.add(AppCookieManager(cookieJarService.cookieJar));
+    _mainSiteDio = dio;
+    return dio;
+  }
+
+  Future<void> _fetchCsrfToken() async {
     try {
+      final dio = await _getMainSiteDio();
       final response = await dio.get(
         '/session/csrf',
         options: Options(extra: {

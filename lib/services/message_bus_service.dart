@@ -299,6 +299,9 @@ class MessageBusService {
         if (!(_currentCancelToken?.isCancelled ?? false) && buffer.trim().isNotEmpty) {
           _processChunk(buffer.trim());
         }
+        
+        // 请求结束后清空 token，避免后续误 cancel 已结束的请求。
+        _currentCancelToken = null;
 
       } on DioException catch (e) {
         _currentCancelToken = null;
@@ -339,6 +342,9 @@ class MessageBusService {
         await Future.delayed(Duration(seconds: backoffSeconds));
         if (generation != _pollGeneration) break;
       } catch (e, stack) {
+        // 出错后也清空 token，避免重试期间误 cancel。
+        _currentCancelToken = null;
+        
         _failureCount++;
         final backoffSeconds = min(pow(2, _failureCount).toInt(), _maxBackoffSeconds);
         debugPrint('[MessageBus] 未知错误: $e');

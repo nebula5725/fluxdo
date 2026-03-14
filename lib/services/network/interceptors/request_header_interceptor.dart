@@ -7,10 +7,9 @@ import '../cookie/cookie_sync_service.dart';
 /// 负责设置 User-Agent 和 CSRF Token
 /// CSRF 策略对齐 Discourse 官方前端：POST 前 token 为空则先从 /session/csrf 获取
 class RequestHeaderInterceptor extends Interceptor {
-  RequestHeaderInterceptor(this._cookieSync, this._dio);
+  RequestHeaderInterceptor(this._cookieSync);
 
   final CookieSyncService _cookieSync;
-  final Dio _dio;
 
   @override
   Future<void> onRequest(
@@ -33,7 +32,7 @@ class RequestHeaderInterceptor extends Interceptor {
       // 对齐 Discourse 前端: if (type !== "GET" && !csrfToken) { updateCsrfToken() }
       final method = options.method.toUpperCase();
       if (method != 'GET' && (_cookieSync.csrfToken == null || _cookieSync.csrfToken!.isEmpty)) {
-        await _cookieSync.updateCsrfToken(_dio);
+        await _cookieSync.updateCsrfToken();
       }
 
       final csrf = _cookieSync.csrfToken;

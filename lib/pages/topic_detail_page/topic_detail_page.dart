@@ -25,6 +25,8 @@ import '../../providers/pinned_categories_provider.dart';
 import '../../services/discourse/discourse_service.dart';
 import '../../services/screen_track.dart';
 import '../../services/toast_service.dart';
+import '../../services/log/log_writer.dart';
+import '../../services/navigation/app_route_observer.dart';
 import '../../widgets/content/lazy_load_scope.dart';
 import '../../widgets/post/post_item_skeleton.dart';
 import '../../widgets/post/reply_sheet.dart';
@@ -59,6 +61,7 @@ class TopicDetailPage extends ConsumerStatefulWidget {
   final String? initialTitle;
   final int? scrollToPostNumber; // 外部控制的跳转位置（如从通知跳转到指定楼层）
   final bool embeddedMode; // 嵌入模式（双栏布局中使用，不显示返回按钮）
+  final bool parentActive; // 父容器是否可见（IndexedStack/双栏切 tab 时用）
   final bool autoSwitchToMasterDetail; // 仅在从首页进入时允许自动切换
   final bool autoOpenReply; // 自动打开回复框（从草稿进入时使用）
   final int? autoReplyToPostNumber; // 自动回复的帖子编号（从草稿进入时使用）
@@ -72,6 +75,7 @@ class TopicDetailPage extends ConsumerStatefulWidget {
     this.initialTitle,
     this.scrollToPostNumber,
     this.embeddedMode = false,
+    this.parentActive = true,
     this.autoSwitchToMasterDetail = false,
     this.autoOpenReply = false,
     this.autoReplyToPostNumber,
@@ -84,7 +88,8 @@ class TopicDetailPage extends ConsumerStatefulWidget {
   ConsumerState<TopicDetailPage> createState() => _TopicDetailPageState();
 }
 
-class _TopicDetailPageState extends ConsumerState<TopicDetailPage> with WidgetsBindingObserver, SingleTickerProviderStateMixin {
+class _TopicDetailPageState extends ConsumerState<TopicDetailPage>
+    with WidgetsBindingObserver, SingleTickerProviderStateMixin, RouteAware {
   /// 唯一实例 ID，确保每次打开页面都创建新的 provider 实例
   /// 支持外部传入以在布局切换时复用同一个 provider
   late final String _instanceId = widget.instanceId ?? const Uuid().v4();
@@ -125,11 +130,16 @@ class _TopicDetailPageState extends ConsumerState<TopicDetailPage> with WidgetsB
   bool _autoOpenReplyHandled = false; // 是否已处理自动打开回复框
   bool _autoOpenAiChatHandled = false; // 是否已处理自动打开 AI 聊天
   late final TopicSearchNotifier _topicSearchNotifier;
+  ModalRoute<dynamic>? _route;
+  bool _isRouteVisible = true;
+  bool _isParentActive = true;
+  bool _isScreenTrackRunning = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _isParentActive = widget.parentActive;
 
     _expandController = AnimationController(
       vsync: this,
@@ -155,6 +165,7 @@ class _TopicDetailPageState extends ConsumerState<TopicDetailPage> with WidgetsB
 
     _screenTrack = ScreenTrack(
       DiscourseService(),
+      debugSourceId: _instanceId,
       onTimingsSent: (topicId, postNumbers, highestSeen) {
         debugPrint('[TopicDetail] onTimingsSent callback triggered: topicId=$topicId, highestSeen=$highestSeen');
         // 遍历所有分类 tab，更新所有活跃的 provider 实例
@@ -167,10 +178,6 @@ class _TopicDetailPageState extends ConsumerState<TopicDetailPage> with WidgetsB
         ref.read(topicSessionProvider(topicId).notifier).markAsRead(postNumbers);
       },
     );
-
-    if (trackEnabled) {
-      _screenTrack.start(widget.topicId);
-    }
 
     _controller = TopicDetailController(
       scrollController: AutoScrollController(),
@@ -188,7 +195,38 @@ class _TopicDetailPageState extends ConsumerState<TopicDetailPage> with WidgetsB
   }
 
   @override
+  void didUpdateWidget(covariant TopicDetailPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.parentActive != widget.parentActive) {
+      _isParentActive = widget.parentActive;
+      _syncScreenTrackState(reason: _isParentActive ? 'parent_active' : 'parent_inactive');
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route == _route || route == null) return;
+
+    if (_route != null) {
+      appRouteObserver.unsubscribe(this);
+    }
+
+    _route = route;
+    appRouteObserver.subscribe(this, route);
+    _isRouteVisible = route.isCurrent;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _syncScreenTrackState(reason: 'route_subscribed');
+    });
+  }
+
+  @override
   void dispose() {
+    if (_route != null) {
+      appRouteObserver.unsubscribe(this);
+    }
     WidgetsBinding.instance.removeObserver(this);
     _expandController.dispose();
     _showTitleNotifier.dispose();
@@ -208,6 +246,57 @@ class _TopicDetailPageState extends ConsumerState<TopicDetailPage> with WidgetsB
   void didChangeAppLifecycleState(AppLifecycleState state) {
     final hasFocus = state == AppLifecycleState.resumed;
     _screenTrack.setHasFocus(hasFocus);
+  }
+
+  @override
+  void didPush() {
+    _setRouteVisible(true, 'did_push');
+  }
+
+  @override
+  void didPopNext() {
+    _setRouteVisible(true, 'did_pop_next');
+  }
+
+  @override
+  void didPushNext() {
+    _setRouteVisible(false, 'did_push_next');
+  }
+
+  @override
+  void didPop() {
+    _setRouteVisible(false, 'did_pop');
+  }
+
+  void _setRouteVisible(bool visible, String reason) {
+    if (_isRouteVisible == visible) return;
+    _isRouteVisible = visible;
+    _syncScreenTrackState(reason: reason);
+  }
+
+  void _syncScreenTrackState({required String reason}) {
+    final shouldRun = _controller.trackEnabled && _isRouteVisible && _isParentActive;
+    if (shouldRun == _isScreenTrackRunning) return;
+
+    if (shouldRun) {
+      _screenTrack.start(widget.topicId);
+    } else {
+      _screenTrack.stop();
+    }
+    _isScreenTrackRunning = shouldRun;
+
+    LogWriter.instance.write({
+      'timestamp': DateTime.now().toIso8601String(),
+      'level': 'info',
+      'type': 'lifecycle',
+      'event': 'screen_track_state',
+      'message': shouldRun ? 'ScreenTrack 启动' : 'ScreenTrack 停止',
+      'topicId': widget.topicId,
+      'screenTrackSourceId': _instanceId,
+      'routeVisible': _isRouteVisible,
+      'parentActive': _isParentActive,
+      'reason': reason,
+    });
   }
 
   void _scheduleCheckTitleVisibility() {
@@ -595,8 +684,11 @@ class _TopicDetailPageState extends ConsumerState<TopicDetailPage> with WidgetsB
     ref.listen<AsyncValue<void>>(authStateProvider, (_, _) {
       if (!mounted) return;
       final stillLoggedIn = ref.read(currentUserProvider).value != null;
-      if (!stillLoggedIn && _controller.trackEnabled) {
-        _controller.trackEnabled = false;
+      if (_controller.trackEnabled != stillLoggedIn) {
+        _controller.trackEnabled = stillLoggedIn;
+        _syncScreenTrackState(
+          reason: stillLoggedIn ? 'auth_logged_in' : 'auth_logged_out',
+        );
       }
     });
 
