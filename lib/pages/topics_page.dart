@@ -30,6 +30,7 @@ import '../widgets/common/error_view.dart';
 import '../widgets/common/loading_dialog.dart';
 import '../widgets/common/fading_edge_scroll_view.dart';
 import '../widgets/offline_indicator.dart';
+import '../l10n/s.dart';
 import '../services/toast_service.dart';
 
 class ScrollToTopNotifier extends StateNotifier<int> {
@@ -193,7 +194,7 @@ class _TopicsPageState extends ConsumerState<TopicsPage> with TickerProviderStat
       MaterialPageRoute(builder: (_) => const WebViewLoginPage()),
     );
     if (result == true && mounted) {
-      LoadingDialog.show(context, message: '加载数据...');
+      LoadingDialog.show(context, message: context.l10n.common_loadingData);
 
       AppStateRefresher.refreshAll(ref);
 
@@ -215,20 +216,20 @@ class _TopicsPageState extends ConsumerState<TopicsPage> with TickerProviderStat
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('跳转到话题'),
+        title: Text(context.l10n.topics_jumpToTopic),
         content: TextField(
           controller: controller,
           keyboardType: TextInputType.number,
           autofocus: true,
-          decoration: const InputDecoration(
-            labelText: '话题 ID',
-            hintText: '例如: 1095754',
+          decoration: InputDecoration(
+            labelText: context.l10n.topics_topicId,
+            hintText: context.l10n.topics_topicIdHint,
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('取消'),
+            child: Text(context.l10n.common_cancel),
           ),
           FilledButton(
             onPressed: () {
@@ -246,7 +247,7 @@ class _TopicsPageState extends ConsumerState<TopicsPage> with TickerProviderStat
                 );
               }
             },
-            child: const Text('跳转'),
+            child: Text(context.l10n.topics_jump),
           ),
         ],
       ),
@@ -364,23 +365,23 @@ class _TopicsPageState extends ConsumerState<TopicsPage> with TickerProviderStat
   }
 
   void _showDismissConfirmDialog(TopicListFilter currentFilter) {
-    final label = currentFilter == TopicListFilter.newTopics ? '新话题' : '未读话题';
+    final label = currentFilter == TopicListFilter.newTopics ? context.l10n.topics_newTopics : context.l10n.topics_unreadTopics;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('忽略确认'),
-        content: Text('确定要忽略全部$label吗？'),
+        title: Text(context.l10n.topics_dismissConfirmTitle),
+        content: Text(context.l10n.topics_dismissConfirmContent(label)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('取消'),
+            child: Text(context.l10n.common_cancel),
           ),
           FilledButton(
             onPressed: () {
               Navigator.pop(context);
               _doDismiss();
             },
-            child: const Text('确定'),
+            child: Text(context.l10n.common_confirm),
           ),
         ],
       ),
@@ -393,7 +394,7 @@ class _TopicsPageState extends ConsumerState<TopicsPage> with TickerProviderStat
       await ref.read(topicListProvider(categoryId).notifier).dismissAll();
     } catch (e) {
       if (mounted) {
-        ToastService.showError('操作失败：$e');
+        ToastService.showError(S.current.common_operationFailed(e.toString()));
       }
     }
   }
@@ -772,7 +773,7 @@ class _TopicsHeaderDelegate extends SliverPersistentHeaderDelegate {
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
-                                      '搜索话题...',
+                                      context.l10n.topics_searchHint,
                                       style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 14),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
@@ -788,7 +789,7 @@ class _TopicsHeaderDelegate extends SliverPersistentHeaderDelegate {
                           IconButton(
                             icon: const Icon(Icons.bug_report),
                             onPressed: onDebugTopicId,
-                            tooltip: '调试：跳转话题',
+                            tooltip: context.l10n.topics_debugJump,
                           ),
                       ],
                     ),
@@ -835,7 +836,7 @@ class _TopicsHeaderDelegate extends SliverPersistentHeaderDelegate {
                   child: IconButton(
                     icon: const Icon(Icons.segment, size: 20),
                     onPressed: onCategoryManager,
-                    tooltip: '浏览分类',
+                    tooltip: context.l10n.topics_browseCategories,
                     visualDensity: VisualDensity.compact,
                   ),
                 ),
@@ -879,7 +880,7 @@ class _TopicsHeaderDelegate extends SliverPersistentHeaderDelegate {
   }
 
   List<Tab> _buildTabs() {
-    final tabs = <Tab>[const Tab(text: '全部')];
+    final tabs = <Tab>[Tab(text: S.current.common_all)];
     for (final id in pinnedIds) {
       final category = categoryMap[id];
       tabs.add(Tab(text: category?.name ?? '...'));
@@ -1014,9 +1015,9 @@ class _TopicListState extends ConsumerState<_TopicList>
               child: ListView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: EdgeInsets.zero,
-                children: const [
-                  SizedBox(height: 100),
-                  Center(child: Text('没有相关话题')),
+                children: [
+                  const SizedBox(height: 100),
+                  Center(child: Text(context.l10n.topics_noTopics)),
                 ],
               ),
             ),
@@ -1075,7 +1076,7 @@ class _TopicListState extends ConsumerState<_TopicList>
                                     Icon(Icons.refresh, size: 16, color: Theme.of(context).colorScheme.primary),
                                     const SizedBox(width: 6),
                                     Text(
-                                      '加载失败，点击重试',
+                                      context.l10n.common_loadFailedTapRetry,
                                       style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.primary),
                                     ),
                                   ],
@@ -1083,7 +1084,7 @@ class _TopicListState extends ConsumerState<_TopicList>
                               )
                             : notifier.hasMore
                                 ? const CircularProgressIndicator()
-                                : const Text('没有更多了', style: TextStyle(color: Colors.grey)),
+                                : Text(context.l10n.common_noMore, style: const TextStyle(color: Colors.grey)),
                       ),
                     );
                   }
@@ -1217,7 +1218,7 @@ class _TopicListState extends ConsumerState<_TopicList>
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          '查看 $count 个新的或更新的话题',
+                          context.l10n.topics_viewNewTopics(count),
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.primary,
                             fontSize: 13,
@@ -1263,7 +1264,7 @@ class _DismissButton extends StatelessWidget {
               Icon(Icons.check, size: 14, color: fgColor),
               const SizedBox(width: 4),
               Text(
-                '忽略',
+                context.l10n.topics_dismiss,
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: fgColor,
                   fontWeight: FontWeight.w500,

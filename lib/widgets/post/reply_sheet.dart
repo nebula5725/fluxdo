@@ -13,6 +13,7 @@ import '../../services/app_error_handler.dart';
 import '../../services/network/exceptions/api_exception.dart';
 import '../../services/toast_service.dart';
 import '../common/smart_avatar.dart';
+import '../../l10n/s.dart';
 import '../common/loading_spinner.dart';
 
 /// 显示回复底部弹框
@@ -217,16 +218,16 @@ class _ReplySheetState extends ConsumerState<ReplySheet> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('放弃帖子'),
-        content: const Text('你想放弃你的帖子吗？'),
+        title: Text(context.l10n.post_discardTitle),
+        content: Text(context.l10n.post_discardConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('取消'),
+            child: Text(context.l10n.common_cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('舍弃'),
+            child: Text(context.l10n.common_discard),
           ),
         ],
       ),
@@ -288,7 +289,7 @@ class _ReplySheetState extends ConsumerState<ReplySheet> {
       }
     } catch (e) {
       if (mounted) {
-        _showError('加载内容失败: ${e.toString().replaceAll('Exception: ', '')}');
+        _showError(S.current.post_loadContentFailed(e.toString().replaceAll('Exception: ', '')));
       }
     } finally {
       if (mounted) setState(() => _isLoadingRaw = false);
@@ -338,12 +339,12 @@ class _ReplySheetState extends ConsumerState<ReplySheet> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('提示'),
+        title: Text(context.l10n.common_hint),
         content: Text(message),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('确定'),
+            child: Text(context.l10n.common_confirm),
           ),
         ],
       ),
@@ -353,12 +354,12 @@ class _ReplySheetState extends ConsumerState<ReplySheet> {
   Future<void> _submit() async {
     final content = _contentController.text.trim();
     if (content.isEmpty) {
-      _showError('请输入内容');
+      _showError(S.current.post_contentRequired);
       return;
     }
 
     if (_isPrivateMessage && _titleController.text.trim().isEmpty) {
-      _showError('请输入标题');
+      _showError(S.current.post_titleRequired);
       return;
     }
 
@@ -402,7 +403,7 @@ class _ReplySheetState extends ConsumerState<ReplySheet> {
       await _draftController?.deleteDraft();
       _submitted = true;
       if (!mounted) return;
-      ToastService.showInfo('你的帖子已提交，正在等待审核');
+      ToastService.showInfo(S.current.post_pendingReview);
       Navigator.of(context).pop();
     } on DioException catch (_) {
       // 网络错误已由 ErrorInterceptor 处理
@@ -508,7 +509,7 @@ class _ReplySheetState extends ConsumerState<ReplySheet> {
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
-                                  '编辑帖子 #${widget.editPost!.postNumber}',
+                                  context.l10n.post_editPostTitle(widget.editPost!.postNumber),
                                   style: theme.textTheme.titleSmall,
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -516,7 +517,7 @@ class _ReplySheetState extends ConsumerState<ReplySheet> {
                             ] else if (_isPrivateMessage)
                               Expanded(
                                 child: Text(
-                                  '发送私信给 @${widget.targetUsername}',
+                                  context.l10n.post_sendPmTitle(widget.targetUsername!),
                                   style: theme.textTheme.titleSmall,
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -533,14 +534,14 @@ class _ReplySheetState extends ConsumerState<ReplySheet> {
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
-                                  '回复 @${widget.replyToPost!.username}',
+                                  context.l10n.post_replyToUser(widget.replyToPost!.username),
                                   style: theme.textTheme.titleSmall,
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                             ] else
                               Text(
-                                '回复话题',
+                                context.l10n.post_replyToTopic,
                                 style: theme.textTheme.titleSmall,
                               ),
 
@@ -559,7 +560,7 @@ class _ReplySheetState extends ConsumerState<ReplySheet> {
                               // 舍弃按钮
                               TextButton(
                                 onPressed: _isSubmitting ? null : _discardDraft,
-                                child: const Text('舍弃'),
+                                child: Text(context.l10n.common_discard),
                               ),
                               const SizedBox(width: 8),
                             ],
@@ -576,7 +577,7 @@ class _ReplySheetState extends ConsumerState<ReplySheet> {
                                         color: Colors.white,
                                       ),
                                     )
-                                  : Text(_isEditMode ? '保存' : '发送'),
+                                  : Text(_isEditMode ? context.l10n.common_save : context.l10n.common_send),
                             ),
                           ],
                         ),
@@ -595,10 +596,10 @@ class _ReplySheetState extends ConsumerState<ReplySheet> {
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: TextField(
                         controller: _titleController,
-                        decoration: const InputDecoration(
-                          hintText: '标题',
+                        decoration: InputDecoration(
+                          hintText: context.l10n.common_title,
                           border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(vertical: 12),
+                          contentPadding: const EdgeInsets.symmetric(vertical: 12),
                         ),
                         style: const TextStyle(fontWeight: FontWeight.bold),
                         textInputAction: TextInputAction.next,
@@ -622,7 +623,7 @@ class _ReplySheetState extends ConsumerState<ReplySheet> {
                       key: _editorKey,
                       controller: _contentController,
                       focusNode: _contentFocusNode,
-                      hintText: '说点什么吧... (支持 Markdown)',
+                      hintText: context.l10n.editor_hintText,
                       expands: true,
                       emojiPanelHeight: _emojiPanelHeight,
                       onEmojiPanelChanged: (show) {

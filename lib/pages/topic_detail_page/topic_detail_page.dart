@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:share_plus/share_plus.dart';
+import '../../l10n/s.dart';
 import '../../utils/html_text_mapper.dart';
 import '../../utils/html_to_markdown.dart';
 import '../../utils/code_selection_context.dart';
@@ -422,7 +423,7 @@ class _TopicDetailPageState extends ConsumerState<TopicDetailPage>
           focusNode: _searchFocusNode,
           autofocus: true,
           decoration: InputDecoration(
-            hintText: '在本话题中搜索...',
+            hintText: context.l10n.topicDetail_searchHint,
             border: InputBorder.none,
             hintStyle: TextStyle(color: theme.colorScheme.onSurfaceVariant),
           ),
@@ -559,13 +560,13 @@ class _TopicDetailPageState extends ConsumerState<TopicDetailPage>
       if (ref.watch(hasAvailableAiModelProvider))
         IconButton(
           icon: const Icon(Icons.auto_awesome),
-          tooltip: 'AI 助手',
+          tooltip: context.l10n.topicDetail_aiAssistant,
           onPressed: () => _showAiAssistantSheet(detail),
         ),
       // 搜索按钮
       IconButton(
         icon: const Icon(Icons.search),
-        tooltip: '搜索本话题',
+        tooltip: context.l10n.topicDetail_searchTopic,
         onPressed: () {
           ref.read(topicSearchProvider(widget.topicId).notifier).enterSearchMode();
         },
@@ -573,7 +574,7 @@ class _TopicDetailPageState extends ConsumerState<TopicDetailPage>
       // 更多选项
       PopupMenuButton<String>(
         icon: const Icon(Icons.more_vert),
-        tooltip: '更多选项',
+        tooltip: context.l10n.topicDetail_moreOptions,
         onSelected: (value) {
           if (value == 'subscribe') {
             showNotificationLevelSheet(
@@ -602,7 +603,7 @@ class _TopicDetailPageState extends ConsumerState<TopicDetailPage>
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
                   const SizedBox(width: 12),
-                  const Text('编辑话题'),
+                  Text(context.l10n.topicDetail_editTopic),
                 ],
               ),
             ),
@@ -619,7 +620,7 @@ class _TopicDetailPageState extends ConsumerState<TopicDetailPage>
                       : Theme.of(context).colorScheme.onSurface,
                 ),
                 const SizedBox(width: 12),
-                Text(detail.bookmarked ? '编辑书签' : '添加书签'),
+                Text(detail.bookmarked ? context.l10n.topicDetail_editBookmark : context.l10n.common_addBookmark),
               ],
             ),
           ),
@@ -639,7 +640,7 @@ class _TopicDetailPageState extends ConsumerState<TopicDetailPage>
                           : Theme.of(context).colorScheme.onSurface,
                     ),
                     const SizedBox(width: 12),
-                    Text(isInReadLater ? '移出浮窗' : '加入浮窗'),
+                    Text(isInReadLater ? context.l10n.topicDetail_removeFromReadLater : context.l10n.topicDetail_addToReadLater),
                   ],
                 );
               },
@@ -656,7 +657,7 @@ class _TopicDetailPageState extends ConsumerState<TopicDetailPage>
                   color: Theme.of(context).colorScheme.onSurface,
                 ),
                 const SizedBox(width: 12),
-                const Text('订阅设置'),
+                Text(context.l10n.topic_notificationSettings),
               ],
             ),
           ),

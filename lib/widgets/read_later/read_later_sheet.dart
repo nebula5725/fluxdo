@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../l10n/s.dart';
 import '../../models/read_later_item.dart';
 import '../../providers/read_later_provider.dart';
 import '../../pages/topic_detail_page/topic_detail_page.dart';
@@ -68,7 +69,7 @@ class ReadLaterSheet extends ConsumerWidget {
                   child: Row(
                     children: [
                       Text(
-                        '稍后阅读',
+                        context.l10n.readLater_title,
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),

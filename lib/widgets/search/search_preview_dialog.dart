@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:share_plus/share_plus.dart';
+import '../../l10n/s.dart';
 import '../../models/category.dart';
 import '../../models/search_result.dart';
 import '../../providers/discourse_providers.dart';
@@ -38,7 +39,7 @@ class SearchPreviewDialog extends ConsumerWidget {
     return showGeneralDialog(
       context: context,
       barrierDismissible: true,
-      barrierLabel: '关闭预览',
+      barrierLabel: S.current.common_closePreview,
       barrierColor: Colors.black54,
       transitionDuration: const Duration(milliseconds: 200),
       pageBuilder: (context, animation, secondaryAnimation) {
@@ -387,7 +388,7 @@ class SearchPreviewDialog extends ConsumerWidget {
                 child: _buildStatItem(
                   context,
                   Icons.chat_bubble_outline_rounded,
-                  '${(topic.postsCount - 1).clamp(0, 999999)} 条回复',
+                  context.l10n.search_replyCount((topic.postsCount - 1).clamp(0, 999999)),
                 ),
               ),
             if (post.likeCount > 0)
@@ -395,7 +396,7 @@ class SearchPreviewDialog extends ConsumerWidget {
                 child: _buildStatItem(
                   context,
                   Icons.favorite_border_rounded,
-                  '${NumberUtils.formatCount(post.likeCount)} 点赞',
+                  context.l10n.search_likeCount(NumberUtils.formatCount(post.likeCount)),
                 ),
               ),
           ],
@@ -408,7 +409,7 @@ class SearchPreviewDialog extends ConsumerWidget {
                 child: _buildStatItem(
                   context,
                   Icons.visibility_outlined,
-                  '${NumberUtils.formatCount(topic.views)} 浏览',
+                  context.l10n.search_viewCount(NumberUtils.formatCount(topic.views)),
                 ),
               ),
               const Expanded(child: SizedBox()),
@@ -456,7 +457,7 @@ class SearchPreviewDialog extends ConsumerWidget {
           // 关闭按钮
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('关闭'),
+            child: Text(context.l10n.common_close),
           ),
 
           const Spacer(),
@@ -475,7 +476,7 @@ class SearchPreviewDialog extends ConsumerWidget {
                 SharePlus.instance.share(ShareParams(text: url));
               },
               icon: const Icon(Icons.share_outlined, size: 20),
-              tooltip: '分享',
+              tooltip: context.l10n.common_share,
             ),
 
           const SizedBox(width: 8),
@@ -487,7 +488,7 @@ class SearchPreviewDialog extends ConsumerWidget {
               onOpen?.call();
             },
             icon: const Icon(Icons.open_in_new, size: 18),
-            label: const Text('查看详情'),
+            label: Text(context.l10n.common_viewDetails),
           ),
         ],
       ),

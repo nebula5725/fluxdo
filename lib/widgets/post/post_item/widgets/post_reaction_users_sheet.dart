@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../l10n/s.dart';
 import '../../../../models/topic.dart';
 import '../../../../pages/user_profile_page.dart';
 import '../../../../services/discourse/discourse_service.dart';
@@ -58,7 +59,7 @@ class _PostReactionUsersSheetState extends State<PostReactionUsersSheet> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _error = '加载失败';
+          _error = S.current.common_loadFailed;
           _isLoading = false;
         });
       }
@@ -127,7 +128,7 @@ class _PostReactionUsersSheetState extends State<PostReactionUsersSheet> {
                       color: theme.colorScheme.primary),
                   const SizedBox(width: 8),
                   Text(
-                    '回应',
+                    context.l10n.post_reactions,
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -164,7 +165,7 @@ class _PostReactionUsersSheetState extends State<PostReactionUsersSheet> {
             else if (_groups == null || _groups!.isEmpty)
               Padding(
                 padding: const EdgeInsets.all(32),
-                child: Text('暂无回应',
+                child: Text(context.l10n.post_noReactions,
                     style: TextStyle(
                         color: theme.colorScheme.onSurfaceVariant)),
               )
@@ -194,7 +195,7 @@ class _PostReactionUsersSheetState extends State<PostReactionUsersSheet> {
           // "全部"标签
           _buildTab(
             theme: theme,
-            label: '全部',
+            label: context.l10n.common_all,
             count: _totalCount,
             isSelected: _selectedReactionId == null,
             onTap: () => setState(() => _selectedReactionId = null),
@@ -282,7 +283,7 @@ class _PostReactionUsersSheetState extends State<PostReactionUsersSheet> {
     if (users.isEmpty) {
       return Padding(
         padding: const EdgeInsets.all(32),
-        child: Text('暂无数据',
+        child: Text(context.l10n.common_noData,
             style: TextStyle(color: theme.colorScheme.onSurfaceVariant)),
       );
     }

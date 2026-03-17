@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../config/site_customization.dart';
+import '../../l10n/s.dart';
 import '../../services/toast_service.dart';
 
 /// 显示外部链接确认对话框
@@ -200,7 +201,7 @@ class _ExternalLinkConfirmSheet extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: const Text('取消'),
+                      child: Text(context.l10n.common_cancel),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -214,7 +215,7 @@ class _ExternalLinkConfirmSheet extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: const Text('继续访问'),
+                      child: Text(context.l10n.common_continueVisit),
                     ),
                   ),
                 ],
@@ -228,7 +229,7 @@ class _ExternalLinkConfirmSheet extends StatelessWidget {
 
   void _copyUrl(BuildContext context) {
     Clipboard.setData(ClipboardData(text: url));
-    ToastService.showSuccess('链接已复制');
+    ToastService.showSuccess(S.current.common_linkCopied);
   }
 
   _UrlInfo _parseUrl(String url) {
@@ -239,40 +240,41 @@ class _ExternalLinkConfirmSheet extends StatelessWidget {
   }
 
   _DialogConfig _getConfigForLevel(LinkRiskLevel level, ThemeData theme) {
+    final l10n = S.current;
     switch (level) {
       case LinkRiskLevel.normal:
         return _DialogConfig(
           icon: Icons.open_in_new_rounded,
           color: theme.colorScheme.primary,
           buttonColor: theme.colorScheme.primary,
-          title: '即将离开',
-          message: '您即将访问外部网站',
+          title: l10n.externalLink_leavingTitle,
+          message: l10n.externalLink_leavingMessage,
         );
       case LinkRiskLevel.risky:
         return _DialogConfig(
           icon: Icons.link_off_rounded,
           color: Colors.orange,
           buttonColor: Colors.orange,
-          title: '短链接提醒',
-          message: '此链接为短链接服务，无法预览真实目标',
-          warning: '短链接可能隐藏真实目的地，请确认来源可信',
+          title: l10n.externalLink_shortLinkTitle,
+          message: l10n.externalLink_shortLinkMessage,
+          warning: l10n.externalLink_shortLinkWarning,
         );
       case LinkRiskLevel.dangerous:
         return _DialogConfig(
           icon: Icons.shield_outlined,
           color: Colors.red,
           buttonColor: Colors.red,
-          title: '安全警告',
-          message: '此链接被标记为潜在风险链接',
-          warning: '可能包含推广内容或存在安全隐患，请谨慎访问',
+          title: l10n.externalLink_securityWarningTitle,
+          message: l10n.externalLink_securityWarningMessage,
+          warning: l10n.externalLink_securityWarningHint,
         );
       default:
         return _DialogConfig(
           icon: Icons.open_in_new_rounded,
           color: theme.colorScheme.primary,
           buttonColor: theme.colorScheme.primary,
-          title: '即将离开',
-          message: '您即将访问外部网站',
+          title: l10n.externalLink_leavingTitle,
+          message: l10n.externalLink_leavingMessage,
         );
     }
   }
@@ -338,14 +340,14 @@ class _LinkBlockedSheet extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                '链接已被阻止',
+                context.l10n.externalLink_blocked,
                 style: theme.textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
-                '此链接已被列入黑名单，无法访问',
+                context.l10n.externalLink_blockedMessage,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -409,7 +411,7 @@ class _LinkBlockedSheet extends StatelessWidget {
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        '如有疑问，请联系站点管理员',
+                        context.l10n.externalLink_contactAdmin,
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
@@ -432,7 +434,7 @@ class _LinkBlockedSheet extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text('我知道了'),
+                  child: Text(context.l10n.common_understood),
                 ),
               ),
             ],

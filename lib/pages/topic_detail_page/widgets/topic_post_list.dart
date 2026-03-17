@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart' show SelectedContent;
 import 'package:scroll_to_index/scroll_to_index.dart';
+import '../../../l10n/s.dart';
 import '../../../models/topic.dart';
 import '../../../providers/message_bus_providers.dart';
 import '../../../services/toast_service.dart';
@@ -592,7 +593,7 @@ class _TopicPostListState extends State<TopicPostList> {
           acceptedAnswerPostNumber: detail.acceptedAnswerPostNumber,
           dateSeparatorLabel: dateSeparatorLabel,
           bottomDateSeparatorLabel: bottomDateSeparatorLabel,
-          onLike: () => ToastService.showInfo('点赞功能开发中...'),
+          onLike: () => ToastService.showInfo(S.current.ai_likeInDev),
           onReply: isLoggedIn ? () => onReply(post.postNumber == 1 ? null : post) : null,
           onEdit: isLoggedIn && post.canEdit ? () => onEdit(post) : null,
           onShareAsImage: onShareAsImage != null ? () => onShareAsImage!(post) : null,
@@ -848,7 +849,7 @@ class _GapIndicatorState extends State<_GapIndicator> {
                 ),
               ),
             Text(
-              _loading ? '加载中...' : '显示 ${widget.count} 条隐藏回复',
+              _loading ? S.current.topicDetail_loading : S.current.topicDetail_showHiddenReplies(widget.count),
               style: theme.textTheme.labelMedium?.copyWith(
                 color: theme.colorScheme.primary,
               ),
@@ -880,7 +881,7 @@ class _LoadFailedRetry extends StatelessWidget {
               Icon(Icons.refresh, size: 16, color: theme.colorScheme.primary),
               const SizedBox(width: 6),
               Text(
-                '加载失败，点击重试',
+                S.current.topicDetail_loadFailedTapRetry,
                 style: TextStyle(
                   fontSize: 14,
                   color: theme.colorScheme.primary,

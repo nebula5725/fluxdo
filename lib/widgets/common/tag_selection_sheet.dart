@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'package:fluxdo/l10n/s.dart';
 import 'package:fluxdo/models/tag_search_result.dart';
 import 'package:fluxdo/services/discourse/discourse_service.dart';
 import 'package:fluxdo/services/toast_service.dart';
@@ -131,7 +132,7 @@ class _TagSelectionSheetState extends State<TagSelectionSheet> {
         _currentSelectedTags.remove(tag);
       } else {
         if (_currentSelectedTags.length >= widget.maxTags) {
-          ToastService.showInfo('最多只能选择 ${widget.maxTags} 个标签');
+          ToastService.showInfo(S.current.tag_maxTagsReached(widget.maxTags));
           return;
         }
         _currentSelectedTags.add(tag);
@@ -147,21 +148,22 @@ class _TagSelectionSheetState extends State<TagSelectionSheet> {
     final theme = Theme.of(context);
 
     // 构建提示文本
+    final l10n = context.l10n;
     String hintText;
     if (widget.filterForInput && _requiredTagGroup != null) {
       // 创建话题模式：有必选标签组要求
-      hintText = '需从 "${_requiredTagGroup!.name}" 选择至少 ${_requiredTagGroup!.minCount} 个';
+      hintText = l10n.tag_requiredTagGroupHint(_requiredTagGroup!.name, _requiredTagGroup!.minCount);
     } else if (widget.filterForInput && widget.minTags > 0) {
       if (_currentSelectedTags.length < widget.minTags) {
-        hintText = '搜索标签 (已选 ${_currentSelectedTags.length}, 至少 ${widget.minTags})...';
+        hintText = l10n.tag_searchWithMin(_currentSelectedTags.length, widget.minTags);
       } else {
-        hintText = '搜索标签 (已选 ${_currentSelectedTags.length}/${widget.maxTags})...';
+        hintText = l10n.tag_searchWithMax(_currentSelectedTags.length, widget.maxTags);
       }
     } else {
       // 筛选模式或无特殊约束
       hintText = _currentSelectedTags.isEmpty
-          ? '搜索标签...'
-          : '搜索标签 (已选 ${_currentSelectedTags.length})...';
+          ? l10n.tag_searchHint
+          : l10n.tag_searchWithCount(_currentSelectedTags.length);
     }
 
     // 过滤出未选中的标签
@@ -228,7 +230,7 @@ class _TagSelectionSheetState extends State<TagSelectionSheet> {
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
-                                '需从 "${_requiredTagGroup!.name}" 标签组选择至少 ${_requiredTagGroup!.minCount} 个标签',
+                                l10n.tag_requiredGroupWarning(_requiredTagGroup!.name, _requiredTagGroup!.minCount),
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   color: theme.colorScheme.primary,
                                 ),
@@ -301,7 +303,7 @@ class _TagSelectionSheetState extends State<TagSelectionSheet> {
                             visualDensity: VisualDensity.compact,
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                           ),
-                          child: const Text('确定'),
+                          child: Text(l10n.common_confirm),
                         ),
                       ],
                     ),
@@ -339,7 +341,7 @@ class _TagSelectionSheetState extends State<TagSelectionSheet> {
                     : displayTags.isEmpty
                         ? Center(
                             child: Text(
-                              _searchController.text.isEmpty ? '暂无可用标签' : '未找到相关标签',
+                              _searchController.text.isEmpty ? l10n.tag_noTags : l10n.tag_noTagsFound,
                               style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
                             ),
                           )
@@ -363,7 +365,7 @@ class _TagSelectionSheetState extends State<TagSelectionSheet> {
                                   backgroundColor: Colors.transparent,
                                 ),
                                 subtitle: tag.count > 0
-                                    ? Text('${tag.count} 个话题')
+                                    ? Text(l10n.tag_topicCount(tag.count))
                                     : null,
                                 trailing: _currentSelectedTags.length >= widget.maxTags
                                     ? Icon(Icons.block, color: theme.colorScheme.outline)

@@ -282,10 +282,10 @@ mixin _TopicsMixin on _DiscourseServiceBase {
       }
 
       if (respData is Map && respData['success'] == false) {
-        throw Exception(respData['errors']?.toString() ?? '创建话题失败');
+        throw Exception(respData['errors']?.toString() ?? S.current.error_createTopicFailed);
       }
 
-      throw Exception('未知响应格式');
+      throw Exception(S.current.error_unknownResponseFormat);
     } on DioException catch (e) {
       if (e.response?.data != null && e.response!.data is Map) {
         final data = e.response!.data as Map;

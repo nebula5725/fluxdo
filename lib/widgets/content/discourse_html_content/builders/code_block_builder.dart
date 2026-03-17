@@ -10,6 +10,7 @@ import '../../../../services/discourse_cache_manager.dart';
 import '../../../../services/toast_service.dart';
 import '../../../../utils/code_selection_context.dart';
 import '../../lazy_load_scope.dart';
+import '../../../../l10n/s.dart';
 
 /// 构建代码块
 Widget buildCodeBlock({
@@ -291,7 +292,7 @@ class _CodeBlockWidgetState extends State<_CodeBlockWidget> {
                       InkWell(
                         onTap: () {
                           Clipboard.setData(ClipboardData(text: text));
-                          ToastService.showSuccess('已复制代码');
+                          ToastService.showSuccess(S.current.common_codeCopied);
                         },
                         borderRadius: BorderRadius.circular(4),
                         child: Padding(
@@ -306,7 +307,7 @@ class _CodeBlockWidgetState extends State<_CodeBlockWidget> {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                '复制',
+                                S.current.common_copy,
                                 style: TextStyle(
                                   fontSize: 11,
                                   color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
@@ -335,7 +336,7 @@ class _CodeBlockWidgetState extends State<_CodeBlockWidget> {
           color: theme.colorScheme.errorContainer,
           borderRadius: BorderRadius.circular(8),
         ),
-        child: Text('代码块渲染失败: $e', style: TextStyle(color: theme.colorScheme.onErrorContainer)),
+        child: Text(S.current.codeBlock_renderFailed(e.toString()), style: TextStyle(color: theme.colorScheme.onErrorContainer)),
       );
     }
   }
@@ -479,7 +480,7 @@ class _MermaidWidgetState extends State<_MermaidWidget> with SingleTickerProvide
                       children: [
                         Icon(_showCode ? Icons.auto_graph : Icons.code, size: 16, color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
                         const SizedBox(width: 4),
-                        Text(_showCode ? '图表' : '代码', style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withValues(alpha: 0.7))),
+                        Text(_showCode ? S.current.codeBlock_chart : S.current.codeBlock_code, style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withValues(alpha: 0.7))),
                       ],
                     ),
                   ),
@@ -488,7 +489,7 @@ class _MermaidWidgetState extends State<_MermaidWidget> with SingleTickerProvide
                 InkWell(
                   onTap: () {
                     Clipboard.setData(ClipboardData(text: text));
-                    ToastService.showSuccess('已复制代码');
+                    ToastService.showSuccess(S.current.common_codeCopied);
                   },
                   borderRadius: BorderRadius.circular(4),
                   child: Padding(
@@ -566,12 +567,12 @@ class _MermaidWidgetState extends State<_MermaidWidget> with SingleTickerProvide
                                 children: [
                                   Icon(Icons.error_outline, color: theme.colorScheme.error),
                                   const SizedBox(height: 8),
-                                  Text('图表加载失败', style: TextStyle(color: theme.colorScheme.error, fontSize: 12)),
+                                  Text(S.current.codeBlock_chartLoadFailed, style: TextStyle(color: theme.colorScheme.error, fontSize: 12)),
                                   const SizedBox(height: 8),
                                   TextButton.icon(
                                     onPressed: _retry,
                                     icon: const Icon(Icons.refresh, size: 16),
-                                    label: const Text('重试'),
+                                    label: Text(S.current.common_retry),
                                     style: TextButton.styleFrom(
                                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                                       minimumSize: Size.zero,

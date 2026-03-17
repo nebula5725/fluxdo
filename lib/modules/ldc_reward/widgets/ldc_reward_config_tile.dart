@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../l10n/s.dart';
 import '../../../pages/webview_page.dart';
 import '../../../services/toast_service.dart';
 import '../providers/ldc_reward_provider.dart';
@@ -51,14 +52,14 @@ class LdcRewardConfigTile extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'LDC 打赏',
+                      context.l10n.reward_title,
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      isConfigured ? '已配置，可在帖子中打赏' : '配置凭证以启用打赏功能',
+                      isConfigured ? context.l10n.reward_configured : context.l10n.reward_notConfigured,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
@@ -88,14 +89,14 @@ class LdcRewardConfigTile extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('配置 LDC 打赏凭证'),
+        title: Text(context.l10n.reward_configDialogTitle),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '请输入在 credit.linux.do 申请的凭证',
+                context.l10n.reward_configHint,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -105,10 +106,10 @@ class LdcRewardConfigTile extends ConsumerWidget {
                 onTap: () => WebViewPage.open(
                   ctx,
                   'https://credit.linux.do/merchant',
-                  title: '创建应用',
+                  title: context.l10n.reward_createApp,
                 ),
                 child: Text(
-                  '前往创建应用 →',
+                  context.l10n.reward_goToCreateApp,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.primary,
                   ),
@@ -142,32 +143,32 @@ class LdcRewardConfigTile extends ConsumerWidget {
               onPressed: () {
                 ref.read(ldcRewardCredentialsProvider.notifier).clear();
                 Navigator.pop(ctx);
-                ToastService.showSuccess('凭证已清除');
+                ToastService.showSuccess(S.current.toast_credentialCleared);
               },
               child: Text(
-                '清除凭证',
+                context.l10n.reward_clearCredential,
                 style: TextStyle(color: theme.colorScheme.error),
               ),
             ),
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('取消'),
+            child: Text(context.l10n.common_cancel),
           ),
           FilledButton(
             onPressed: () {
               final clientId = clientIdController.text.trim();
               final clientSecret = clientSecretController.text.trim();
               if (clientId.isEmpty || clientSecret.isEmpty) {
-                ToastService.showError('请填写完整的凭证信息');
+                ToastService.showError(S.current.toast_credentialIncomplete);
                 return;
               }
               ref
                   .read(ldcRewardCredentialsProvider.notifier)
                   .save(clientId, clientSecret);
               Navigator.pop(ctx);
-              ToastService.showSuccess('凭证保存成功');
+              ToastService.showSuccess(S.current.toast_credentialSaved);
             },
-            child: const Text('保存'),
+            child: Text(context.l10n.common_save),
           ),
         ],
       ),

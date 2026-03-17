@@ -4,6 +4,7 @@ import '../../../models/topic.dart';
 import '../../../providers/discourse_providers.dart';
 import 'package:dio/dio.dart';
 import '../../../services/app_error_handler.dart';
+import '../../../l10n/s.dart';
 import '../../../services/discourse/discourse_service.dart';
 import '../../../services/toast_service.dart';
 
@@ -49,14 +50,14 @@ class _TopicVoteButtonState extends ConsumerState<TopicVoteButton> {
     final user = ref.read(currentUserProvider).value;
     if (user == null) {
       if (mounted) {
-        ToastService.showInfo('请先登录');
+        ToastService.showInfo(S.current.vote_pleaseLogin);
       }
       return;
     }
 
     if (widget.topic.closed) {
       if (mounted) {
-        ToastService.showInfo('话题已关闭，无法投票');
+        ToastService.showInfo(S.current.vote_topicClosed);
       }
       return;
     }
@@ -80,7 +81,7 @@ class _TopicVoteButtonState extends ConsumerState<TopicVoteButton> {
           
           widget.onVoteChanged?.call(response.voteCount, false);
 
-          ToastService.showSuccess('已取消投票');
+          ToastService.showSuccess(S.current.vote_cancelled);
         }
       } else {
         // 投票
@@ -95,11 +96,11 @@ class _TopicVoteButtonState extends ConsumerState<TopicVoteButton> {
           widget.onVoteChanged?.call(response.voteCount, true);
 
           // 显示投票成功提示
-          String message = '投票成功';
+          String message = S.current.vote_success;
           if (response.votesLeft > 0) {
-            message += '，剩余 ${response.votesLeft} 票';
+            message = S.current.vote_successRemaining(response.votesLeft);
           } else if (response.alert) {
-            message = '投票成功，您的投票已用完';
+            message = S.current.vote_successNoRemaining;
           }
 
           ToastService.showSuccess(message);
@@ -228,14 +229,14 @@ class _TopicVoteButtonState extends ConsumerState<TopicVoteButton> {
 
   String _getButtonText(bool isLoggedIn, bool isClosed) {
     if (!isLoggedIn) {
-      return '投票';
+      return S.current.vote_label;
     }
     if (isClosed) {
-      return '已关闭';
+      return S.current.vote_closed;
     }
     if (_userVoted) {
-      return '已投票';
+      return S.current.vote_voted;
     }
-    return '投票';
+    return S.current.vote_label;
   }
 }

@@ -8,6 +8,7 @@ import 'onebox/github_onebox_builder.dart';
 import 'onebox/social_onebox_builder.dart';
 import 'onebox/video_onebox_builder.dart';
 import 'onebox/tech_onebox_builder.dart';
+import '../../../../l10n/s.dart';
 
 /// 构建链接预览卡片 (onebox)
 ///
@@ -245,7 +246,7 @@ Widget _buildSafeDefault({
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              '链接预览',
+              S.current.onebox_linkPreview,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),

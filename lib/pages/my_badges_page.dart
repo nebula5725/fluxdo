@@ -9,6 +9,7 @@ import '../widgets/badge/my_badges_skeleton.dart';
 import '../utils/font_awesome_helper.dart';
 import '../widgets/badge/badge_ui_utils.dart';
 import 'badge_page.dart';
+import '../l10n/s.dart';
 
 /// 我的徽章页面
 class MyBadgesPage extends ConsumerStatefulWidget {
@@ -39,7 +40,7 @@ class _MyBadgesPageState extends ConsumerState<MyBadgesPage> {
       final user = ref.read(currentUserProvider).value;
       if (user == null) {
         setState(() {
-          _error = '请先登录';
+          _error = S.current.error_unauthorizedExpired;
           _isLoading = false;
         });
         return;
@@ -95,12 +96,12 @@ class _MyBadgesPageState extends ConsumerState<MyBadgesPage> {
                       const Icon(Icons.error_outline,
                           size: 64, color: Colors.grey),
                       const SizedBox(height: 16),
-                      Text('加载失败: $_error',
+                      Text('${context.l10n.common_loadFailed}: $_error',
                           style: const TextStyle(color: Colors.grey)),
                       const SizedBox(height: 16),
                       ElevatedButton(
                         onPressed: _loadBadges,
-                        child: const Text('重试'),
+                        child: Text(context.l10n.common_retry),
                       ),
                     ],
                   ),
@@ -119,7 +120,7 @@ class _MyBadgesPageState extends ConsumerState<MyBadgesPage> {
                                 Icon(Icons.military_tech_outlined,
                                     size: 64, color: Colors.grey[400]),
                                 const SizedBox(height: 16),
-                                Text('暂无徽章',
+                                Text(context.l10n.myBadges_empty,
                                     style: TextStyle(color: Colors.grey[600])),
                               ],
                             ),
@@ -141,7 +142,7 @@ class _MyBadgesPageState extends ConsumerState<MyBadgesPage> {
 
   Widget _buildAppBar(BuildContext context, int totalCount) {
     return SliverAppBar.large(
-      title: const Text('我的徽章'),
+      title: Text(context.l10n.myBadges_title),
       centerTitle: false,
       expandedHeight: 200, // Taller header
       flexibleSpace: FlexibleSpaceBar(
@@ -175,7 +176,7 @@ class _MyBadgesPageState extends ConsumerState<MyBadgesPage> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      '累计获得',
+                      context.l10n.myBadges_totalEarned,
                       style: TextStyle(
                         fontSize: 14,
                         color: Theme.of(context).colorScheme.secondary,
@@ -194,7 +195,7 @@ class _MyBadgesPageState extends ConsumerState<MyBadgesPage> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '枚徽章',
+                      context.l10n.myBadges_badgeUnit,
                       style: TextStyle(
                         fontSize: 14,
                         color: Theme.of(context).colorScheme.outline,

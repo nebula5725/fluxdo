@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../../../../l10n/s.dart';
 import '../../../../constants.dart';
 import '../../../../models/topic.dart';
 import '../../../../pages/user_profile_page.dart';
@@ -152,11 +153,11 @@ class PostHeader extends StatelessWidget {
                   ],
                   if (isTopicOwner && post.postNumber > 1) ...[
                     const SizedBox(width: 4),
-                    buildCompactBadge(context, '主', theme.colorScheme.primaryContainer, theme.colorScheme.onPrimaryContainer),
+                    buildCompactBadge(context, context.l10n.post_opBadge, theme.colorScheme.primaryContainer, theme.colorScheme.onPrimaryContainer),
                   ],
                   if (isOwnPost) ...[
                     const SizedBox(width: 4),
-                    buildCompactBadge(context, '我', theme.colorScheme.tertiaryContainer, theme.colorScheme.onTertiaryContainer),
+                    buildCompactBadge(context, context.l10n.post_meBadge, theme.colorScheme.tertiaryContainer, theme.colorScheme.onTertiaryContainer),
                   ],
                   if (isWhisper) ...[
                     const SizedBox(width: 8),

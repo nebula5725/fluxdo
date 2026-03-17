@@ -14,6 +14,7 @@ import '../providers/theme_provider.dart';
 import '../services/network/exceptions/api_exception.dart';
 import '../services/toast_service.dart';
 import '../utils/time_utils.dart';
+import '../l10n/s.dart';
 
 enum _InviteExpiryPreset { days1, days7, days30, days90, never }
 
@@ -21,15 +22,15 @@ extension on _InviteExpiryPreset {
   String get label {
     switch (this) {
       case _InviteExpiryPreset.days1:
-        return '1 天';
+        return S.current.time_days(1);
       case _InviteExpiryPreset.days7:
-        return '7 天';
+        return S.current.time_days(7);
       case _InviteExpiryPreset.days30:
-        return '30 天';
+        return S.current.time_days(30);
       case _InviteExpiryPreset.days90:
-        return '90 天';
+        return S.current.time_days(90);
       case _InviteExpiryPreset.never:
-        return '从不';
+        return S.current.invite_never;
     }
   }
 
@@ -58,7 +59,7 @@ class InviteLinksPage extends ConsumerStatefulWidget {
 
 class _InviteLinksPageState extends ConsumerState<InviteLinksPage> {
   static const int _maxRedemptionsAllowed = 1;
-  static const String _defaultRateLimitWait = '21 小时';
+  static final String _defaultRateLimitWait = S.current.time_hours(21);
   static const Duration _inviteCooldownDuration = Duration(hours: 24);
   static const String _inviteCacheKeyPrefix = 'invite_link_cache:';
 
@@ -107,12 +108,12 @@ class _InviteLinksPageState extends ConsumerState<InviteLinksPage> {
 
   String get _summaryText {
     if (_expiryPreset == _InviteExpiryPreset.days1) {
-      return '链接最多可用于 1 个用户，并且将在 1 天后到期。';
+      return S.current.invite_summaryDay1;
     }
     if (_expiryPreset == _InviteExpiryPreset.never) {
-      return '链接最多可用于 1 个用户，并且永不过期。';
+      return S.current.invite_summaryNever;
     }
-    return '链接最多可用于 1 个用户，并且将在 ${_expiryPreset.label} 后到期。';
+    return S.current.invite_summaryExpiry(_expiryPreset.label);
   }
 
   String? get _effectiveInviteLink {
@@ -247,11 +248,11 @@ class _InviteLinksPageState extends ConsumerState<InviteLinksPage> {
   Future<void> _createInviteLink({bool useAdvancedOptions = false}) async {
     final user = ref.read(currentUserProvider).value;
     if (user == null) {
-      ToastService.showError('请先登录');
+      ToastService.showError(S.current.common_pleaseLogin);
       return;
     }
     if (user.trustLevel < 3) {
-      ToastService.showError('当前账号尚未达到 L3，无法创建邀请链接');
+      ToastService.showError(S.current.invite_trustLevelTooLow);
       return;
     }
 
@@ -280,7 +281,7 @@ class _InviteLinksPageState extends ConsumerState<InviteLinksPage> {
         await _loadPendingInvites(force: true);
       }
       ToastService.showSuccess(
-        resolved.inviteLink.trim().isNotEmpty ? '邀请链接已生成' : '邀请已创建',
+        resolved.inviteLink.trim().isNotEmpty ? S.current.invite_linkGenerated : S.current.invite_created,
       );
     } catch (error) {
       if (!mounted) return;
@@ -300,14 +301,14 @@ class _InviteLinksPageState extends ConsumerState<InviteLinksPage> {
     final inviteLink = _effectiveInviteLink;
     if (inviteLink == null || inviteLink.isEmpty) return;
     await Clipboard.setData(ClipboardData(text: inviteLink));
-    ToastService.showSuccess('邀请链接已复制');
+    ToastService.showSuccess(S.current.invite_linkCopied);
   }
 
   void _shareInviteLink() {
     final inviteLink = _effectiveInviteLink;
     if (inviteLink == null || inviteLink.isEmpty) return;
     SharePlus.instance.share(
-      ShareParams(text: inviteLink, subject: 'Linux.do 邀请链接'),
+      ShareParams(text: inviteLink, subject: S.current.invite_shareSubject),
     );
   }
 
@@ -319,7 +320,7 @@ class _InviteLinksPageState extends ConsumerState<InviteLinksPage> {
       final waitText = waitSeconds != null && waitSeconds > 0
           ? _formatWaitDuration(waitSeconds)
           : (waitFromMessage ?? estimatedWait ?? _defaultRateLimitWait);
-      return '出错了：您执行此操作的次数过多。请等待 $waitText 后再试。';
+      return S.current.invite_rateLimited(waitText);
     }
 
     final message = _extractErrorMessage(error);
@@ -329,9 +330,9 @@ class _InviteLinksPageState extends ConsumerState<InviteLinksPage> {
     }
     if (message.contains('You are not permitted') ||
         message.contains('not permitted')) {
-      return '服务端拒绝了当前账号的邀请权限';
+      return S.current.invite_permissionDenied;
     }
-    return message.isEmpty ? '生成邀请链接失败' : message;
+    return message.isEmpty ? S.current.invite_createFailed : message;
   }
 
   String _extractErrorMessage(Object error) {
@@ -395,10 +396,10 @@ class _InviteLinksPageState extends ConsumerState<InviteLinksPage> {
         _extractWaitTextFromHeaders(dioError?.response?.headers) ??
         _estimateInviteCooldownWait() ??
         _defaultRateLimitWait;
-    if (waitText == '21 小时') {
-      return '出错了：您执行此操作的次数过多。请等待 21 小时后再试。';
+    if (waitText == S.current.time_hours(21)) {
+      return S.current.invite_rateLimited(S.current.time_hours(21));
     }
-    return '出错了：您执行此操作的次数过多。请等待 $waitText 后再试。';
+    return S.current.invite_rateLimited(waitText);
   }
 
   String? _estimateInviteCooldownWait() {
@@ -475,10 +476,10 @@ class _InviteLinksPageState extends ConsumerState<InviteLinksPage> {
       final value = int.tryParse(englishMatch.group(1) ?? '');
       final unit = englishMatch.group(2)?.toLowerCase();
       if (value == null || unit == null) return null;
-      if (unit.startsWith('day')) return '$value 天';
-      if (unit.startsWith('hour')) return '$value 小时';
-      if (unit.startsWith('minute')) return '$value 分钟';
-      return '$value 秒';
+      if (unit.startsWith('day')) return S.current.time_days(value);
+      if (unit.startsWith('hour')) return S.current.time_hours(value);
+      if (unit.startsWith('minute')) return S.current.time_minutes(value);
+      return S.current.time_seconds(value);
     }
 
     return null;
@@ -486,15 +487,15 @@ class _InviteLinksPageState extends ConsumerState<InviteLinksPage> {
 
   String _formatWaitDuration(int seconds) {
     if (seconds >= 86400) {
-      return '${(seconds / 86400).ceil()} 天';
+      return S.current.time_days((seconds / 86400).ceil());
     }
     if (seconds >= 3600) {
-      return '${(seconds / 3600).ceil()} 小时';
+      return S.current.time_hours((seconds / 3600).ceil());
     }
     if (seconds >= 60) {
-      return '${(seconds / 60).ceil()} 分钟';
+      return S.current.time_minutes((seconds / 60).ceil());
     }
-    return '$seconds 秒';
+    return S.current.time_seconds(seconds);
   }
 
   @override
@@ -502,7 +503,7 @@ class _InviteLinksPageState extends ConsumerState<InviteLinksPage> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('邀请链接')),
+      appBar: AppBar(title: Text(context.l10n.invite_title)),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -532,7 +533,7 @@ class _InviteLinksPageState extends ConsumerState<InviteLinksPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '创建邀请链接',
+              context.l10n.invite_createLink,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -550,7 +551,7 @@ class _InviteLinksPageState extends ConsumerState<InviteLinksPage> {
               onPressed: () =>
                   setState(() => _showAdvancedOptions = !_showAdvancedOptions),
               style: TextButton.styleFrom(padding: EdgeInsets.zero),
-              child: Text(_showAdvancedOptions ? '收起链接选项' : '编辑链接选项或通过电子邮件发送。'),
+              child: Text(_showAdvancedOptions ? context.l10n.invite_collapseOptions : context.l10n.invite_expandOptions),
             ),
             if (!_showAdvancedOptions) ...[
               const SizedBox(height: 12),
@@ -565,7 +566,7 @@ class _InviteLinksPageState extends ConsumerState<InviteLinksPage> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : const Icon(Icons.link_rounded),
-                  label: Text(_isSubmitting ? '创建中...' : '创建链接'),
+                  label: Text(_isSubmitting ? context.l10n.invite_creating : context.l10n.invite_createLink),
                 ),
               ),
             ],
@@ -584,7 +585,7 @@ class _InviteLinksPageState extends ConsumerState<InviteLinksPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '邀请成员',
+              context.l10n.invite_inviteMembers,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -593,8 +594,8 @@ class _InviteLinksPageState extends ConsumerState<InviteLinksPage> {
             TextField(
               controller: _descriptionController,
               maxLength: 100,
-              decoration: const InputDecoration(
-                labelText: '描述 (可选)',
+              decoration: InputDecoration(
+                labelText: context.l10n.invite_description,
                 border: OutlineInputBorder(),
               ),
             ),
@@ -602,16 +603,16 @@ class _InviteLinksPageState extends ConsumerState<InviteLinksPage> {
             TextField(
               controller: _restrictionController,
               keyboardType: TextInputType.emailAddress,
-              decoration: const InputDecoration(
-                labelText: '限制为 (可选)',
-                helperText: '填写邮箱或域名',
-                hintText: 'name@example.com 或者 example.com',
+              decoration: InputDecoration(
+                labelText: context.l10n.invite_restriction,
+                helperText: context.l10n.invite_restrictionHelper,
+                hintText: context.l10n.invite_restrictionHint,
                 border: OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 16),
             Text(
-              '最大使用次数',
+              context.l10n.invite_maxRedemptions,
               style: theme.textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -620,7 +621,7 @@ class _InviteLinksPageState extends ConsumerState<InviteLinksPage> {
             _buildReadOnlyField(theme, value: '1'),
             const SizedBox(height: 16),
             Text(
-              '有效截止时间',
+              context.l10n.invite_expiryTime,
               style: theme.textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -651,7 +652,7 @@ class _InviteLinksPageState extends ConsumerState<InviteLinksPage> {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Icon(Icons.link_rounded),
-                label: Text(_isSubmitting ? '创建中...' : '创建链接'),
+                label: Text(_isSubmitting ? context.l10n.invite_creating : context.l10n.invite_createLink),
               ),
             ),
           ],
@@ -670,7 +671,7 @@ class _InviteLinksPageState extends ConsumerState<InviteLinksPage> {
         children: [
           Expanded(child: Text(value, style: theme.textTheme.bodyLarge)),
           Text(
-            '固定',
+            context.l10n.invite_fixed,
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
               fontWeight: FontWeight.w600,
@@ -692,7 +693,7 @@ class _InviteLinksPageState extends ConsumerState<InviteLinksPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '最新生成结果',
+              context.l10n.invite_latestResult,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -720,18 +721,18 @@ class _InviteLinksPageState extends ConsumerState<InviteLinksPage> {
                 _MetaChip(
                   icon: Icons.repeat_rounded,
                   label:
-                      '可用 ${invite.invite?.maxRedemptionsAllowed ?? _maxRedemptionsAllowed} 次',
+                      context.l10n.invite_usableCount(invite.invite?.maxRedemptionsAllowed ?? _maxRedemptionsAllowed),
                 ),
                 if (invite.invite?.expiresAt != null)
                   _MetaChip(
                     icon: Icons.schedule_rounded,
                     label:
-                        '截止 ${TimeUtils.formatDetailTime(invite.invite!.expiresAt)}',
+                        context.l10n.invite_expiryDate(TimeUtils.formatDetailTime(invite.invite!.expiresAt)),
                   )
                 else
-                  const _MetaChip(
+                  _MetaChip(
                     icon: Icons.all_inclusive_rounded,
-                    label: '无过期时间',
+                    label: context.l10n.invite_noExpiry,
                   ),
               ],
             ),
@@ -742,7 +743,7 @@ class _InviteLinksPageState extends ConsumerState<InviteLinksPage> {
                   child: OutlinedButton.icon(
                     onPressed: _copyInviteLink,
                     icon: const Icon(Icons.copy_rounded),
-                    label: const Text('复制链接'),
+                    label: Text(context.l10n.common_copyLink),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -750,7 +751,7 @@ class _InviteLinksPageState extends ConsumerState<InviteLinksPage> {
                   child: FilledButton.icon(
                     onPressed: _shareInviteLink,
                     icon: const Icon(Icons.share_rounded),
-                    label: const Text('分享'),
+                    label: Text(context.l10n.common_share),
                   ),
                 ),
               ],
@@ -767,7 +768,7 @@ class _InviteLinksPageState extends ConsumerState<InviteLinksPage> {
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Text(
-          '暂无生成邀请链接',
+          context.l10n.invite_noLinks,
           style: theme.textTheme.bodyMedium?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),

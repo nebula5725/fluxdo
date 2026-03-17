@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../l10n/s.dart';
 
 /// 构建 Discourse details 折叠块
 /// 
@@ -11,12 +12,12 @@ Widget buildDetails({
 }) {
   // 提取 summary 文本
   final summaryElements = element.getElementsByTagName('summary');
-  String summaryText = '详情'; // 默认标题
+  String summaryText = S.current.common_details; // 默认标题
   if (summaryElements.isNotEmpty) {
     // 取 summary 的纯文本
     summaryText = summaryElements.first.text.trim();
     if (summaryText.isEmpty) {
-      summaryText = '详情';
+      summaryText = S.current.common_details;
     }
   }
 

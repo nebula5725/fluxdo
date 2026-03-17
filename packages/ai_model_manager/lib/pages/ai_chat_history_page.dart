@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../l10n/ai_l10n.dart';
 import '../models/ai_chat_message.dart';
 import '../providers/ai_provider_providers.dart';
 
@@ -43,12 +44,12 @@ class _AiChatHistoryPageState extends ConsumerState<AiChatHistoryPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('会话记录'),
+        title: Text(AiL10n.current.sessionHistory),
         actions: [
           if (_groups.isNotEmpty)
             IconButton(
               icon: const Icon(Icons.delete_sweep_outlined),
-              tooltip: '清除所有对话',
+              tooltip: AiL10n.current.clearAllConversations,
               onPressed: () => _confirmDeleteAll(context),
             ),
         ],
@@ -84,7 +85,7 @@ class _AiChatHistoryPageState extends ConsumerState<AiChatHistoryPage> {
           ),
           const SizedBox(height: 16),
           Text(
-            '暂无会话记录',
+            AiL10n.current.noSessionHistory,
             style: theme.textTheme.bodyLarge?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -110,12 +111,12 @@ class _AiChatHistoryPageState extends ConsumerState<AiChatHistoryPage> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('清除所有对话'),
-        content: Text('确定要删除全部 $_totalSessionCount 条会话记录吗？此操作不可恢复。'),
+        title: Text(AiL10n.current.clearAllConversations),
+        content: Text(AiL10n.current.confirmDeleteAllSessions(_totalSessionCount)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('取消'),
+            child: Text(AiL10n.current.cancel),
           ),
           FilledButton(
             onPressed: () async {
@@ -131,7 +132,7 @@ class _AiChatHistoryPageState extends ConsumerState<AiChatHistoryPage> {
             style: FilledButton.styleFrom(
               backgroundColor: Theme.of(ctx).colorScheme.error,
             ),
-            child: const Text('清除全部'),
+            child: Text(AiL10n.current.clearAll),
           ),
         ],
       ),
@@ -156,7 +157,7 @@ class _TopicGroupTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final topicTitle = group.topicTitle ?? '话题 #${group.topicId}';
+    final topicTitle = group.topicTitle ?? AiL10n.current.topicWithId(group.topicId);
 
     return ExpansionTile(
       leading: Icon(
@@ -171,7 +172,7 @@ class _TopicGroupTile extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
       ),
       subtitle: Text(
-        '${group.sessions.length} 条会话',
+        AiL10n.current.sessionCount(group.sessions.length),
         style: theme.textTheme.bodySmall?.copyWith(
           color: theme.colorScheme.onSurfaceVariant,
         ),
@@ -185,7 +186,7 @@ class _TopicGroupTile extends StatelessWidget {
               size: 18,
               color: theme.colorScheme.error,
             ),
-            tooltip: '删除此话题所有会话',
+            tooltip: AiL10n.current.deleteAllTopicSessions,
             onPressed: () => _confirmDeleteTopic(context, topicTitle),
           ),
           const Icon(Icons.expand_more, size: 20),
@@ -200,7 +201,7 @@ class _TopicGroupTile extends StatelessWidget {
             color: theme.colorScheme.onSurfaceVariant,
           ),
           title: Text(
-            session.title ?? '未命名会话',
+            session.title ?? AiL10n.current.unnamedSession,
             style: theme.textTheme.bodyMedium,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -231,12 +232,12 @@ class _TopicGroupTile extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('删除话题会话'),
-        content: Text('确定要删除「$topicTitle」的所有会话记录吗？'),
+        title: Text(AiL10n.current.deleteTopicSessions),
+        content: Text(AiL10n.current.confirmDeleteTopicSessions(topicTitle)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('取消'),
+            child: Text(AiL10n.current.cancel),
           ),
           FilledButton(
             onPressed: () {
@@ -246,7 +247,7 @@ class _TopicGroupTile extends StatelessWidget {
             style: FilledButton.styleFrom(
               backgroundColor: Theme.of(ctx).colorScheme.error,
             ),
-            child: const Text('删除'),
+            child: Text(AiL10n.current.delete),
           ),
         ],
       ),
@@ -257,10 +258,10 @@ class _TopicGroupTile extends StatelessWidget {
     final now = DateTime.now();
     final diff = now.difference(time);
 
-    if (diff.inMinutes < 1) return '刚刚';
-    if (diff.inHours < 1) return '${diff.inMinutes} 分钟前';
-    if (diff.inDays < 1) return '${diff.inHours} 小时前';
-    if (diff.inDays < 30) return '${diff.inDays} 天前';
+    if (diff.inMinutes < 1) return AiL10n.current.justNow;
+    if (diff.inHours < 1) return AiL10n.current.minutesAgo(diff.inMinutes);
+    if (diff.inDays < 1) return AiL10n.current.hoursAgo(diff.inHours);
+    if (diff.inDays < 30) return AiL10n.current.daysAgo(diff.inDays);
 
     return '${time.month}/${time.day}';
   }

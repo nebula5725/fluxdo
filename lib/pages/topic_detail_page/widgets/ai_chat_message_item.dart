@@ -1,5 +1,6 @@
 import 'package:ai_model_manager/ai_model_manager.dart';
 import 'package:flutter/material.dart';
+import '../../../l10n/s.dart';
 
 import '../../../widgets/markdown_editor/markdown_renderer.dart';
 
@@ -183,7 +184,7 @@ class AiChatMessageItem extends StatelessWidget {
             const SizedBox(width: 6),
             Flexible(
               child: Text(
-                message.errorMessage ?? '生成失败',
+                message.errorMessage ?? context.l10n.ai_generateFailed,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.error,
                 ),
@@ -201,7 +202,7 @@ class AiChatMessageItem extends StatelessWidget {
               onPressed: onRetry,
               icon: Icon(Icons.refresh, size: 14, color: theme.colorScheme.primary),
               label: Text(
-                '重试',
+                context.l10n.ai_retryLabel,
                 style: TextStyle(fontSize: 12, color: theme.colorScheme.primary),
               ),
               style: TextButton.styleFrom(
@@ -226,14 +227,14 @@ class AiChatMessageItem extends StatelessWidget {
       children: [
         _ActionButton(
           icon: Icons.image_outlined,
-          label: '导出图片',
+          label: context.l10n.ai_exportImage,
           color: color,
           onTap: onShareAsImage,
         ),
         const SizedBox(width: 12),
         _ActionButton(
           icon: Icons.copy_outlined,
-          label: '复制',
+          label: context.l10n.ai_copyLabel,
           color: color,
           onTap: onCopyText,
         ),

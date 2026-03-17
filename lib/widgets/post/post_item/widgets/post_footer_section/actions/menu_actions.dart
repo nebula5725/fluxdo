@@ -15,7 +15,7 @@ extension _PostFooterMenuActions on _PostFooterSectionState {
         postId: widget.post.id,
         postUsername: widget.post.username,
         service: _service,
-        onSuccess: () => ToastService.showSuccess('举报已提交'),
+        onSuccess: () => ToastService.showSuccess(S.current.post_flagSubmitted),
       ),
     );
   }
@@ -24,12 +24,12 @@ extension _PostFooterMenuActions on _PostFooterSectionState {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('删除回复'),
-        content: const Text('确定要删除这条回复吗？此操作可以撤销。'),
+        title: Text(context.l10n.post_deleteReplyTitle),
+        content: Text(context.l10n.post_deleteReplyConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('取消'),
+            child: Text(context.l10n.common_cancel),
           ),
           FilledButton(
             onPressed: () {
@@ -39,7 +39,7 @@ extension _PostFooterMenuActions on _PostFooterSectionState {
             style: FilledButton.styleFrom(
               backgroundColor: theme.colorScheme.error,
             ),
-            child: const Text('删除'),
+            child: Text(context.l10n.common_delete),
           ),
         ],
       ),
@@ -65,7 +65,7 @@ extension _PostFooterMenuActions on _PostFooterSectionState {
               if (widget.post.canEdit && widget.onEdit != null)
                 ListTile(
                   leading: Icon(Icons.edit_outlined, color: theme.colorScheme.primary),
-                  title: Text('编辑', style: TextStyle(color: theme.colorScheme.primary)),
+                  title: Text(context.l10n.common_edit, style: TextStyle(color: theme.colorScheme.primary)),
                   onTap: () {
                     Navigator.pop(ctx);
                     widget.onEdit!();
@@ -73,7 +73,7 @@ extension _PostFooterMenuActions on _PostFooterSectionState {
                 ),
               ListTile(
                 leading: Icon(Icons.share_outlined, color: theme.colorScheme.onSurface),
-                title: const Text('分享链接'),
+                title: Text(context.l10n.common_shareLink),
                 onTap: () {
                   Navigator.pop(ctx);
                   _sharePost();
@@ -82,7 +82,7 @@ extension _PostFooterMenuActions on _PostFooterSectionState {
               if (widget.onShareAsImage != null)
                 ListTile(
                   leading: Icon(Icons.image_outlined, color: theme.colorScheme.onSurface),
-                  title: const Text('生成分享图片'),
+                  title: Text(context.l10n.post_generateShareImage),
                   onTap: () {
                     Navigator.pop(ctx);
                     widget.onShareAsImage!();
@@ -103,7 +103,7 @@ extension _PostFooterMenuActions on _PostFooterSectionState {
                         Icons.volunteer_activism_rounded,
                         color: theme.colorScheme.onSurface,
                       ),
-                      title: const Text('打赏 LDC'),
+                      title: Text(context.l10n.post_tipLdc),
                       onTap: () {
                         Navigator.pop(ctx);
                         showLdcRewardSheet(
@@ -128,7 +128,7 @@ extension _PostFooterMenuActions on _PostFooterSectionState {
                     color: _isAcceptedAnswer ? Colors.green : theme.colorScheme.onSurface,
                   ),
                   title: Text(
-                    _isAcceptedAnswer ? '取消采纳' : '采纳为解决方案',
+                    _isAcceptedAnswer ? context.l10n.post_unacceptSolution : context.l10n.post_acceptSolution,
                     style: TextStyle(
                       color: _isAcceptedAnswer ? Colors.green : theme.colorScheme.onSurface,
                     ),
@@ -148,7 +148,7 @@ extension _PostFooterMenuActions on _PostFooterSectionState {
                         ? theme.colorScheme.primary
                         : theme.colorScheme.onSurface,
                   ),
-                  title: Text(_isBookmarked ? '编辑书签' : '添加书签'),
+                  title: Text(_isBookmarked ? context.l10n.bookmark_editBookmark : context.l10n.common_addBookmark),
                   onTap: () {
                     Navigator.pop(ctx);
                     if (_isBookmarked) {
@@ -161,7 +161,7 @@ extension _PostFooterMenuActions on _PostFooterSectionState {
               if (!isGuest)
                 ListTile(
                   leading: Icon(Icons.flag_outlined, color: theme.colorScheme.error),
-                  title: Text('举报', style: TextStyle(color: theme.colorScheme.error)),
+                  title: Text(context.l10n.common_report, style: TextStyle(color: theme.colorScheme.error)),
                   onTap: () {
                     Navigator.pop(ctx);
                     _showFlagDialog(context);
@@ -170,7 +170,7 @@ extension _PostFooterMenuActions on _PostFooterSectionState {
               if (!isGuest && widget.post.canRecover)
                 ListTile(
                   leading: Icon(Icons.restore, color: theme.colorScheme.primary),
-                  title: Text('恢复', style: TextStyle(color: theme.colorScheme.primary)),
+                  title: Text(context.l10n.common_restore, style: TextStyle(color: theme.colorScheme.primary)),
                   onTap: _isDeleting
                       ? null
                       : () {
@@ -181,7 +181,7 @@ extension _PostFooterMenuActions on _PostFooterSectionState {
               if (!isGuest && widget.post.canDelete && !widget.post.isDeleted)
                 ListTile(
                   leading: Icon(Icons.delete_outline, color: theme.colorScheme.error),
-                  title: Text('删除', style: TextStyle(color: theme.colorScheme.error)),
+                  title: Text(context.l10n.common_delete, style: TextStyle(color: theme.colorScheme.error)),
                   onTap: _isDeleting
                       ? null
                       : () {
@@ -192,7 +192,7 @@ extension _PostFooterMenuActions on _PostFooterSectionState {
               const SizedBox(height: 8),
               ListTile(
                 title: Text(
-                  '取消',
+                  context.l10n.common_cancel,
                   textAlign: TextAlign.center,
                   style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
                 ),

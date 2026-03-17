@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:super_clipboard/super_clipboard.dart';
 import '../../providers/preferences_provider.dart';
 import '../../services/discourse/discourse_service.dart';
+import '../../l10n/s.dart';
 import '../../services/toast_service.dart';
 import '../../utils/screenshot_utils.dart';
 import 'ai_share_image_widget.dart';
@@ -131,11 +132,11 @@ class _AiShareImagePreviewState extends ConsumerState<AiShareImagePreview> {
 
     try {
       final bytes = await _captureImage();
-      if (bytes == null) throw Exception('截图失败');
+      if (bytes == null) throw Exception(S.current.share_screenshotFailed);
 
       final clipboard = SystemClipboard.instance;
       if (clipboard == null) {
-        ToastService.showError('剪贴板不可用');
+        ToastService.showError(S.current.common_clipboardUnavailable);
         return;
       }
       final item = DataWriterItem();
@@ -143,12 +144,12 @@ class _AiShareImagePreviewState extends ConsumerState<AiShareImagePreview> {
       await clipboard.write([item]);
 
       if (mounted) {
-        ToastService.showSuccess('图片已复制');
+        ToastService.showSuccess(S.current.share_imageCopied);
       }
     } catch (e) {
       debugPrint('[AiShareImagePreview] copyImage error: $e');
       if (mounted) {
-        ToastService.showError('复制失败，请重试');
+        ToastService.showError(S.current.share_copyFailed);
       }
     } finally {
       if (mounted) setState(() => _isCopying = false);
@@ -161,19 +162,19 @@ class _AiShareImagePreviewState extends ConsumerState<AiShareImagePreview> {
 
     try {
       final bytes = await _captureImage();
-      if (bytes == null) throw Exception('截图失败');
+      if (bytes == null) throw Exception(S.current.share_screenshotFailed);
 
       final success = await ScreenshotUtils.saveToGallery(bytes);
       if (mounted) {
         if (success) {
-          ToastService.showSuccess('图片已保存到相册');
+          ToastService.showSuccess(S.current.share_imageSaved);
         } else {
-          ToastService.showError('保存失败，请授予相册权限');
+          ToastService.showError(S.current.share_savePermissionDenied);
         }
       }
     } catch (e) {
       debugPrint('[AiShareImagePreview] saveImage error: $e');
-      if (mounted) ToastService.showError('保存失败，请重试');
+      if (mounted) ToastService.showError(S.current.share_saveFailed);
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
@@ -185,12 +186,12 @@ class _AiShareImagePreviewState extends ConsumerState<AiShareImagePreview> {
 
     try {
       final bytes = await _captureImage();
-      if (bytes == null) throw Exception('截图失败');
+      if (bytes == null) throw Exception(S.current.share_screenshotFailed);
 
       await ScreenshotUtils.shareImage(bytes);
     } catch (e) {
       debugPrint('[AiShareImagePreview] shareImage error: $e');
-      if (mounted) ToastService.showError('分享失败，请重试');
+      if (mounted) ToastService.showError(S.current.common_shareFailed);
     } finally {
       if (mounted) setState(() => _isSharing = false);
     }
@@ -203,7 +204,7 @@ class _AiShareImagePreviewState extends ConsumerState<AiShareImagePreview> {
 
     try {
       final bytes = await _captureImage();
-      if (bytes == null) throw Exception('截图失败');
+      if (bytes == null) throw Exception(S.current.share_screenshotFailed);
 
       // 保存到临时文件
       final tempDir = await getTemporaryDirectory();
@@ -214,7 +215,7 @@ class _AiShareImagePreviewState extends ConsumerState<AiShareImagePreview> {
       // 上传到 Discourse
       final service = DiscourseService();
       final uploadResult = await service.uploadImage(tempFile.path);
-      final imageMarkdown = uploadResult.toMarkdown(alt: 'AI 助手回复');
+      final imageMarkdown = uploadResult.toMarkdown(alt: S.current.share_aiReplyAlt);
 
       if (mounted) {
         // 关闭预览页
@@ -225,7 +226,7 @@ class _AiShareImagePreviewState extends ConsumerState<AiShareImagePreview> {
     } catch (e) {
       debugPrint('[AiShareImagePreview] replyToTopic error: $e');
       if (mounted) {
-        ToastService.showError('上传失败，请重试');
+        ToastService.showError(S.current.share_uploadFailed);
       }
     } finally {
       if (mounted) setState(() => _isReplying = false);
@@ -272,7 +273,7 @@ class _AiShareImagePreviewState extends ConsumerState<AiShareImagePreview> {
                 ),
                 Expanded(
                   child: Text(
-                    widget.messages.length > 1 ? '导出对话图片' : '导出图片',
+                    widget.messages.length > 1 ? context.l10n.share_exportChatImage : context.l10n.share_exportImage,
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
@@ -422,7 +423,7 @@ class _AiShareImagePreviewState extends ConsumerState<AiShareImagePreview> {
                                     strokeWidth: 2),
                               )
                             : const Icon(Icons.copy, size: 18),
-                        label: const Text('复制'),
+                        label: Text(context.l10n.common_copy),
                         style: OutlinedButton.styleFrom(
                           padding:
                               const EdgeInsets.symmetric(vertical: 12),
@@ -442,7 +443,7 @@ class _AiShareImagePreviewState extends ConsumerState<AiShareImagePreview> {
                                     strokeWidth: 2),
                               )
                             : const Icon(Icons.save_alt, size: 18),
-                        label: const Text('保存'),
+                        label: Text(context.l10n.common_save),
                         style: OutlinedButton.styleFrom(
                           padding:
                               const EdgeInsets.symmetric(vertical: 12),
@@ -464,7 +465,7 @@ class _AiShareImagePreviewState extends ConsumerState<AiShareImagePreview> {
                                 ),
                               )
                             : const Icon(Icons.share, size: 18),
-                        label: const Text('分享'),
+                        label: Text(context.l10n.common_share),
                         style: FilledButton.styleFrom(
                           padding:
                               const EdgeInsets.symmetric(vertical: 12),
@@ -488,7 +489,7 @@ class _AiShareImagePreviewState extends ConsumerState<AiShareImagePreview> {
                                   CircularProgressIndicator(strokeWidth: 2),
                             )
                           : const Icon(Icons.reply, size: 18),
-                      label: Text(_isReplying ? '正在上传...' : '回复话题'),
+                      label: Text(_isReplying ? context.l10n.share_uploading : context.l10n.share_replyToTopic),
                       style: FilledButton.styleFrom(
                         padding:
                             const EdgeInsets.symmetric(vertical: 12),

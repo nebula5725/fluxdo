@@ -1,5 +1,6 @@
 import 'package:ai_model_manager/ai_model_manager.dart';
 import 'package:flutter/material.dart';
+import '../../../l10n/s.dart';
 
 /// 上下文范围选择器
 class AiContextSelector extends StatelessWidget {
@@ -17,7 +18,7 @@ class AiContextSelector extends StatelessWidget {
     final theme = Theme.of(context);
 
     return PopupMenuButton<ContextScope>(
-      tooltip: '选择上下文范围',
+      tooltip: context.l10n.ai_selectContext,
       initialValue: currentScope,
       onSelected: onChanged,
       child: Padding(

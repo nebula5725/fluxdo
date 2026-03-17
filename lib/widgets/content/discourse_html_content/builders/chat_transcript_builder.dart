@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../utils/time_utils.dart';
 import '../../../common/smart_avatar.dart';
+import '../../../../l10n/s.dart';
 
 /// 构建 Chat Transcript 聊天记录引用卡片
 ///
@@ -222,7 +223,7 @@ Widget _buildThreadHeader(ThemeData theme, dynamic detailsElement) {
   final threadTitle = threadHeaderElement
           ?.querySelector('.chat-transcript-thread-header__title')
           ?.text ??
-      '线程';
+      S.current.chat_thread;
 
   return Padding(
     padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),

@@ -1,19 +1,34 @@
 // ignore: depend_on_referenced_packages
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../l10n/s.dart';
 import 'theme_provider.dart';
 
 /// 搜索排序方式
 enum SearchSortOrder {
-  relevance('相关性', null),
-  latest('最新帖子', 'latest'),
-  likes('最受欢迎', 'likes'),
-  views('最多浏览', 'views'),
-  latestTopic('最新话题', 'latest_topic');
+  relevance(null),
+  latest('latest'),
+  likes('likes'),
+  views('views'),
+  latestTopic('latest_topic');
 
-  final String label;
   final String? value;
-  const SearchSortOrder(this.label, this.value);
+  const SearchSortOrder(this.value);
+
+  String get label {
+    switch (this) {
+      case SearchSortOrder.relevance:
+        return S.current.search_sortRelevance;
+      case SearchSortOrder.latest:
+        return S.current.search_sortLatest;
+      case SearchSortOrder.likes:
+        return S.current.search_sortLikes;
+      case SearchSortOrder.views:
+        return S.current.search_sortViews;
+      case SearchSortOrder.latestTopic:
+        return S.current.search_sortLatestTopic;
+    }
+  }
 }
 
 /// 搜索设置数据类

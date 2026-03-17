@@ -1,57 +1,107 @@
+import '../l10n/s.dart';
 import '../utils/time_utils.dart';
 import '../utils/url_helper.dart';
 
 /// Discourse 通知类型枚举
 enum NotificationType {
-  mentioned(1, '提及'),
-  replied(2, '回复'),
-  quoted(3, '引用'),
-  edited(4, '编辑'),
-  liked(5, '点赞'),
-  privateMessage(6, '私信'),
-  invitedToPrivateMessage(7, '私信邀请'),
-  inviteeAccepted(8, '邀请已接受'),
-  posted(9, '发帖'),
-  movedPost(10, '帖子移动'),
-  linked(11, '链接'),
-  grantedBadge(12, '获得徽章'),
-  invitedToTopic(13, '话题邀请'),
-  custom(14, '自定义'),
-  groupMentioned(15, '群组提及'),
-  groupMessageSummary(16, '群组消息摘要'),
-  watchingFirstPost(17, '关注首帖'),
-  topicReminder(18, '话题提醒'),
-  likedConsolidated(19, '点赞汇总'),
-  postApproved(20, '帖子已批准'),
-  codeReviewCommitApproved(21, '代码审核通过'),
-  membershipRequestAccepted(22, '成员申请已接受'),
-  membershipRequestConsolidated(23, '成员申请汇总'),
-  bookmarkReminder(24, '书签提醒'),
-  reaction(25, '反应'),
-  votesReleased(26, '投票发布'),
-  eventReminder(27, '活动提醒'),
-  eventInvitation(28, '活动邀请'),
-  chatMention(29, '聊天提及'),
-  chatMessage(30, '聊天消息'),
-  chatInvitation(31, '聊天邀请'),
-  chatGroupMention(32, '群聊提及'),
-  chatQuotedPost(33, '聊天引用'),
-  assignedTopic(34, '话题指派'),
-  questionAnswerUserCommented(35, '问答评论'),
-  watchingCategoryOrTag(36, '关注分类或标签'),
-  newFeatures(37, '新功能'),
-  adminProblems(38, '管理员问题'),
-  linkedConsolidated(39, '链接汇总'),
-  chatWatchedThread(40, '聊天关注话题'),
-  following(800, '关注'),
-  followingCreatedTopic(801, '关注的用户创建了话题'),
-  followingReplied(802, '关注的用户回复了'),
-  circlesActivity(900, '圈子活动'),
-  unknown(0, '未知');
+  mentioned(1),
+  replied(2),
+  quoted(3),
+  edited(4),
+  liked(5),
+  privateMessage(6),
+  invitedToPrivateMessage(7),
+  inviteeAccepted(8),
+  posted(9),
+  movedPost(10),
+  linked(11),
+  grantedBadge(12),
+  invitedToTopic(13),
+  custom(14),
+  groupMentioned(15),
+  groupMessageSummary(16),
+  watchingFirstPost(17),
+  topicReminder(18),
+  likedConsolidated(19),
+  postApproved(20),
+  codeReviewCommitApproved(21),
+  membershipRequestAccepted(22),
+  membershipRequestConsolidated(23),
+  bookmarkReminder(24),
+  reaction(25),
+  votesReleased(26),
+  eventReminder(27),
+  eventInvitation(28),
+  chatMention(29),
+  chatMessage(30),
+  chatInvitation(31),
+  chatGroupMention(32),
+  chatQuotedPost(33),
+  assignedTopic(34),
+  questionAnswerUserCommented(35),
+  watchingCategoryOrTag(36),
+  newFeatures(37),
+  adminProblems(38),
+  linkedConsolidated(39),
+  chatWatchedThread(40),
+  following(800),
+  followingCreatedTopic(801),
+  followingReplied(802),
+  circlesActivity(900),
+  unknown(0);
 
   final int id;
-  final String label;
-  const NotificationType(this.id, this.label);
+  const NotificationType(this.id);
+
+  String get label {
+    switch (this) {
+      case NotificationType.mentioned: return S.current.notification_typeMentioned;
+      case NotificationType.replied: return S.current.notification_typeReplied;
+      case NotificationType.quoted: return S.current.notification_typeQuoted;
+      case NotificationType.edited: return S.current.notification_typeEdited;
+      case NotificationType.liked: return S.current.notification_typeLiked;
+      case NotificationType.privateMessage: return S.current.notification_typePrivateMessage;
+      case NotificationType.invitedToPrivateMessage: return S.current.notification_typeInvitedToPM;
+      case NotificationType.inviteeAccepted: return S.current.notification_typeInviteeAccepted;
+      case NotificationType.posted: return S.current.notification_typePosted;
+      case NotificationType.movedPost: return S.current.notification_typeMovedPost;
+      case NotificationType.linked: return S.current.notification_typeLinked;
+      case NotificationType.grantedBadge: return S.current.notification_typeGrantedBadge;
+      case NotificationType.invitedToTopic: return S.current.notification_typeInvitedToTopic;
+      case NotificationType.custom: return S.current.notification_typeCustom;
+      case NotificationType.groupMentioned: return S.current.notification_typeGroupMentioned;
+      case NotificationType.groupMessageSummary: return S.current.notification_typeGroupMessageSummary;
+      case NotificationType.watchingFirstPost: return S.current.notification_typeWatchingFirstPost;
+      case NotificationType.topicReminder: return S.current.notification_typeTopicReminder;
+      case NotificationType.likedConsolidated: return S.current.notification_typeLikedConsolidated;
+      case NotificationType.postApproved: return S.current.notification_typePostApproved;
+      case NotificationType.codeReviewCommitApproved: return S.current.notification_typeCodeReviewApproved;
+      case NotificationType.membershipRequestAccepted: return S.current.notification_typeMembershipAccepted;
+      case NotificationType.membershipRequestConsolidated: return S.current.notification_typeMembershipConsolidated;
+      case NotificationType.bookmarkReminder: return S.current.notification_typeBookmarkReminder;
+      case NotificationType.reaction: return S.current.notification_typeReaction;
+      case NotificationType.votesReleased: return S.current.notification_typeVotesReleased;
+      case NotificationType.eventReminder: return S.current.notification_typeEventReminder;
+      case NotificationType.eventInvitation: return S.current.notification_typeEventInvitation;
+      case NotificationType.chatMention: return S.current.notification_typeChatMention;
+      case NotificationType.chatMessage: return S.current.notification_typeChatMessage;
+      case NotificationType.chatInvitation: return S.current.notification_typeChatInvitation;
+      case NotificationType.chatGroupMention: return S.current.notification_typeChatGroupMention;
+      case NotificationType.chatQuotedPost: return S.current.notification_typeChatQuotedPost;
+      case NotificationType.assignedTopic: return S.current.notification_typeAssignedTopic;
+      case NotificationType.questionAnswerUserCommented: return S.current.notification_typeQACommented;
+      case NotificationType.watchingCategoryOrTag: return S.current.notification_typeWatchingCategoryOrTag;
+      case NotificationType.newFeatures: return S.current.notification_typeNewFeatures;
+      case NotificationType.adminProblems: return S.current.notification_typeAdminProblems;
+      case NotificationType.linkedConsolidated: return S.current.notification_typeLinkedConsolidated;
+      case NotificationType.chatWatchedThread: return S.current.notification_typeChatWatchedThread;
+      case NotificationType.following: return S.current.notification_typeFollowing;
+      case NotificationType.followingCreatedTopic: return S.current.notification_typeFollowingCreatedTopic;
+      case NotificationType.followingReplied: return S.current.notification_typeFollowingReplied;
+      case NotificationType.circlesActivity: return S.current.notification_typeCirclesActivity;
+      case NotificationType.unknown: return S.current.notification_typeUnknown;
+    }
+  }
 
   static NotificationType fromId(int id) {
     return NotificationType.values.firstWhere(
@@ -220,34 +270,34 @@ class DiscourseNotification {
     switch (notificationType) {
       case NotificationType.grantedBadge:
         return data.badgeName != null
-            ? "获得了 '${data.badgeName}'"
+            ? S.current.notification_grantedBadge(data.badgeName!)
             : notificationType.label;
       case NotificationType.inviteeAccepted:
-        return displayName.isNotEmpty ? '$displayName 接受了你的邀请' : notificationType.label;
+        return displayName.isNotEmpty ? S.current.notification_inviteeAccepted(displayName) : notificationType.label;
       case NotificationType.following:
-        return displayName.isNotEmpty ? '$displayName 开始关注你' : notificationType.label;
+        return displayName.isNotEmpty ? S.current.notification_followingYou(displayName) : notificationType.label;
       case NotificationType.likedConsolidated:
         final count = data.count ?? 0;
         return displayName.isNotEmpty
-            ? '$displayName 点赞了你的 $count 个帖子'
-            : '$count 人赞了你的帖子';
+            ? S.current.notification_likedMultiplePosts(displayName, count)
+            : S.current.notification_peopleLikedPost(count);
       case NotificationType.linkedConsolidated:
         final count = data.count ?? 0;
         return displayName.isNotEmpty
-            ? '$displayName 链接了你的 $count 个帖子'
-            : '$count 人链接了你的帖子';
+            ? S.current.notification_linkedMultiplePosts(displayName, count)
+            : S.current.notification_peopleLinkedPost(count);
       case NotificationType.groupMessageSummary:
-        final count = data.inboxCount ?? '0';
-        return '${data.groupName ?? ""} 收件箱有 $count 条消息';
+        final count = int.tryParse(data.inboxCount ?? '0') ?? 0;
+        return S.current.notification_groupMessageSummary(data.groupName ?? "", count);
       case NotificationType.membershipRequestAccepted:
-        return "加入 '${data.groupName ?? ""}' 的申请已被接受";
+        return S.current.notification_membershipAccepted(data.groupName ?? "");
       case NotificationType.membershipRequestConsolidated:
         final count = data.count ?? 0;
-        return "$count 个未处理的 '${data.groupName ?? ""}' 成员申请";
+        return S.current.notification_membershipPending(count, data.groupName ?? "");
       case NotificationType.newFeatures:
-        return '有新功能可用！';
+        return S.current.notification_newFeaturesAvailable;
       case NotificationType.adminProblems:
-        return '网站信息中心有新建议';
+        return S.current.notification_adminNewSuggestions;
       default:
         break;
     }
@@ -266,82 +316,82 @@ class DiscourseNotification {
     switch (notificationType) {
       // === 话题类通知：描述为 "用户 + 操作" ===
       case NotificationType.mentioned:
-        return '$username 在帖子中提及了你';
+        return S.current.notification_mentioned(username);
       case NotificationType.replied:
-        return '$username 回复了你的帖子';
+        return S.current.notification_replied(username);
       case NotificationType.quoted:
-        return '$username 引用了你的帖子';
+        return S.current.notification_quoted(username);
       case NotificationType.liked:
         // 处理多人点赞
         final count = data.count ?? 1;
         if (count <= 1) {
-          return '$username 赞了你的帖子';
+          return S.current.notification_liked(username);
         } else if (count == 2) {
           final username2 = data.username2 ?? '';
-          return '$username、$username2 赞了你的帖子';
+          return S.current.notification_likedByTwo(username, username2);
         } else {
-          return '$username 和其他 ${count - 1} 人赞了你的帖子';
+          return S.current.notification_likedByMany(username, count - 1);
         }
       case NotificationType.privateMessage:
-        return '$username 发送了私信';
+        return S.current.notification_privateMsgSent(username);
       case NotificationType.posted:
-        return '$username 发布了新帖子';
+        return S.current.notification_newPostPublished(username);
       case NotificationType.linked:
-        return '$username 链接了你的帖子';
+        return S.current.notification_linkedPost(username);
       case NotificationType.edited:
-        return '$username 编辑了帖子';
+        return S.current.notification_editedPost(username);
       case NotificationType.movedPost:
-        return '$username 移动了帖子';
+        return S.current.notification_movedPost(username);
       case NotificationType.groupMentioned:
         return '$username @${data.groupName ?? ""}';
       case NotificationType.watchingFirstPost:
-        return '新建话题';
+        return S.current.notification_newTopic;
       case NotificationType.followingCreatedTopic:
-        return '$username 创建了新话题';
+        return S.current.notification_createdNewTopic(username);
       case NotificationType.followingReplied:
-        return '$username 回复了话题';
+        return S.current.notification_repliedTopic(username);
       case NotificationType.invitedToTopic:
-        return '$username 邀请你参与话题';
+        return S.current.notification_invitedToTopic(username);
       case NotificationType.invitedToPrivateMessage:
-        return '$username 邀请你参与私信';
+        return S.current.notification_invitedToPM(username);
       case NotificationType.bookmarkReminder:
-        return '书签提醒';
+        return S.current.notification_bookmarkReminder;
       case NotificationType.topicReminder:
-        return '话题提醒';
+        return S.current.notification_topicReminder;
       case NotificationType.reaction:
-        return '$username 对你的帖子做出了反应';
+        return S.current.notification_reaction(username);
       case NotificationType.votesReleased:
-        return '投票已发布';
+        return S.current.notification_votesReleased;
       case NotificationType.eventReminder:
-        return '活动提醒';
+        return S.current.notification_eventReminder;
       case NotificationType.eventInvitation:
-        return '$username 邀请你参加活动';
+        return S.current.notification_eventInvitation(username);
       case NotificationType.chatMention:
-        return '$username 在聊天中提及了你';
+        return S.current.notification_chatMention(username);
       case NotificationType.chatMessage:
-        return '$username 发送了聊天消息';
+        return S.current.notification_chatMessage(username);
       case NotificationType.chatInvitation:
-        return '$username 邀请你参与聊天';
+        return S.current.notification_chatInvitation(username);
       case NotificationType.chatGroupMention:
-        return '群组在聊天中被提及';
+        return S.current.notification_chatGroupMention;
       case NotificationType.chatQuotedPost:
-        return '$username 在聊天中引用了你';
+        return S.current.notification_chatQuotedPost(username);
       case NotificationType.chatWatchedThread:
-        return '你关注的聊天话题有新消息';
+        return S.current.notification_chatWatchedThread;
       case NotificationType.assignedTopic:
-        return '话题已分配给你';
+        return S.current.notification_assignedTopic;
       case NotificationType.questionAnswerUserCommented:
-        return '$username 评论了问答';
+        return S.current.notification_qaCommented(username);
       case NotificationType.watchingCategoryOrTag:
-        return '$username 发布了新帖子';
+        return S.current.notification_watchingCategoryNewPost(username);
       case NotificationType.postApproved:
-        return '你的帖子已被批准';
+        return S.current.notification_postApproved;
       case NotificationType.codeReviewCommitApproved:
-        return '代码审核已通过';
+        return S.current.notification_codeReviewApproved;
       case NotificationType.custom:
-        return '自定义通知';
+        return S.current.notification_custom;
       case NotificationType.circlesActivity:
-        return '圈子有新动态';
+        return S.current.notification_circlesActivity;
 
       // === 非话题类通知：标题已包含完整信息，描述使用类型标签 ===
       case NotificationType.grantedBadge:

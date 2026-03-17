@@ -16,7 +16,7 @@ extension _PostFooterManageActions on _PostFooterSectionState {
           setState(() => _isAcceptedAnswer = false);
           widget.onAcceptedAnswerChanged?.call(false);
           widget.onSolutionChanged?.call(widget.post.id, false);
-          ToastService.showSuccess('已取消采纳');
+          ToastService.showSuccess(S.current.post_solutionUnaccepted);
         }
       } else {
         await _service.acceptAnswer(widget.post.id);
@@ -24,7 +24,7 @@ extension _PostFooterManageActions on _PostFooterSectionState {
           setState(() => _isAcceptedAnswer = true);
           widget.onAcceptedAnswerChanged?.call(true);
           widget.onSolutionChanged?.call(widget.post.id, true);
-          ToastService.showSuccess('已采纳为解决方案');
+          ToastService.showSuccess(S.current.post_solutionAccepted);
         }
       }
     } on DioException catch (_) {
@@ -46,7 +46,7 @@ extension _PostFooterManageActions on _PostFooterSectionState {
     try {
       await _service.deletePost(widget.post.id);
       if (mounted) {
-        ToastService.showSuccess('已删除');
+        ToastService.showSuccess(S.current.common_deleted);
         widget.onRefreshPost?.call(widget.post.id);
       }
     } on DioException catch (_) {
@@ -68,7 +68,7 @@ extension _PostFooterManageActions on _PostFooterSectionState {
     try {
       await _service.recoverPost(widget.post.id);
       if (mounted) {
-        ToastService.showSuccess('已恢复');
+        ToastService.showSuccess(S.current.common_restored);
         widget.onRefreshPost?.call(widget.post.id);
       }
     } on DioException catch (_) {

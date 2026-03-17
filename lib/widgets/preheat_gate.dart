@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:jovial_svg/jovial_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../l10n/s.dart';
 import '../pages/about_page.dart';
 import '../pages/network_settings_page/network_settings_page.dart';
 import '../providers/app_icon_provider.dart';
@@ -68,7 +69,7 @@ class _PreheatGateState extends State<PreheatGate> {
 
   void _skip() {
     setState(() {
-      _error ??= TimeoutException('用户跳过预加载');
+      _error ??= TimeoutException(S.current.preheat_userSkipped);
       _loadFuture = Future.value(false);
     });
   }
@@ -251,7 +252,7 @@ class _PreheatLoadingState extends State<_PreheatLoading>
                 child: TextButton(
                   onPressed: widget.onSkip,
                   child: Text(
-                    '跳过',
+                    context.l10n.common_skip,
                     style: TextStyle(color: colorScheme.onSurfaceVariant),
                   ),
                 ),
@@ -285,16 +286,16 @@ class _PreheatFailed extends StatelessWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('退出登录'),
-        content: const Text('确定要退出当前账号吗？退出后将清除本地登录信息。'),
+        title: Text(context.l10n.common_logout),
+        content: Text(context.l10n.preheat_logoutConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('取消'),
+            child: Text(context.l10n.common_cancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('退出'),
+            child: Text(context.l10n.common_exit),
           ),
         ],
       ),
@@ -306,7 +307,7 @@ class _PreheatFailed extends StatelessWidget {
         'level': 'info',
         'type': 'lifecycle',
         'event': 'logout_active',
-        'message': '用户主动退出登录（预热失败页面）',
+        'message': S.current.preheat_logoutMessage,
       });
       await DiscourseService().logout(callApi: false, refreshPreload: false);
       onRetry();
@@ -347,21 +348,21 @@ class _PreheatFailed extends StatelessWidget {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.info_outline_rounded),
-                    tooltip: '关于',
+                    tooltip: context.l10n.common_about,
                     style: buttonStyle,
                     onPressed: () => _openAbout(context),
                   ),
                   const SizedBox(width: 8),
                   IconButton(
                     icon: const Icon(Icons.network_check_rounded),
-                    tooltip: '网络设置',
+                    tooltip: context.l10n.preheat_networkSettings,
                     style: buttonStyle,
                     onPressed: () => _openNetworkSettings(context),
                   ),
                   const SizedBox(width: 8),
                   IconButton(
                     icon: const Icon(Icons.logout_rounded),
-                    tooltip: '退出登录',
+                    tooltip: context.l10n.common_logout,
                     style: buttonStyle,
                     onPressed: () => _confirmLogout(context),
                   ),
@@ -407,7 +408,7 @@ class _PreheatFailed extends StatelessWidget {
                     FilledButton.tonalIcon(
                       onPressed: onRetry,
                       icon: const Icon(Icons.refresh_rounded, size: 20),
-                      label: const Text('重试连接'),
+                      label: Text(context.l10n.preheat_retryConnection),
                       style: FilledButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 32,
@@ -419,7 +420,7 @@ class _PreheatFailed extends StatelessWidget {
                     OutlinedButton.icon(
                       onPressed: () => _showErrorDetails(context),
                       icon: const Icon(Icons.info_outline_rounded, size: 20),
-                      label: const Text('查看详情'),
+                      label: Text(context.l10n.common_viewDetails),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 32,

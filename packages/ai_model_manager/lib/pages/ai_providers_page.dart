@@ -5,6 +5,7 @@ import '../models/ai_provider.dart';
 import '../providers/ai_chat_providers.dart';
 import '../providers/ai_provider_providers.dart';
 import '../services/ai_chat_storage_service.dart';
+import '../l10n/ai_l10n.dart';
 import '../widgets/swipe_action_cell.dart';
 import 'ai_chat_history_page.dart';
 import 'ai_provider_edit_page.dart';
@@ -23,11 +24,11 @@ class AiProvidersPage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('AI 模型服务'),
+        title: Text(AiL10n.current.aiModelService),
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            tooltip: '添加供应商',
+            tooltip: AiL10n.current.addProvider,
             onPressed: () => _navigateToEdit(context),
           ),
         ],
@@ -50,14 +51,14 @@ class AiProvidersPage extends ConsumerWidget {
                           SwipeAction(
                             icon: Icons.edit_outlined,
                             color: Colors.blue,
-                            label: '编辑',
+                            label: AiL10n.current.edit,
                             onPressed: () =>
                                 _navigateToEdit(context, provider),
                           ),
                           SwipeAction(
                             icon: Icons.delete_outline,
                             color: Colors.red,
-                            label: '删除',
+                            label: AiL10n.current.delete,
                             onPressed: () =>
                                 _confirmDelete(context, ref, provider),
                           ),
@@ -88,18 +89,18 @@ class AiProvidersPage extends ConsumerWidget {
           Icon(Icons.smart_toy_outlined,
               size: 64, color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4)),
           const SizedBox(height: 16),
-          Text('还没有配置 AI 供应商',
+          Text(AiL10n.current.noProviderConfigured,
               style: theme.textTheme.bodyLarge?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant)),
           const SizedBox(height: 8),
-          Text('添加供应商后可以使用 AI 助手功能',
+          Text(AiL10n.current.addProviderHint,
               style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7))),
           const SizedBox(height: 24),
           FilledButton.icon(
             onPressed: () => _navigateToEdit(context),
             icon: const Icon(Icons.add),
-            label: const Text('添加供应商'),
+            label: Text(AiL10n.current.addProvider),
           ),
         ],
       ),
@@ -120,12 +121,12 @@ class AiProvidersPage extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('确认删除'),
-        content: Text('确定要删除供应商「${provider.name}」吗？'),
+        title: Text(AiL10n.current.confirmDelete),
+        content: Text(AiL10n.current.confirmDeleteProvider(provider.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('取消'),
+            child: Text(AiL10n.current.cancel),
           ),
           FilledButton(
             onPressed: () {
@@ -136,7 +137,7 @@ class AiProvidersPage extends ConsumerWidget {
             },
             style:
                 FilledButton.styleFrom(backgroundColor: Theme.of(ctx).colorScheme.error),
-            child: const Text('删除'),
+            child: Text(AiL10n.current.delete),
           ),
         ],
       ),
@@ -207,7 +208,7 @@ class _ProviderCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        '$enabledCount/$totalCount 个模型',
+                        AiL10n.current.modelCount(enabledCount, totalCount),
                         style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant),
                       ),
@@ -262,7 +263,7 @@ class _ChatSettingsSection extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.only(left: 4, bottom: 8),
           child: Text(
-            '聊天记录',
+            AiL10n.current.chatHistory,
             style: theme.textTheme.titleSmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -277,8 +278,8 @@ class _ChatSettingsSection extends StatelessWidget {
             children: [
               // 标题生成模型
               _SettingRow(
-                title: '标题生成模型',
-                subtitle: '自动为新会话生成标题',
+                title: AiL10n.current.titleGenerationModel,
+                subtitle: AiL10n.current.autoGenerateTitleSubtitle,
                 trailing: GestureDetector(
                   onTap: () => _showTitleModelPicker(
                       context, allModels, titleModel),
@@ -298,7 +299,7 @@ class _ChatSettingsSection extends StatelessWidget {
                             titleModel != null
                                 ? (titleModel.model.name ??
                                     titleModel.model.id)
-                                : '未设置',
+                                : AiL10n.current.notSet,
                             style: theme.textTheme.bodySmall?.copyWith(
                               fontWeight: FontWeight.w600,
                             ),
@@ -317,8 +318,8 @@ class _ChatSettingsSection extends StatelessWidget {
               const Divider(height: 1, indent: 16, endIndent: 16),
               // 最大会话记录数
               _SettingRow(
-                title: '最大会话记录数',
-                subtitle: '超出上限时自动删除最旧的会话',
+                title: AiL10n.current.maxSessionCount,
+                subtitle: AiL10n.current.autoDeleteOldestSession,
                 trailing: GestureDetector(
                   onTap: () =>
                       _showMaxSessionsPicker(context, storageService, maxSessions),
@@ -351,8 +352,8 @@ class _ChatSettingsSection extends StatelessWidget {
                 borderRadius: const BorderRadius.vertical(
                     bottom: Radius.circular(12)),
                 child: _SettingRow(
-                  title: '会话记录管理',
-                  subtitle: '共 $totalCount 条会话',
+                  title: AiL10n.current.sessionManagement,
+                  subtitle: AiL10n.current.totalSessionCount(totalCount),
                   trailing: Icon(
                     Icons.chevron_right_rounded,
                     size: 20,
@@ -382,7 +383,7 @@ class _ChatSettingsSection extends StatelessWidget {
             padding: EdgeInsets.zero,
             children: [
               ListTile(
-                title: const Text('不自动生成标题'),
+                title: Text(AiL10n.current.noAutoGenerateTitle),
                 trailing: current == null ? const Icon(Icons.check) : null,
                 onTap: () {
                   setAiTitleModel(ref, null, null);

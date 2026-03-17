@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../../l10n/s.dart';
 import '../../models/category.dart';
 import '../../models/search_filter.dart';
 import '../../providers/category_provider.dart';
@@ -146,10 +147,10 @@ class _SearchFilterPanelState extends ConsumerState<SearchFilterPanel> {
       lastDate: now,
       initialDateRange: initialRange,
       locale: const Locale('zh', 'CN'),
-      helpText: '选择时间范围',
-      cancelText: '取消',
-      confirmText: '确定',
-      saveText: '确定',
+      helpText: context.l10n.search_selectDateRange,
+      cancelText: context.l10n.common_cancel,
+      confirmText: context.l10n.common_confirm,
+      saveText: context.l10n.common_confirm,
     );
 
     if (result != null && mounted) {
@@ -192,7 +193,7 @@ class _SearchFilterPanelState extends ConsumerState<SearchFilterPanel> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '高级搜索',
+                  context.l10n.search_advancedSearch,
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -209,7 +210,7 @@ class _SearchFilterPanelState extends ConsumerState<SearchFilterPanel> {
                       foregroundColor: colorScheme.error,
                       visualDensity: VisualDensity.compact,
                     ),
-                    child: const Text('重置'),
+                    child: Text(context.l10n.common_reset),
                   ),
                 ),
               ],
@@ -225,7 +226,7 @@ class _SearchFilterPanelState extends ConsumerState<SearchFilterPanel> {
               children: [
                 // 状态选择
                 Text(
-                  '状态',
+                  context.l10n.search_status,
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
@@ -237,7 +238,7 @@ class _SearchFilterPanelState extends ConsumerState<SearchFilterPanel> {
 
                 // 时间范围
                 Text(
-                  '时间范围',
+                  context.l10n.search_dateRange,
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
@@ -249,7 +250,7 @@ class _SearchFilterPanelState extends ConsumerState<SearchFilterPanel> {
 
                 // 分类选择
                 Text(
-                  '分类',
+                  context.l10n.search_category,
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
@@ -267,7 +268,7 @@ class _SearchFilterPanelState extends ConsumerState<SearchFilterPanel> {
                       child: CircularProgressIndicator(),
                     ),
                   ),
-                  error: (e, _) => Center(child: Text('加载分类失败: $e')),
+                  error: (e, _) => Center(child: Text(context.l10n.search_categoryLoadFailed('$e'))),
                 ),
 
                 const SizedBox(height: 24),
@@ -276,7 +277,7 @@ class _SearchFilterPanelState extends ConsumerState<SearchFilterPanel> {
                 Row(
                   children: [
                     Text(
-                      '标签',
+                      context.l10n.search_tags,
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
@@ -285,7 +286,7 @@ class _SearchFilterPanelState extends ConsumerState<SearchFilterPanel> {
                     TextButton.icon(
                       onPressed: _openTagSearchSheet,
                       icon: const Icon(Icons.search, size: 18),
-                      label: const Text('搜索更多'),
+                      label: Text(context.l10n.common_searchMore),
                       style: TextButton.styleFrom(
                         visualDensity: VisualDensity.compact,
                         padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -303,7 +304,7 @@ class _SearchFilterPanelState extends ConsumerState<SearchFilterPanel> {
 
                     if (hotTags.isEmpty && extraSelectedTags.isEmpty) {
                       return Text(
-                        '暂无热门标签',
+                        context.l10n.search_noPopularTags,
                         style: TextStyle(color: colorScheme.outline),
                       );
                     }
@@ -314,7 +315,7 @@ class _SearchFilterPanelState extends ConsumerState<SearchFilterPanel> {
                         // 已选的非热门标签
                         if (extraSelectedTags.isNotEmpty) ...[
                           Text(
-                            '已选标签',
+                            context.l10n.search_selectedTags,
                             style: theme.textTheme.labelMedium?.copyWith(
                               color: colorScheme.onSurfaceVariant,
                             ),
@@ -326,7 +327,7 @@ class _SearchFilterPanelState extends ConsumerState<SearchFilterPanel> {
                         // 热门标签
                         if (hotTags.isNotEmpty) ...[
                           Text(
-                            '热门标签',
+                            context.l10n.search_popularTags,
                             style: theme.textTheme.labelMedium?.copyWith(
                               color: colorScheme.onSurfaceVariant,
                             ),
@@ -339,7 +340,7 @@ class _SearchFilterPanelState extends ConsumerState<SearchFilterPanel> {
                   },
                   loading: () =>
                       const Center(child: CircularProgressIndicator()),
-                  error: (e, _) => Text('加载标签失败: $e'),
+                  error: (e, _) => Text(context.l10n.search_tagsLoadFailed('$e')),
                 ),
               ],
             ),
@@ -362,7 +363,7 @@ class _SearchFilterPanelState extends ConsumerState<SearchFilterPanel> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text('应用筛选', style: TextStyle(fontSize: 16)),
+                  child: Text(context.l10n.search_applyFilter, style: const TextStyle(fontSize: 16)),
                 ),
               ),
             ),
@@ -379,7 +380,7 @@ class _SearchFilterPanelState extends ConsumerState<SearchFilterPanel> {
       children: [
         // 全部选项
         _FilterChip(
-          label: '全部',
+          label: context.l10n.common_all,
           isSelected: _localFilter.status == null,
           onTap: () => _setStatus(null),
         ),
@@ -404,13 +405,13 @@ class _SearchFilterPanelState extends ConsumerState<SearchFilterPanel> {
       children: [
         // 不限
         _FilterChip(
-          label: '不限',
+          label: context.l10n.search_noLimit,
           isSelected: !hasDateRange,
           onTap: () => _setDateRange(),
         ),
         // 快捷选项
         _FilterChip(
-          label: '最近一周',
+          label: context.l10n.search_lastWeek,
           isSelected: false,
           onTap: () {
             final now = DateTime.now();
@@ -421,7 +422,7 @@ class _SearchFilterPanelState extends ConsumerState<SearchFilterPanel> {
           },
         ),
         _FilterChip(
-          label: '最近一月',
+          label: context.l10n.search_lastMonth,
           isSelected: false,
           onTap: () {
             final now = DateTime.now();
@@ -432,7 +433,7 @@ class _SearchFilterPanelState extends ConsumerState<SearchFilterPanel> {
           },
         ),
         _FilterChip(
-          label: '最近一年',
+          label: context.l10n.search_lastYear,
           isSelected: false,
           onTap: () {
             final now = DateTime.now();
@@ -444,7 +445,7 @@ class _SearchFilterPanelState extends ConsumerState<SearchFilterPanel> {
         ),
         // 自定义
         _FilterChip(
-          label: hasDateRange ? _formatDateRange() : '自定义',
+          label: hasDateRange ? _formatDateRange() : context.l10n.search_custom,
           isSelected: hasDateRange,
           onTap: _selectDateRange,
           icon: Icons.calendar_today,
@@ -454,16 +455,17 @@ class _SearchFilterPanelState extends ConsumerState<SearchFilterPanel> {
   }
 
   String _formatDateRange() {
+    final l10n = S.current;
     final after = _localFilter.afterDate;
     final before = _localFilter.beforeDate;
     if (after != null && before != null) {
       return '${_formatShortDate(after)} - ${_formatShortDate(before)}';
     } else if (after != null) {
-      return '${_formatShortDate(after)} 之后';
+      return l10n.search_afterDate(_formatShortDate(after));
     } else if (before != null) {
-      return '${_formatShortDate(before)} 之前';
+      return l10n.search_beforeDate(_formatShortDate(before));
     }
-    return '自定义';
+    return l10n.search_custom;
   }
 
   String _formatShortDate(DateTime date) {
@@ -511,7 +513,7 @@ class _SearchFilterPanelState extends ConsumerState<SearchFilterPanel> {
           children: [
             // "全部" 选项
             _CategoryFilterItem(
-              name: '全部',
+              name: S.current.common_all,
               color: Colors.grey,
               isSelected: selectedId == null,
               onTap: () => _setCategory(null),
@@ -908,7 +910,7 @@ class ActiveSearchFiltersBar extends StatelessWidget {
                           size: 14, color: colorScheme.primary),
                       const SizedBox(width: 8),
                       Text(
-                        '当前筛选',
+                        context.l10n.search_currentFilter,
                         style: TextStyle(
                           fontSize: 12,
                           color: colorScheme.primary,
@@ -922,7 +924,7 @@ class ActiveSearchFiltersBar extends StatelessWidget {
                           child: Padding(
                             padding: const EdgeInsets.all(4),
                             child: Text(
-                              '清除全部',
+                              context.l10n.search_clearAll,
                               style:
                                   TextStyle(fontSize: 12, color: colorScheme.error),
                             ),
@@ -940,7 +942,7 @@ class ActiveSearchFiltersBar extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.only(right: 8),
                             child: RemovableCategoryBadge(
-                              name: filter.categoryName ?? '分类',
+                              name: filter.categoryName ?? S.current.search_category,
                               onDeleted: onClearCategory!,
                               size: const BadgeSize(
                                 padding:
@@ -996,14 +998,15 @@ class ActiveSearchFiltersBar extends StatelessWidget {
   }
 
   String _formatDateRange(DateTime? after, DateTime? before) {
+    final l10n = S.current;
     if (after != null && before != null) {
       return '${_formatShortDate(after)} - ${_formatShortDate(before)}';
     } else if (after != null) {
-      return '${_formatShortDate(after)} 之后';
+      return l10n.search_afterDate(_formatShortDate(after));
     } else if (before != null) {
-      return '${_formatShortDate(before)} 之前';
+      return l10n.search_beforeDate(_formatShortDate(before));
     }
-    return '时间范围';
+    return l10n.search_dateRange;
   }
 
   String _formatShortDate(DateTime date) {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../l10n/s.dart';
 import '../../../../models/topic.dart';
 
 class PostSegmentFrame extends StatelessWidget {
@@ -60,7 +61,7 @@ class PostSegmentFrame extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
                         color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
                         child: Text(
-                          '上次看到这里',
+                          context.l10n.post_lastReadHere,
                           style: theme.textTheme.labelSmall?.copyWith(
                             color: theme.colorScheme.primary,
                             fontWeight: FontWeight.w500,

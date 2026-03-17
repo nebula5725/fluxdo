@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 
+import '../../../l10n/s.dart';
 import '../../toast_service.dart';
 import '../exceptions/api_exception.dart';
 
@@ -46,15 +47,15 @@ class ErrorInterceptor extends Interceptor {
       final retryAfter = _extractRetryAfterSeconds(err.response);
       if (showErrorToast) {
         final toastMessage = retryAfter != null && retryAfter > 0
-            ? '请求过于频繁，请等待 ${_formatWaitDuration(retryAfter)} 后再试'
-            : (errorMessage ?? '请求过于频繁，请稍后再试');
+            ? S.current.network_rateLimitedWait(_formatWaitDuration(retryAfter))
+            : (errorMessage ?? S.current.network_rateLimited);
         ToastService.showError(toastMessage);
       }
       throw RateLimitException(retryAfter, errorMessage);
     }
     if (statusCode == 502 || statusCode == 503 || statusCode == 504) {
       if (showErrorToast) {
-        ToastService.showError(errorMessage ?? '服务器暂时不可用，请稍后再试');
+        ToastService.showError(errorMessage ?? S.current.network_serverUnavailableRetry);
       }
       throw ServerException(statusCode!);
     }
@@ -66,13 +67,13 @@ class ErrorInterceptor extends Interceptor {
       } else {
         // 通用错误提示
         final message = switch (statusCode) {
-          400 => '请求参数错误',
-          401 => '未登录或登录已过期',
-          403 => '没有权限执行此操作',
-          404 => '请求的资源不存在',
-          422 => '请求无法处理',
-          500 => '服务器内部错误',
-          _ => '请求失败 ($statusCode)',
+          400 => S.current.network_badRequest,
+          401 => S.current.network_unauthorized,
+          403 => S.current.network_forbidden,
+          404 => S.current.network_notFound,
+          422 => S.current.network_unprocessable,
+          500 => S.current.network_internalError,
+          _ => S.current.error_requestFailed,
         };
         ToastService.showError(message);
       }
@@ -193,14 +194,14 @@ class ErrorInterceptor extends Interceptor {
 
   String _formatWaitDuration(int seconds) {
     if (seconds >= 86400) {
-      return '${(seconds / 86400).ceil()} 天';
+      return S.current.time_days((seconds / 86400).ceil());
     }
     if (seconds >= 3600) {
-      return '${(seconds / 3600).ceil()} 小时';
+      return S.current.time_hours((seconds / 3600).ceil());
     }
     if (seconds >= 60) {
-      return '${(seconds / 60).ceil()} 分钟';
+      return S.current.time_minutes((seconds / 60).ceil());
     }
-    return '$seconds 秒';
+    return S.current.time_seconds(seconds);
   }
 }

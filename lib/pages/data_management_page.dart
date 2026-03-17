@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:ai_model_manager/ai_model_manager.dart';
 
+import '../l10n/s.dart';
 import '../providers/preferences_provider.dart';
 import '../providers/theme_provider.dart';
 import '../services/data_management/cache_size_service.dart';
@@ -57,8 +58,8 @@ class _DataManagementPageState extends ConsumerState<DataManagementPage> {
   }
 
   String _formatCacheSize(int size) {
-    if (size < 0) return '计算中...';
-    if (size == 0) return '无缓存';
+    if (size < 0) return S.current.dataManagement_calculating;
+    if (size == 0) return S.current.dataManagement_noCache;
     return CacheSizeService.formatSize(size);
   }
 
@@ -75,9 +76,9 @@ class _DataManagementPageState extends ConsumerState<DataManagementPage> {
       await CacheSizeService.deleteImageCacheDirs();
       PaintingBinding.instance.imageCache.clear();
       setState(() => _imageCacheSize = 0);
-      ToastService.showSuccess('图片缓存已清除');
+      ToastService.showSuccess(S.current.dataManagement_imageCacheCleared);
     } catch (e) {
-      ToastService.showError('清除失败: $e');
+      ToastService.showError(S.current.common_clearFailed(e.toString()));
     } finally {
       if (mounted) setState(() => _isClearing = false);
     }
@@ -85,8 +86,8 @@ class _DataManagementPageState extends ConsumerState<DataManagementPage> {
 
   Future<void> _clearAiChatData() async {
     final confirmed = await _showConfirmDialog(
-      title: '清除 AI 聊天数据',
-      content: '将删除所有 AI 聊天记录，此操作不可恢复。',
+      title: S.current.dataManagement_clearAiChatTitle,
+      content: S.current.dataManagement_clearAiChatContent,
     );
     if (confirmed != true) return;
 
@@ -95,9 +96,9 @@ class _DataManagementPageState extends ConsumerState<DataManagementPage> {
       final prefs = ref.read(sharedPreferencesProvider);
       await AiChatStorageService(prefs).deleteAllSessions();
       setState(() => _aiChatDataSize = 0);
-      ToastService.showSuccess('AI 聊天数据已清除');
+      ToastService.showSuccess(S.current.dataManagement_aiChatCleared);
     } catch (e) {
-      ToastService.showError('清除失败: $e');
+      ToastService.showError(S.current.common_clearFailed(e.toString()));
     } finally {
       if (mounted) setState(() => _isClearing = false);
     }
@@ -105,9 +106,9 @@ class _DataManagementPageState extends ConsumerState<DataManagementPage> {
 
   Future<void> _clearCookieCache() async {
     final confirmed = await _showConfirmDialog(
-      title: '清除 Cookie 缓存',
-      content: '清除 Cookie 后需要重新登录，确定要继续吗？',
-      confirmText: '清除并退出登录',
+      title: S.current.dataManagement_clearCookieTitle,
+      content: S.current.dataManagement_clearCookieContent,
+      confirmText: S.current.dataManagement_clearAndLogout,
       isDestructive: true,
     );
     if (confirmed != true) return;
@@ -116,9 +117,9 @@ class _DataManagementPageState extends ConsumerState<DataManagementPage> {
     try {
       await _doClearCookies();
       setState(() => _cookieCacheSize = 0);
-      ToastService.showSuccess('Cookie 缓存已清除，请重新登录');
+      ToastService.showSuccess(S.current.dataManagement_cookieCleared);
     } catch (e) {
-      ToastService.showError('清除失败: $e');
+      ToastService.showError(S.current.common_clearFailed(e.toString()));
     } finally {
       if (mounted) setState(() => _isClearing = false);
     }
@@ -126,10 +127,9 @@ class _DataManagementPageState extends ConsumerState<DataManagementPage> {
 
   Future<void> _clearAllCache() async {
     final confirmed = await _showConfirmDialog(
-      title: '清除所有缓存',
-      content: '将清除所有缓存数据，包括图片缓存、AI 聊天数据和 Cookie。\n\n'
-          '清除 Cookie 后需要重新登录。',
-      confirmText: '全部清除',
+      title: S.current.dataManagement_clearAllTitle,
+      content: S.current.dataManagement_clearAllContent,
+      confirmText: S.current.dataManagement_clearAll,
       isDestructive: true,
     );
     if (confirmed != true) return;
@@ -152,9 +152,9 @@ class _DataManagementPageState extends ConsumerState<DataManagementPage> {
         _aiChatDataSize = 0;
         _cookieCacheSize = 0;
       });
-      ToastService.showSuccess('所有缓存已清除，请重新登录');
+      ToastService.showSuccess(S.current.dataManagement_allCleared);
     } catch (e) {
-      ToastService.showError('清除失败: $e');
+      ToastService.showError(S.current.common_clearFailed(e.toString()));
     } finally {
       if (mounted) setState(() => _isClearing = false);
     }
@@ -174,11 +174,11 @@ class _DataManagementPageState extends ConsumerState<DataManagementPage> {
       await SharePlus.instance.share(
         ShareParams(
           files: [XFile(filePath, mimeType: 'application/json')],
-          subject: 'FluxDO 数据备份',
+          subject: S.current.dataManagement_backupSubject,
         ),
       );
     } catch (e) {
-      ToastService.showError('导出失败: $e');
+      ToastService.showError(S.current.dataManagement_exportFailed(e.toString()));
     }
   }
 
@@ -196,41 +196,41 @@ class _DataManagementPageState extends ConsumerState<DataManagementPage> {
       final backup = await DataBackupService.parseBackupFile(filePath);
       final data = backup['data'] as Map<String, dynamic>;
       final apiKeys = backup['apiKeys'] as Map<String, dynamic>?;
-      final appVersion = backup['appVersion'] as String? ?? '未知';
-      final exportTime = backup['exportTime'] as String? ?? '未知';
+      final appVersion = backup['appVersion'] as String? ?? S.current.common_unknown;
+      final exportTime = backup['exportTime'] as String? ?? S.current.common_unknown;
 
       if (!mounted) return;
 
       final details = StringBuffer()
-        ..writeln('备份来源: v$appVersion')
-        ..writeln('导出时间: $exportTime')
-        ..writeln('包含 ${data.length} 项设置');
+        ..writeln(S.current.dataManagement_backupSource(appVersion))
+        ..writeln(S.current.dataManagement_exportTime(exportTime))
+        ..writeln(S.current.dataManagement_settingsCount(data.length));
       if (apiKeys != null && apiKeys.isNotEmpty) {
-        details.writeln('包含 ${apiKeys.length} 个 API Key');
+        details.writeln(S.current.dataManagement_apiKeysCount(apiKeys.length));
       }
-      details.write('\n导入后将覆盖当前对应的设置项，需要重启应用生效。');
+      details.write('\n${S.current.dataManagement_importWarning}');
 
       final confirmed = await _showConfirmDialog(
-        title: '确认导入',
+        title: S.current.dataManagement_confirmImport,
         content: details.toString(),
-        confirmText: '导入并重启',
+        confirmText: S.current.dataManagement_importAndRestart,
       );
       if (confirmed != true) return;
 
       final prefs = ref.read(sharedPreferencesProvider);
       await DataBackupService.importData(prefs, backup);
-      ToastService.showSuccess('数据已导入，请重启应用');
+      ToastService.showSuccess(S.current.dataManagement_importSuccess);
     } on FormatException catch (e) {
       ToastService.showError(e.message);
     } catch (e) {
-      ToastService.showError('导入失败: $e');
+      ToastService.showError(S.current.dataManagement_importFailed(e.toString()));
     }
   }
 
   Future<bool?> _showConfirmDialog({
     required String title,
     required String content,
-    String confirmText = '确定',
+    String? confirmText,
     bool isDestructive = false,
   }) {
     return showDialog<bool>(
@@ -241,7 +241,7 @@ class _DataManagementPageState extends ConsumerState<DataManagementPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('取消'),
+            child: Text(context.l10n.common_cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
@@ -250,7 +250,7 @@ class _DataManagementPageState extends ConsumerState<DataManagementPage> {
                     backgroundColor: Theme.of(context).colorScheme.error,
                   )
                 : null,
-            child: Text(confirmText),
+            child: Text(confirmText ?? context.l10n.common_confirm),
           ),
         ],
       ),
@@ -263,12 +263,12 @@ class _DataManagementPageState extends ConsumerState<DataManagementPage> {
     final preferences = ref.watch(preferencesProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('数据管理')),
+      appBar: AppBar(title: Text(context.l10n.dataManagement_title)),
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         children: [
           // Section 1 — 缓存管理
-          _buildSectionHeader(theme, Icons.cleaning_services_rounded, '缓存管理'),
+          _buildSectionHeader(theme, Icons.cleaning_services_rounded, context.l10n.dataManagement_cacheManagement),
           const SizedBox(height: 12),
           Card(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -277,21 +277,21 @@ class _DataManagementPageState extends ConsumerState<DataManagementPage> {
               children: [
                 _buildCacheTile(
                   icon: Icons.image_rounded,
-                  title: '图片缓存',
+                  title: context.l10n.dataManagement_imageCache,
                   size: _imageCacheSize,
                   onClear: _isClearing ? null : _clearImageCache,
                 ),
                 _buildDivider(theme),
                 _buildCacheTile(
                   icon: Icons.smart_toy_rounded,
-                  title: 'AI 聊天数据',
+                  title: context.l10n.dataManagement_aiChatData,
                   size: _aiChatDataSize,
                   onClear: _isClearing ? null : _clearAiChatData,
                 ),
                 _buildDivider(theme),
                 _buildCacheTile(
                   icon: Icons.cookie_rounded,
-                  title: 'Cookie 缓存',
+                  title: context.l10n.dataManagement_cookieCache,
                   size: _cookieCacheSize,
                   onClear: _isClearing ? null : _clearCookieCache,
                 ),
@@ -301,13 +301,13 @@ class _DataManagementPageState extends ConsumerState<DataManagementPage> {
                     Icons.delete_sweep_rounded,
                     color: theme.colorScheme.error,
                   ),
-                  title: const Text('清除所有缓存'),
+                  title: Text(context.l10n.dataManagement_clearAllCache),
                   subtitle: Text(_formatCacheSize(_totalCacheSize)),
                   trailing: TextButton(
                     onPressed: _isClearing || _totalCacheSize <= 0
                         ? null
                         : _clearAllCache,
-                    child: const Text('清除'),
+                    child: Text(context.l10n.common_clear),
                   ),
                 ),
               ],
@@ -316,14 +316,14 @@ class _DataManagementPageState extends ConsumerState<DataManagementPage> {
           const SizedBox(height: 24),
 
           // Section 2 — 自动管理
-          _buildSectionHeader(theme, Icons.auto_delete_rounded, '自动管理'),
+          _buildSectionHeader(theme, Icons.auto_delete_rounded, context.l10n.dataManagement_autoManagement),
           const SizedBox(height: 12),
           Card(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             clipBehavior: Clip.antiAlias,
             child: SwitchListTile(
-              title: const Text('退出时清除图片缓存'),
-              subtitle: const Text('下次启动时自动清除图片缓存'),
+              title: Text(context.l10n.dataManagement_clearOnExit),
+              subtitle: Text(context.l10n.dataManagement_clearOnExitDesc),
               secondary: Icon(
                 Icons.auto_delete_rounded,
                 color: preferences.clearCacheOnExit
@@ -339,7 +339,7 @@ class _DataManagementPageState extends ConsumerState<DataManagementPage> {
           const SizedBox(height: 24),
 
           // Section 3 — 数据备份
-          _buildSectionHeader(theme, Icons.backup_rounded, '数据备份'),
+          _buildSectionHeader(theme, Icons.backup_rounded, context.l10n.dataManagement_dataBackup),
           const SizedBox(height: 12),
           Card(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -348,8 +348,8 @@ class _DataManagementPageState extends ConsumerState<DataManagementPage> {
               children: [
                 ListTile(
                   leading: const Icon(Icons.upload_rounded),
-                  title: const Text('导出数据'),
-                  subtitle: const Text('将偏好设置导出为文件'),
+                  title: Text(context.l10n.dataManagement_exportData),
+                  subtitle: Text(context.l10n.dataManagement_exportDesc),
                   trailing: Icon(
                     Icons.chevron_right_rounded,
                     color: theme.colorScheme.outline.withValues(alpha: 0.4),
@@ -360,8 +360,8 @@ class _DataManagementPageState extends ConsumerState<DataManagementPage> {
                 _buildDivider(theme),
                 ListTile(
                   leading: const Icon(Icons.download_rounded),
-                  title: const Text('导入数据'),
-                  subtitle: const Text('从备份文件恢复偏好设置'),
+                  title: Text(context.l10n.dataManagement_importData),
+                  subtitle: Text(context.l10n.dataManagement_importDesc),
                   trailing: Icon(
                     Icons.chevron_right_rounded,
                     color: theme.colorScheme.outline.withValues(alpha: 0.4),
@@ -405,7 +405,7 @@ class _DataManagementPageState extends ConsumerState<DataManagementPage> {
       subtitle: Text(_formatCacheSize(size)),
       trailing: TextButton(
         onPressed: size <= 0 ? null : onClear,
-        child: const Text('清除'),
+        child: Text(S.current.common_clear),
       ),
     );
   }

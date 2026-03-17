@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../l10n/s.dart';
 import '../../../../models/topic.dart';
 import '../../../../services/discourse_cache_manager.dart';
 import '../../../content/discourse_html_content/discourse_html_content.dart';
@@ -54,7 +55,7 @@ class PostRepliesList extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  '$replyCount 条回复',
+                  context.l10n.post_replyCount(replyCount),
                   style: theme.textTheme.labelLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -147,7 +148,7 @@ class PostRepliesList extends StatelessWidget {
                       icon: isLoadingReplies
                           ? const SizedBox(width: 12, height: 12, child: CircularProgressIndicator(strokeWidth: 2))
                           : const Icon(Icons.refresh, size: 16),
-                      label: const Text('加载更多回复'),
+                      label: Text(context.l10n.post_loadMoreReplies),
                       style: TextButton.styleFrom(
                         visualDensity: VisualDensity.compact,
                       ),
@@ -158,7 +159,7 @@ class PostRepliesList extends StatelessWidget {
                       showRepliesNotifier.value = false;
                     },
                     icon: Icon(Icons.expand_less, size: 16, color: theme.colorScheme.onSurfaceVariant),
-                    label: Text('收起回复', style: TextStyle(color: theme.colorScheme.onSurfaceVariant)),
+                    label: Text(context.l10n.post_collapseReplies, style: TextStyle(color: theme.colorScheme.onSurfaceVariant)),
                     style: TextButton.styleFrom(
                       visualDensity: VisualDensity.compact,
                     ),

@@ -190,7 +190,7 @@ mixin _UsersMixin on _DiscourseServiceBase {
   Future<TopicListResponse> getUserBookmarks({int page = 0}) async {
     final username = await getUsername();
     if (username == null) {
-      throw Exception('未登录或无法获取用户名');
+      throw Exception(S.current.error_notLoggedInNoUsername);
     }
     final response = await _dio.get(
       '/u/$username/bookmarks.json',
@@ -203,7 +203,7 @@ mixin _UsersMixin on _DiscourseServiceBase {
   Future<TopicListResponse> getUserCreatedTopics({int page = 0}) async {
     final username = await getUsername();
     if (username == null) {
-      throw Exception('未登录或无法获取用户名');
+      throw Exception(S.current.error_notLoggedInNoUsername);
     }
     final response = await _dio.get(
       '/topics/created-by/$username.json',

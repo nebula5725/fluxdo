@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/ldc_oauth_service.dart';
 import '../services/cdk_oauth_service.dart';
+import '../l10n/s.dart';
 import '../services/toast_service.dart';
 import '../providers/ldc_providers.dart';
 import '../providers/cdk_providers.dart';
@@ -78,12 +79,12 @@ class _MetaversePageState extends ConsumerState<MetaversePage> {
         setState(() => _ldcEnabled = true);
         ref.read(ldcUserInfoProvider.notifier).refresh();
         if (mounted) {
-          ToastService.showSuccess('LDC 授权成功');
+          ToastService.showSuccess(S.current.metaverse_ldcAuthSuccess);
         }
       }
     } catch (e) {
       if (mounted) {
-        ToastService.showError('授权失败: $e');
+        ToastService.showError(S.current.metaverse_authFailed(e.toString()));
       }
     }
   }
@@ -128,12 +129,12 @@ class _MetaversePageState extends ConsumerState<MetaversePage> {
         setState(() => _cdkEnabled = true);
         ref.read(cdkUserInfoProvider.notifier).refresh();
         if (mounted) {
-          ToastService.showSuccess('CDK 授权成功');
+          ToastService.showSuccess(S.current.metaverse_cdkAuthSuccess);
         }
       }
     } catch (e) {
       if (mounted) {
-        ToastService.showError('授权失败: $e');
+        ToastService.showError(S.current.metaverse_authFailed(e.toString()));
       }
     }
   }
@@ -161,8 +162,8 @@ class _MetaversePageState extends ConsumerState<MetaversePage> {
           ? const Center(child: CircularProgressIndicator())
           : CustomScrollView(
               slivers: [
-                const SliverAppBar.large(
-                  title: Text('元宇宙'),
+                SliverAppBar.large(
+                  title: Text(context.l10n.metaverse_title),
                   centerTitle: false,
                 ),
                 SliverPadding(
@@ -174,7 +175,7 @@ class _MetaversePageState extends ConsumerState<MetaversePage> {
                         Padding(
                           padding: const EdgeInsets.only(bottom: 16, top: 8),
                           child: Text(
-                            '我的服务',
+                            context.l10n.metaverse_myServices,
                             style: theme.textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: colorScheme.onSurface,
@@ -218,11 +219,11 @@ class _MetaversePageState extends ConsumerState<MetaversePage> {
       final result = await service.authorize(context);
       if (result && mounted) {
         ref.read(ldcUserInfoProvider.notifier).refresh();
-        ToastService.showSuccess('LDC 重新授权成功');
+        ToastService.showSuccess(S.current.metaverse_ldcReauthSuccess);
       }
     } catch (e) {
       if (mounted) {
-        ToastService.showError('授权失败: $e');
+        ToastService.showError(S.current.metaverse_authFailed(e.toString()));
       }
     } finally {
       if (mounted) {
@@ -245,11 +246,11 @@ class _MetaversePageState extends ConsumerState<MetaversePage> {
       final result = await service.authorize(context);
       if (result && mounted) {
         ref.read(cdkUserInfoProvider.notifier).refresh();
-        ToastService.showSuccess('CDK 重新授权成功');
+        ToastService.showSuccess(S.current.metaverse_cdkReauthSuccess);
       }
     } catch (e) {
       if (mounted) {
-        ToastService.showError('授权失败: $e');
+        ToastService.showError(S.current.metaverse_authFailed(e.toString()));
       }
     } finally {
       if (mounted) {
@@ -298,14 +299,14 @@ class _MetaversePageState extends ConsumerState<MetaversePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'LDC 积分服务',
+                      context.l10n.metaverse_ldcService,
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '连接账户，开启积分权益',
+                      context.l10n.metaverse_ldcDesc,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
@@ -327,7 +328,7 @@ class _MetaversePageState extends ConsumerState<MetaversePage> {
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     visualDensity: VisualDensity.compact,
                   ),
-                  child: const Text('开启'),
+                  child: Text(context.l10n.common_enable),
                 ),
             ],
           ),
@@ -376,14 +377,14 @@ class _MetaversePageState extends ConsumerState<MetaversePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'CDK 服务',
+                      context.l10n.metaverse_cdkService,
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '连接账户，开启 CDK 权益',
+                      context.l10n.metaverse_cdkDesc,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
@@ -405,7 +406,7 @@ class _MetaversePageState extends ConsumerState<MetaversePage> {
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     visualDensity: VisualDensity.compact,
                   ),
-                  child: const Text('开启'),
+                  child: Text(context.l10n.common_enable),
                 ),
             ],
           ),
@@ -432,7 +433,7 @@ class _MetaversePageState extends ConsumerState<MetaversePage> {
               ),
               const SizedBox(height: 8),
               Text(
-                '更多服务接入中...',
+                context.l10n.metaverse_comingSoon,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.outline,
                 ),

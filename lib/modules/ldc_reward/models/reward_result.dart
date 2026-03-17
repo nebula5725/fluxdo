@@ -1,3 +1,5 @@
+import '../../../l10n/s.dart';
+
 /// LDC 打赏结果模型
 class LdcRewardResult {
   final bool success;
@@ -24,7 +26,7 @@ class LdcRewardResult {
     }
     return LdcRewardResult(
       success: false,
-      errorMsg: errorMsg ?? '打赏失败',
+      errorMsg: errorMsg ?? S.current.reward_defaultError,
     );
   }
 

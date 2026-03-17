@@ -10,6 +10,7 @@ import '../widgets/topic/topic_item_builder.dart';
 import '../widgets/topic/topic_list_skeleton.dart';
 import '../providers/preferences_provider.dart';
 import '../widgets/common/error_view.dart';
+import '../l10n/s.dart';
 import 'topic_detail_page/topic_detail_page.dart';
 
 /// 我的话题页面
@@ -77,7 +78,7 @@ class _MyTopicsPageState extends ConsumerState<MyTopicsPage> {
       },
       child: Scaffold(
         appBar: SearchableAppBar(
-          title: '我的话题',
+          title: context.l10n.myTopics_title,
           isSearchMode: searchState.isSearchMode,
           onSearchPressed: () => ref
               .read(userContentSearchProvider(SearchInType.created).notifier)
@@ -92,7 +93,7 @@ class _MyTopicsPageState extends ConsumerState<MyTopicsPage> {
           filterActive: searchState.filter.isNotEmpty,
           onFilterPressed: () =>
               showSearchFilterPanel(context, ref, SearchInType.created),
-          searchHint: '在我的话题中搜索...',
+          searchHint: context.l10n.myTopics_searchHint,
         ),
         body: Stack(
           children: [
@@ -102,9 +103,9 @@ class _MyTopicsPageState extends ConsumerState<MyTopicsPage> {
               child: _buildTopicList(myTopicsAsync),
             ),
             if (searchState.isSearchMode)
-              const UserContentSearchView(
+              UserContentSearchView(
                 inType: SearchInType.created,
-                emptySearchHint: '输入关键词搜索我的话题',
+                emptySearchHint: context.l10n.myTopics_emptySearchHint,
               ),
           ],
         ),
@@ -118,13 +119,13 @@ class _MyTopicsPageState extends ConsumerState<MyTopicsPage> {
       child: myTopicsAsync.when(
         data: (topics) {
           if (topics.isEmpty) {
-            return const Center(
+            return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.article_outlined, size: 64, color: Colors.grey),
-                  SizedBox(height: 16),
-                  Text('暂无话题', style: TextStyle(color: Colors.grey)),
+                  const Icon(Icons.article_outlined, size: 64, color: Colors.grey),
+                  const SizedBox(height: 16),
+                  Text(context.l10n.myTopics_empty, style: const TextStyle(color: Colors.grey)),
                 ],
               ),
             );
@@ -138,12 +139,12 @@ class _MyTopicsPageState extends ConsumerState<MyTopicsPage> {
               if (index == topics.length) {
                 final notifier = ref.watch(myTopicsProvider.notifier);
                 if (!notifier.hasMore) {
-                  return const Padding(
-                    padding: EdgeInsets.all(16.0),
+                  return Padding(
+                    padding: const EdgeInsets.all(16.0),
                     child: Center(
                       child: Text(
-                        '没有更多了',
-                        style: TextStyle(color: Colors.grey),
+                        context.l10n.common_noMore,
+                        style: const TextStyle(color: Colors.grey),
                       ),
                     ),
                   );
@@ -160,7 +161,7 @@ class _MyTopicsPageState extends ConsumerState<MyTopicsPage> {
                             Icon(Icons.refresh, size: 16, color: Theme.of(context).colorScheme.primary),
                             const SizedBox(width: 6),
                             Text(
-                              '加载失败，点击重试',
+                              context.l10n.common_loadFailedTapRetry,
                               style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.primary),
                             ),
                           ],

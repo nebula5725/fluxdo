@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/s.dart';
 import '../../models/topic.dart';
 import '../../pages/topic_detail_page/topic_detail_page.dart';
 import '../../utils/discourse_url_parser.dart';
@@ -118,7 +119,7 @@ class _PostLinksState extends State<PostLinks> with SingleTickerProviderStateMix
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    '相关链接',
+                    context.l10n.post_relatedLinks,
                     style: theme.textTheme.labelMedium?.copyWith(
                       color: theme.colorScheme.primary,
                       fontWeight: FontWeight.bold,
@@ -185,7 +186,7 @@ class _PostLinksState extends State<PostLinks> with SingleTickerProviderStateMix
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            '还有 $_remainingCount 条',
+                            context.l10n.post_moreLinks(_remainingCount),
                             style: theme.textTheme.labelMedium?.copyWith(
                               color: theme.colorScheme.primary,
                             ),

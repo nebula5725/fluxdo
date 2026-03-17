@@ -6,6 +6,8 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../l10n/s.dart';
+
 /// 数据备份导出/导入服务
 class DataBackupService {
   static const FlutterSecureStorage _secureStorage = FlutterSecureStorage(
@@ -140,7 +142,7 @@ class DataBackupService {
     Map<String, dynamic> backup,
   ) async {
     final data = backup['data'] as Map<String, dynamic>?;
-    if (data == null) throw const FormatException('备份文件格式错误：缺少 data 字段');
+    if (data == null) throw FormatException(S.current.backup_missingDataField);
 
     for (final entry in data.entries) {
       final key = entry.key;
@@ -185,7 +187,7 @@ class DataBackupService {
 
     // 基本校验
     if (json['version'] == null || json['data'] == null) {
-      throw const FormatException('无效的备份文件格式');
+      throw FormatException(S.current.backup_invalidFormat);
     }
 
     return json;

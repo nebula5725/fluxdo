@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../l10n/s.dart';
 import '../../../models/topic.dart';
 import '../../../services/discourse/discourse_service.dart';
 import '../../../services/toast_service.dart';
@@ -247,7 +248,7 @@ class _AiChatPageState extends ConsumerState<AiChatPage> {
         .toList();
 
     if (selectedMessages.isEmpty) {
-      ToastService.show('请选择要导出的消息');
+      ToastService.show(S.current.ai_selectExportMessages);
       return;
     }
 
@@ -278,7 +279,7 @@ class _AiChatPageState extends ConsumerState<AiChatPage> {
   /// 复制消息文本
   void _copyMessageText(AiChatMessage message) {
     Clipboard.setData(ClipboardData(text: message.content));
-    ToastService.showSuccess('已复制到剪贴板');
+    ToastService.showSuccess(S.current.ai_copiedToClipboard);
   }
 
   /// 预览页上传完成后的回调
@@ -350,8 +351,8 @@ class _AiChatPageState extends ConsumerState<AiChatPage> {
                                 color: theme.colorScheme.primary,
                               ),
                               const SizedBox(width: 8),
-                              const Text(
-                                'AI 助手',
+                              Text(
+                                context.l10n.ai_title,
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w600,
@@ -376,13 +377,13 @@ class _AiChatPageState extends ConsumerState<AiChatPage> {
                               if (chatState.messages.isNotEmpty)
                                 IconButton(
                                   icon: const Icon(Icons.check_box_outlined),
-                                  tooltip: '多选导出',
+                                  tooltip: context.l10n.ai_multiSelectExport,
                                   iconSize: 20,
                                   onPressed: _enterSelectionMode,
                                 ),
                               PopupMenuButton<String>(
                                 icon: const Icon(Icons.more_vert),
-                                tooltip: '更多',
+                                tooltip: context.l10n.ai_moreTooltip,
                                 iconSize: 20,
                                 onSelected: (value) {
                                   switch (value) {
@@ -396,31 +397,31 @@ class _AiChatPageState extends ConsumerState<AiChatPage> {
                                   }
                                 },
                                 itemBuilder: (context) => [
-                                  const PopupMenuItem(
+                                  PopupMenuItem(
                                     value: 'new_session',
                                     child: ListTile(
-                                      leading: Icon(Icons.add_comment_outlined),
-                                      title: Text('新建会话'),
+                                      leading: const Icon(Icons.add_comment_outlined),
+                                      title: Text(context.l10n.ai_newSession),
                                       dense: true,
                                       contentPadding: EdgeInsets.zero,
                                     ),
                                   ),
                                   if (chatState.sessions.isNotEmpty)
-                                    const PopupMenuItem(
+                                    PopupMenuItem(
                                       value: 'history',
                                       child: ListTile(
-                                        leading: Icon(Icons.history),
-                                        title: Text('会话记录'),
+                                        leading: const Icon(Icons.history),
+                                        title: Text(context.l10n.ai_sessionHistory),
                                         dense: true,
                                         contentPadding: EdgeInsets.zero,
                                       ),
                                     ),
                                   if (chatState.messages.isNotEmpty)
-                                    const PopupMenuItem(
+                                    PopupMenuItem(
                                       value: 'clear',
                                       child: ListTile(
-                                        leading: Icon(Icons.delete_outline),
-                                        title: Text('清空聊天'),
+                                        leading: const Icon(Icons.delete_outline),
+                                        title: Text(context.l10n.ai_clearChat),
                                         dense: true,
                                         contentPadding: EdgeInsets.zero,
                                       ),
@@ -495,22 +496,22 @@ class _AiChatPageState extends ConsumerState<AiChatPage> {
   }
 
   /// 常用对话
-  static const _quickPrompts = [
+  List<({IconData icon, String label, String prompt})> get _quickPrompts => [
     (
       icon: Icons.summarize_outlined,
-      label: '总结这个话题',
-      prompt: '请简要总结这个话题的主要内容和讨论要点。',
+      label: S.current.ai_summarizeTopic,
+      prompt: S.current.ai_summarizePrompt,
     ),
-    (icon: Icons.translate_outlined, label: '翻译主帖', prompt: '请将主帖内容翻译成英文。'),
+    (icon: Icons.translate_outlined, label: S.current.ai_translatePost, prompt: S.current.ai_translatePrompt),
     (
       icon: Icons.question_answer_outlined,
-      label: '列出主要观点',
-      prompt: '请列出这个话题中各楼层的主要观点和立场。',
+      label: S.current.ai_listViewpoints,
+      prompt: S.current.ai_listViewpointsPrompt,
     ),
     (
       icon: Icons.lightbulb_outlined,
-      label: '有什么值得关注的',
-      prompt: '这个话题中有哪些值得关注的信息或亮点？',
+      label: S.current.ai_highlights,
+      prompt: S.current.ai_highlightsPrompt,
     ),
   ];
 
@@ -538,14 +539,14 @@ class _AiChatPageState extends ConsumerState<AiChatPage> {
             ),
             const SizedBox(height: 16),
             Text(
-              '向 AI 助手提问',
+              context.l10n.ai_askTitle,
               style: theme.textTheme.titleMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              'AI 会基于话题内容为你解答',
+              context.l10n.ai_askSubtitle,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant.withValues(
                   alpha: 0.7,
@@ -631,7 +632,7 @@ class _AiChatPageState extends ConsumerState<AiChatPage> {
             ),
             const SizedBox(width: 4),
             Text(
-              '已选 ${_selectedMessageIds.length} 条',
+              context.l10n.ai_selectedCount(_selectedMessageIds.length),
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -644,7 +645,7 @@ class _AiChatPageState extends ConsumerState<AiChatPage> {
               ? null
               : _exportSelectedMessages,
           icon: const Icon(Icons.image_outlined, size: 18),
-          label: const Text('导出图片'),
+          label: Text(context.l10n.ai_exportImage),
           style: FilledButton.styleFrom(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           ),
@@ -681,19 +682,19 @@ class _AiChatPageState extends ConsumerState<AiChatPage> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('清空聊天'),
-        content: const Text('确定要清空所有聊天记录吗？'),
+        title: Text(context.l10n.ai_clearChatTitle),
+        content: Text(context.l10n.ai_clearChatConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('取消'),
+            child: Text(context.l10n.common_cancel),
           ),
           FilledButton(
             onPressed: () {
               notifier.clearMessages();
               Navigator.pop(ctx);
             },
-            child: const Text('清空'),
+            child: Text(context.l10n.ai_clearLabel),
           ),
         ],
       ),
@@ -718,7 +719,7 @@ class _AiModelSelector extends StatelessWidget {
     final theme = Theme.of(context);
 
     return PopupMenuButton<int>(
-      tooltip: '选择模型',
+      tooltip: S.current.ai_selectModel,
       onSelected: (index) => onChanged(allModels[index]),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -838,12 +839,12 @@ class _SessionHistorySheetState extends State<_SessionHistorySheet> {
               child: Row(
                 children: [
                   Text(
-                    '会话记录',
+                    S.current.ai_sessionHistory,
                     style: theme.textTheme.titleMedium,
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    '${_sessions.length} 条',
+                    S.current.ai_sessionCount(_sessions.length),
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
@@ -924,17 +925,17 @@ class _SessionHistorySheetState extends State<_SessionHistorySheet> {
   }
 
   String _formatSessionTitle(AiChatSession session, int index) {
-    return session.title ?? '会话 ${_sessions.length - index}';
+    return session.title ?? S.current.ai_sessionTitle(_sessions.length - index);
   }
 
   String _formatTime(DateTime time) {
     final now = DateTime.now();
     final diff = now.difference(time);
 
-    if (diff.inMinutes < 1) return '刚刚';
-    if (diff.inHours < 1) return '${diff.inMinutes} 分钟前';
-    if (diff.inDays < 1) return '${diff.inHours} 小时前';
-    if (diff.inDays < 30) return '${diff.inDays} 天前';
+    if (diff.inMinutes < 1) return S.current.time_justNow;
+    if (diff.inHours < 1) return S.current.time_minutesAgo(diff.inMinutes);
+    if (diff.inDays < 1) return S.current.time_hoursAgo(diff.inHours);
+    if (diff.inDays < 30) return S.current.time_daysAgo(diff.inDays);
 
     return '${time.month}/${time.day}';
   }

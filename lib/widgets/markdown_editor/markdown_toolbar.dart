@@ -16,6 +16,7 @@ import '../../services/toast_service.dart';
 import '../common/fading_edge_scroll_view.dart';
 import 'image_upload_dialog.dart';
 import 'link_insert_dialog.dart';
+import '../../../../../l10n/s.dart';
 
 /// Markdown 工具栏组件
 /// 提供格式化按钮、预览切换和图片上传功能（纯按钮行，不含面板和间距）
@@ -307,7 +308,7 @@ class MarkdownToolbarState extends State<MarkdownToolbar> {
 
     if (!selection.isValid) {
       // 没有选中，在文本末尾插入
-      const placeholder = '在此处键入或粘贴代码';
+      final placeholder = S.current.toolbar_codePlaceholder;
       final codeBlock = '```\n$placeholder\n```';
       final newText = text.isEmpty ? codeBlock : '$text\n$codeBlock';
       final placeholderStart = newText.length - codeBlock.length + 4; // 4 = '```\n'.length
@@ -394,7 +395,7 @@ class MarkdownToolbarState extends State<MarkdownToolbar> {
 
     if (!selection.isValid || selection.start == selection.end) {
       // 没有选中文本，插入带占位符的删除线
-      const placeholder = '删除线文本';
+      final placeholder = S.current.toolbar_strikethroughPlaceholder;
       final strikethrough = '~~$placeholder~~';
       final insertPos = selection.isValid ? selection.start : text.length;
       final newText = text.replaceRange(insertPos, insertPos, strikethrough);
@@ -437,7 +438,7 @@ class MarkdownToolbarState extends State<MarkdownToolbar> {
 
     if (!selection.isValid || selection.start == selection.end) {
       // 没有选中文本，插入带占位符的剧透
-      const placeholder = '剧透内容';
+      final placeholder = S.current.toolbar_spoilerPlaceholder;
       final spoiler = '[spoiler]$placeholder[/spoiler]';
       final insertPos = selection.isValid ? selection.start : text.length;
       final newText = text.replaceRange(insertPos, insertPos, spoiler);
@@ -480,7 +481,7 @@ class MarkdownToolbarState extends State<MarkdownToolbar> {
 
     if (!selection.isValid || selection.start == selection.end) {
       // 没有选中文本，插入带占位符的代码
-      const placeholder = '代码';
+      final placeholder = S.current.codeBlock_code;
       final code = '`$placeholder`';
       final insertPos = selection.isValid ? selection.start : text.length;
       final newText = text.replaceRange(insertPos, insertPos, code);
@@ -549,7 +550,7 @@ class MarkdownToolbarState extends State<MarkdownToolbar> {
     final allImages = imageRegex.allMatches(text).toList();
     if (allImages.length < 2) {
       // 图片数量不足
-      _showToast('需要至少 2 张图片才能创建网格');
+      _showToast(S.current.toolbar_gridMinImages);
       return;
     }
 
@@ -606,7 +607,7 @@ class MarkdownToolbarState extends State<MarkdownToolbar> {
     final groupImages = imageRegex.allMatches(groupText).toList();
 
     if (groupImages.length < 2) {
-      _showToast('需要至少 2 张连续的图片才能创建网格');
+      _showToast(S.current.toolbar_gridNeedConsecutive);
       return;
     }
 
@@ -614,7 +615,7 @@ class MarkdownToolbarState extends State<MarkdownToolbar> {
     final beforeGroup = text.substring(0, groupStart);
     final afterGroup = text.substring(groupEnd);
     if (beforeGroup.trimRight().endsWith('[grid]') && afterGroup.trimLeft().startsWith('[/grid]')) {
-      _showToast('这些图片已经在网格中了');
+      _showToast(S.current.toolbar_imagesAlreadyInGrid);
       return;
     }
 
@@ -640,7 +641,7 @@ class MarkdownToolbarState extends State<MarkdownToolbar> {
 
     if (!selection.isValid || selection.start == selection.end) {
       // 没有选中文本，插入带占位符的引用
-      const placeholder = '引用文本';
+      final placeholder = S.current.toolbar_quotePlaceholder;
       final quote = '> $placeholder';
       final insertPos = selection.isValid ? selection.start : text.length;
 
@@ -837,11 +838,11 @@ class MarkdownToolbarState extends State<MarkdownToolbar> {
                             color: theme.colorScheme.onSurfaceVariant,
                           ),
                           itemBuilder: (context) => [
-                            const PopupMenuItem(value: 1, child: Text('H1 - 一级标题')),
-                            const PopupMenuItem(value: 2, child: Text('H2 - 二级标题')),
-                            const PopupMenuItem(value: 3, child: Text('H3 - 三级标题')),
-                            const PopupMenuItem(value: 4, child: Text('H4 - 四级标题')),
-                            const PopupMenuItem(value: 5, child: Text('H5 - 五级标题')),
+                            PopupMenuItem(value: 1, child: Text(S.current.toolbar_h1)),
+                            PopupMenuItem(value: 2, child: Text(S.current.toolbar_h2)),
+                            PopupMenuItem(value: 3, child: Text(S.current.toolbar_h3)),
+                            PopupMenuItem(value: 4, child: Text(S.current.toolbar_h4)),
+                            PopupMenuItem(value: 5, child: Text(S.current.toolbar_h5)),
                           ],
                           onSelected: (level) {
                             applyLinePrefix('${'#' * level} ');
@@ -851,11 +852,11 @@ class MarkdownToolbarState extends State<MarkdownToolbar> {
                         ),
                         _ToolbarButton(
                           icon: FontAwesomeIcons.bold,
-                          onPressed: () => wrapSelection('**', '**', placeholder: '粗体文本'),
+                          onPressed: () => wrapSelection('**', '**', placeholder: S.current.toolbar_boldPlaceholder),
                         ),
                         _ToolbarButton(
                           icon: FontAwesomeIcons.italic,
-                          onPressed: () => wrapSelection('*', '*', placeholder: '斜体文本'),
+                          onPressed: () => wrapSelection('*', '*', placeholder: S.current.toolbar_italicPlaceholder),
                         ),
                         _ToolbarButton(
                           icon: FontAwesomeIcons.strikethrough,
@@ -864,7 +865,7 @@ class MarkdownToolbarState extends State<MarkdownToolbar> {
                         _ToolbarButton(
                           icon: FontAwesomeIcons.eyeSlash,
                           onPressed: insertSpoiler,
-                          tooltip: '剧透',
+                          tooltip: S.current.toolbar_spoilerTooltip,
                         ),
                         _ToolbarButton(
                           icon: FontAwesomeIcons.listUl,
@@ -893,7 +894,7 @@ class MarkdownToolbarState extends State<MarkdownToolbar> {
                         _ToolbarButton(
                           icon: FontAwesomeIcons.tableColumns,
                           onPressed: wrapImagesInGrid,
-                          tooltip: '图片网格',
+                          tooltip: S.current.toolbar_imageGridTooltip,
                         ),
                       ],
                     ),
@@ -914,7 +915,7 @@ class MarkdownToolbarState extends State<MarkdownToolbar> {
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
                   onPressed: widget.onApplyPangu,
-                  tooltip: '混排优化',
+                  tooltip: S.current.toolbar_mixOptimize,
                 ),
               // 预览按钮（放到最后）
               if (widget.showPreviewButton)
@@ -925,7 +926,7 @@ class MarkdownToolbarState extends State<MarkdownToolbar> {
                     color: widget.isPreview ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant,
                   ),
                   onPressed: widget.onTogglePreview,
-                  tooltip: widget.isPreview ? '编辑' : '预览',
+                  tooltip: widget.isPreview ? S.current.common_edit : S.current.common_preview,
                 ),
             ],
           ),

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../l10n/s.dart';
 import 'log/log_writer.dart';
 import 'toast_service.dart';
 
@@ -14,7 +15,7 @@ class AppErrorHandler {
   /// 显示通用 toast 并写入本地日志。
   static void handleUnexpected(Object error, StackTrace stackTrace) {
     debugPrint('[AppErrorHandler] 意外异常: $error\n$stackTrace');
-    ToastService.showError('操作失败，请重试');
+    ToastService.showError(S.current.toast_operationFailedRetry);
     LogWriter.instance.write({
       'timestamp': DateTime.now().toIso8601String(),
       'level': 'error',

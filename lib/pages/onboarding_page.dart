@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:jovial_svg/jovial_svg.dart';
 import 'dart:async';
 import 'dart:math' as math;
+import '../l10n/s.dart';
 import 'webview_login_page.dart';
 import 'network_settings_page/network_settings_page.dart';
 
@@ -95,7 +96,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
         opacity: _fadeAnimations[0],
         child: IconButton(
           icon: const Icon(Icons.network_check_rounded),
-          tooltip: '网络设置',
+          tooltip: context.l10n.onboarding_networkSettings,
           style: IconButton.styleFrom(
             backgroundColor: Theme.of(context).colorScheme.surface.withValues(alpha:0.3),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -151,7 +152,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
               fadeAnimation: _fadeAnimations[2],
               slideAnimation: _slideAnimations[2],
               child: Text(
-                '真诚 · 友善 · 团结 · 专业',
+                context.l10n.onboarding_slogan,
                 textAlign: TextAlign.center,
                 style: theme.textTheme.titleMedium?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant.withValues(alpha:0.8),
@@ -187,9 +188,9 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                     return 8; // Soft glow shadow
                   }),
                 ),
-                child: const Text(
-                  '登录',
-                  style: TextStyle(
+                child: Text(
+                  context.l10n.common_login,
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 1.0,
@@ -213,9 +214,9 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                   ),
                   foregroundColor: theme.colorScheme.onSurfaceVariant,
                 ),
-                child: const Text(
-                  '游客访问',
-                  style: TextStyle(
+                child: Text(
+                  context.l10n.onboarding_guestAccess,
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                     letterSpacing: 0.5,

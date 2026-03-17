@@ -8,6 +8,7 @@ import '../../../../constants.dart';
 import '../../../../utils/layout_lock.dart';
 import '../../../../utils/url_helper.dart';
 import '../../../../pages/webview_page.dart';
+import '../../../../l10n/s.dart';
 
 /// 是否需要交互遮罩（macOS 上 WebView 会捕获滚动事件）
 bool get _needsInteractionMask => !kIsWeb && Platform.isMacOS;
@@ -202,15 +203,15 @@ class _IframeWidgetState extends State<IframeWidget> {
             child: InkWell(
               borderRadius: BorderRadius.circular(20),
               onTap: _exitInteractMode,
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.close, size: 18, color: Colors.white),
-                    SizedBox(width: 6),
+                    const Icon(Icons.close, size: 18, color: Colors.white),
+                    const SizedBox(width: 6),
                     Text(
-                      '退出交互',
+                      S.current.iframe_exitInteraction,
                       style: TextStyle(color: Colors.white, fontSize: 13),
                     ),
                   ],
@@ -335,7 +336,7 @@ class _IframeWidgetState extends State<IframeWidget> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          '加载失败',
+                          S.current.common_loadFailed,
                           style: TextStyle(
                             color: theme.colorScheme.onSurfaceVariant,
                           ),

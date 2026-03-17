@@ -5,6 +5,7 @@ import '../../pages/topic_detail_page/topic_detail_page.dart';
 import '../../providers/discourse_providers.dart';
 import '../common/relative_time_text.dart';
 import '../markdown_editor/markdown_renderer.dart';
+import '../../../../../l10n/s.dart';
 
 /// 话题 AI 摘要组件
 class TopicSummaryWidget extends ConsumerWidget {
@@ -86,7 +87,7 @@ class TopicSummaryWidget extends ConsumerWidget {
           ),
           const SizedBox(width: 12),
           Text(
-            '正在生成摘要...',
+            S.current.topic_generatingSummary,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -113,7 +114,7 @@ class TopicSummaryWidget extends ConsumerWidget {
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              '加载摘要失败',
+              S.current.topic_summaryLoadFailed,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.error,
               ),
@@ -121,7 +122,7 @@ class TopicSummaryWidget extends ConsumerWidget {
           ),
           TextButton(
             onPressed: () => ref.invalidate(topicSummaryProvider(topicId)),
-            child: const Text('重试'),
+            child: Text(S.current.common_retry),
           ),
         ],
       ),
@@ -144,7 +145,7 @@ class TopicSummaryWidget extends ConsumerWidget {
           ),
           const SizedBox(width: 12),
           Text(
-            '暂无摘要',
+            S.current.topic_noSummary,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -183,7 +184,7 @@ class TopicSummaryWidget extends ConsumerWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                'AI 摘要',
+                S.current.topic_aiSummary,
                 style: theme.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.w600,
                   color: theme.colorScheme.primary,
@@ -199,7 +200,7 @@ class TopicSummaryWidget extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
-                    '有 ${summary.newPostsSinceSummary} 条新回复',
+                    S.current.topic_newRepliesSinceSummary(summary.newPostsSinceSummary),
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: theme.colorScheme.onTertiaryContainer,
                     ),
@@ -237,7 +238,7 @@ class TopicSummaryWidget extends ConsumerWidget {
                 RelativeTimeText(
                   dateTime: summary.updatedAt,
                   displayStyle: TimeDisplayStyle.prefixed,
-                  prefix: '更新于 ',
+                  prefix: S.current.topic_updatedAt,
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -248,7 +249,7 @@ class TopicSummaryWidget extends ConsumerWidget {
                 TextButton.icon(
                   onPressed: () => _refreshSummary(ref),
                   icon: const Icon(Icons.refresh, size: 16),
-                  label: const Text('刷新'),
+                  label: Text(S.current.common_refresh),
                   style: TextButton.styleFrom(
                     padding: const EdgeInsets.symmetric(horizontal: 8),
                     minimumSize: const Size(0, 32),
@@ -357,7 +358,7 @@ class _CollapsibleTopicSummaryState
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      hasCachedSummary ? 'AI 摘要' : '生成 AI 摘要',
+                      hasCachedSummary ? S.current.topic_aiSummary : S.current.topic_generateAiSummary,
                       style: theme.textTheme.labelMedium?.copyWith(
                         color: theme.colorScheme.primary,
                         fontWeight: FontWeight.w500,

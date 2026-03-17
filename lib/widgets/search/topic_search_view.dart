@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../l10n/s.dart';
 import '../../providers/topic_search_provider.dart';
 import '../common/loading_spinner.dart';
 import '../../pages/topic_detail_page/topic_detail_page.dart';
@@ -59,7 +60,7 @@ class _TopicSearchViewState extends ConsumerState<TopicSearchView> {
             Icon(Icons.search, size: 64, color: theme.colorScheme.outline),
             const SizedBox(height: 16),
             Text(
-              '输入关键词搜索本话题',
+              context.l10n.search_topicSearchHint,
               style: theme.textTheme.bodyLarge?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -82,7 +83,7 @@ class _TopicSearchViewState extends ConsumerState<TopicSearchView> {
           children: [
             Icon(Icons.error_outline, size: 48, color: theme.colorScheme.error),
             const SizedBox(height: 16),
-            Text('搜索出错', style: theme.textTheme.titleMedium),
+            Text(context.l10n.search_error, style: theme.textTheme.titleMedium),
             const SizedBox(height: 8),
             Text(
               searchState.error!,
@@ -105,14 +106,14 @@ class _TopicSearchViewState extends ConsumerState<TopicSearchView> {
             Icon(Icons.search_off, size: 64, color: theme.colorScheme.outline),
             const SizedBox(height: 16),
             Text(
-              '没有找到相关结果',
+              context.l10n.search_noResults,
               style: theme.textTheme.bodyLarge?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              '请尝试其他关键词',
+              context.l10n.search_tryOtherKeywords,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.outline,
               ),
@@ -131,7 +132,7 @@ class _TopicSearchViewState extends ConsumerState<TopicSearchView> {
           child: Row(
             children: [
               Text(
-                '${searchState.results.length}${searchState.hasMore ? '+' : ''} 条结果',
+                context.l10n.search_resultCount(searchState.results.length, searchState.hasMore ? '+' : ''),
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.outline,
                 ),

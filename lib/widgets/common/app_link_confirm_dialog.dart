@@ -1,70 +1,79 @@
 import 'dart:async';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import '../../l10n/s.dart';
 import '../../services/local_notification_service.dart';
 
-/// 已知应用 scheme 的友好名称
-const _knownApps = {
-  'twitter': 'Twitter',
-  'x': 'X (Twitter)',
-  'telegram': 'Telegram',
-  'tg': 'Telegram',
-  'whatsapp': 'WhatsApp',
-  'weixin': '微信',
-  'wechat': '微信',
-  'alipay': '支付宝',
-  'alipays': '支付宝',
-  'taobao': '淘宝',
-  'zhihu': '知乎',
-  'bilibili': 'Bilibili',
-  'snssdk1128': '抖音',
-  'snssdk1233': 'TikTok',
-  'mailto': '邮件',
-  'tel': '电话',
-  'sms': '短信',
-  'market': 'Play 商店',
-  'geo': '地图',
-  'googlechrome': 'Chrome',
-  'firefox': 'Firefox',
-  'line': 'LINE',
-  'kakaolink': 'KakaoTalk',
-  'fb': 'Facebook',
-  'instagram': 'Instagram',
-  'youtube': 'YouTube',
-  'spotify': 'Spotify',
-  'discord': 'Discord',
-  'bdnetdisk': '百度网盘',
-  'baidunetdisk': '百度网盘',
-  'baiduyun': '百度网盘',
-  'baiduboxapp': '百度',
-  'qqmap': '腾讯地图',
-  'iosamap': '高德地图',
-  'amapuri': '高德地图',
-  'androidamap': '高德地图',
-  'waze': 'Waze',
-  'mqqapi': 'QQ',
-  'mqq': 'QQ',
-  'tim': 'TIM',
-  'weibo': '微博',
-  'sinaweibo': '微博',
-  'dingtalk': '钉钉',
-  'pinduoduo': '拼多多',
-  'jdmobile': '京东',
-  'openapp.jdmobile': '京东',
-  'suning': '苏宁',
-  'eleme': '饿了么',
-  'meituanwaimai': '美团外卖',
-  'imeituan': '美团',
-  'dianping': '大众点评',
-  'ctrip': '携程',
-  'taobaotravel': '飞猪',
-  'xhsdiscover': '小红书',
-  'douyinopensdk': '抖音',
-  'kwai': '快手',
-  'snssdk32': '今日头条',
-  'vnd.youtube': 'YouTube',
-  'com.douban.frodo': '豆瓣',
-};
+/// 已知应用 scheme -> l10n key 映射函数
+String _getKnownAppName(String scheme) {
+  final l10n = S.current;
+  const staticNames = {
+    'twitter': 'Twitter',
+    'x': 'X (Twitter)',
+    'telegram': 'Telegram',
+    'tg': 'Telegram',
+    'whatsapp': 'WhatsApp',
+    'bilibili': 'Bilibili',
+    'snssdk1233': 'TikTok',
+    'googlechrome': 'Chrome',
+    'firefox': 'Firefox',
+    'line': 'LINE',
+    'kakaolink': 'KakaoTalk',
+    'fb': 'Facebook',
+    'instagram': 'Instagram',
+    'youtube': 'YouTube',
+    'vnd.youtube': 'YouTube',
+    'spotify': 'Spotify',
+    'discord': 'Discord',
+    'waze': 'Waze',
+    'mqqapi': 'QQ',
+    'mqq': 'QQ',
+    'tim': 'TIM',
+  };
+  if (staticNames.containsKey(scheme)) return staticNames[scheme]!;
+
+  final localizedNames = {
+    'weixin': l10n.appLink_weixin,
+    'wechat': l10n.appLink_weixin,
+    'alipay': l10n.appLink_alipay,
+    'alipays': l10n.appLink_alipay,
+    'taobao': l10n.appLink_taobao,
+    'zhihu': l10n.appLink_zhihu,
+    'snssdk1128': l10n.appLink_douyin,
+    'mailto': l10n.appLink_email,
+    'tel': l10n.appLink_phone,
+    'sms': l10n.appLink_sms,
+    'market': l10n.appLink_playStore,
+    'geo': l10n.appLink_map,
+    'bdnetdisk': l10n.appLink_baiduNetdisk,
+    'baidunetdisk': l10n.appLink_baiduNetdisk,
+    'baiduyun': l10n.appLink_baiduNetdisk,
+    'baiduboxapp': l10n.appLink_baidu,
+    'qqmap': l10n.appLink_qqMap,
+    'iosamap': l10n.appLink_amap,
+    'amapuri': l10n.appLink_amap,
+    'androidamap': l10n.appLink_amap,
+    'weibo': l10n.appLink_weibo,
+    'sinaweibo': l10n.appLink_weibo,
+    'dingtalk': l10n.appLink_dingtalk,
+    'pinduoduo': l10n.appLink_pinduoduo,
+    'jdmobile': l10n.appLink_jd,
+    'openapp.jdmobile': l10n.appLink_jd,
+    'suning': l10n.appLink_suning,
+    'eleme': l10n.appLink_eleme,
+    'meituanwaimai': l10n.appLink_meituanWaimai,
+    'imeituan': l10n.appLink_meituan,
+    'dianping': l10n.appLink_dianping,
+    'ctrip': l10n.appLink_ctrip,
+    'taobaotravel': l10n.appLink_fliggy,
+    'xhsdiscover': l10n.appLink_xiaohongshu,
+    'douyinopensdk': l10n.appLink_douyin,
+    'kwai': l10n.appLink_kuaishou,
+    'snssdk32': l10n.appLink_toutiao,
+    'com.douban.frodo': l10n.appLink_douban,
+  };
+  return localizedNames[scheme] ?? '';
+}
 
 // ==================== 横幅状态管理 ====================
 
@@ -279,7 +288,7 @@ class _AppLinkBannerState extends State<_AppLinkBanner>
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                '继续访问${widget.displayName}？',
+                                context.l10n.appLink_continueVisitConfirm(widget.displayName),
                                 style: theme.textTheme.titleSmall?.copyWith(
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -288,7 +297,7 @@ class _AppLinkBannerState extends State<_AppLinkBanner>
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                '此网站想打开${widget.displayName}应用',
+                                context.l10n.appLink_openAppConfirm(widget.displayName),
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   color: colorScheme.onSurfaceVariant,
                                 ),
@@ -313,7 +322,7 @@ class _AppLinkBannerState extends State<_AppLinkBanner>
                               borderRadius: BorderRadius.circular(20),
                             ),
                           ),
-                          child: const Text('继续'),
+                          child: Text(context.l10n.common_continue),
                         ),
                       ],
                     ),
@@ -370,19 +379,19 @@ String _guessAppName(String url) {
         }
         if (param.startsWith('scheme=')) {
           final scheme = param.substring(7);
-          if (_knownApps.containsKey(scheme)) {
-            return _knownApps[scheme]!;
-          }
+          final name = _getKnownAppName(scheme);
+          if (name.isNotEmpty) return name;
         }
       }
     }
-    return '外部应用';
+    return S.current.appLink_externalApp;
   }
 
   final uri = Uri.tryParse(url);
   if (uri != null) {
-    return _knownApps[uri.scheme] ?? uri.scheme;
+    final name = _getKnownAppName(uri.scheme);
+    return name.isNotEmpty ? name : uri.scheme;
   }
 
-  return '外部应用';
+  return S.current.appLink_externalApp;
 }

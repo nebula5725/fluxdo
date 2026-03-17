@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../l10n/s.dart';
 import '../models/topic.dart';
 import 'core_providers.dart';
 import 'message_bus/models.dart';

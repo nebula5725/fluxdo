@@ -3,6 +3,7 @@ import 'package:html/parser.dart' as html_parser;
 
 import '../widgets/common/trust_level_skeleton.dart';
 import '../services/network/discourse_dio.dart';
+import '../l10n/s.dart';
 
 
 class TrustLevelRequirementsPage extends StatefulWidget {
@@ -43,13 +44,13 @@ class _TrustLevelRequirementsPageState
         _parseHtml(response.data);
       } else {
         setState(() {
-          _error = '请求失败: ${response.statusCode}';
+          _error = S.current.trustLevel_requestFailed(response.statusCode ?? 0);
           _isLoading = false;
         });
       }
     } catch (e) {
       setState(() {
-        _error = '加载失败: $e';
+        _error = '${S.current.common_loadFailed}: $e';
         _isLoading = false;
       });
     }
@@ -61,12 +62,12 @@ class _TrustLevelRequirementsPageState
 
       final cardDiv = document.querySelector('div.card');
       if (cardDiv == null) {
-        throw Exception('未找到信任级别信息 (div.card)');
+        throw Exception(S.current.trustLevel_parseNotFound);
       }
 
       // 1. Title & Badge & Status Text
       final titleEl = cardDiv.querySelector('h2.card-title');
-      final title = titleEl?.text.trim() ?? '信任级别要求';
+      final title = titleEl?.text.trim() ?? S.current.trustLevel_title;
 
       final badgeEl = cardDiv.querySelector('.badge');
       final badgeText = badgeEl?.text.trim() ?? '';
@@ -191,7 +192,7 @@ class _TrustLevelRequirementsPageState
       });
     } catch (e) {
       setState(() {
-        _error = '解析失败: $e';
+        _error = S.current.trustLevel_parseFailed(e.toString());
         _isLoading = false;
       });
     }
@@ -234,19 +235,19 @@ class _TrustLevelRequirementsPageState
                                   const SizedBox(height: 24),
                                   _buildCard(
                                     theme,
-                                    title: '活跃程度',
+                                    title: context.l10n.trustLevel_activity,
                                     child: _buildRings(theme),
                                   ),
                                   const SizedBox(height: 16),
                                   _buildCard(
                                     theme,
-                                    title: '互动参与',
+                                    title: context.l10n.trustLevel_interaction,
                                     child: _buildBars(theme),
                                   ),
                                   const SizedBox(height: 16),
                                   _buildCard(
                                     theme,
-                                    title: '合规记录',
+                                    title: context.l10n.trustLevel_compliance,
                                     child: _buildCompliance(theme),
                                   ),
                                   const SizedBox(height: 24),
@@ -283,7 +284,7 @@ class _TrustLevelRequirementsPageState
     }
 
     return SliverAppBar.large(
-      title: const Text('信任要求'),
+      title: Text(context.l10n.trustLevel_appBarTitle),
       centerTitle: false,
       expandedHeight: 200,
       flexibleSpace: FlexibleSpaceBar(
@@ -794,7 +795,7 @@ class _TrustLevelRequirementsPageState
   }
 
   Widget _buildEmpty(ThemeData theme) {
-    return const Center(child: Text('没有数据'));
+    return Center(child: Text(context.l10n.common_noData));
   }
 
   Widget _buildError(ThemeData theme) {
@@ -806,9 +807,9 @@ class _TrustLevelRequirementsPageState
           children: [
             Icon(Icons.error_outline, size: 48, color: theme.colorScheme.error),
             const SizedBox(height: 16),
-            Text(_error ?? '未知错误'),
+            Text(_error ?? context.l10n.error_unknown),
             const SizedBox(height: 16),
-            FilledButton(onPressed: _fetchData, child: const Text('重试')),
+            FilledButton(onPressed: _fetchData, child: Text(context.l10n.common_retry)),
           ],
         ),
       ),

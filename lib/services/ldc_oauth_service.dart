@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'network/discourse_dio.dart';
 import 'network/exceptions/oauth_exception.dart';
+import '../l10n/s.dart';
 import 'toast_service.dart';
 import '../models/ldc_user_info.dart';
 
@@ -150,7 +151,7 @@ class _AuthDialogState extends State<_AuthDialog> {
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
-        ToastService.showError('授权失败: $e');
+        ToastService.showError('${S.current.reward_authFailed}: $e');
       }
     }
   }
@@ -158,12 +159,12 @@ class _AuthDialogState extends State<_AuthDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('授权确认'),
-      content: const Text('Linux.do Credit 将获取你的基本信息，是否允许？'),
+      title: Text(context.l10n.auth_ldcConfirmTitle),
+      content: Text(context.l10n.auth_ldcConfirmMessage),
       actions: [
         TextButton(
           onPressed: _isLoading ? null : () => Navigator.pop(context, false),
-          child: const Text('拒绝'),
+          child: Text(context.l10n.common_deny),
         ),
         FilledButton(
           onPressed: _isLoading ? null : _handleApprove,
@@ -173,7 +174,7 @@ class _AuthDialogState extends State<_AuthDialog> {
                   height: 16,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : const Text('允许'),
+              : Text(context.l10n.common_allow),
         ),
       ],
     );

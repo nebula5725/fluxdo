@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/s.dart';
 import '../../../providers/message_bus_providers.dart';
 import '../../../widgets/common/smart_avatar.dart';
 
@@ -10,7 +11,7 @@ class TypingIndicator extends StatefulWidget {
   const TypingIndicator({
     super.key,
     this.textStyle,
-    this.text = '正在输入',
+    this.text = '',
   });
 
   @override
@@ -48,7 +49,7 @@ class _TypingIndicatorState extends State<TypingIndicator>
       animation: _dotCount,
       builder: (context, child) {
         return Text(
-          '${widget.text}${'.' * (_dotCount.value + 1)}',
+          '${widget.text.isEmpty ? S.current.ai_typingIndicator : widget.text}${'.' * (_dotCount.value + 1)}',
           style: widget.textStyle,
         );
       },

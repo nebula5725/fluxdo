@@ -5,6 +5,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../l10n/s.dart';
+
 /// 认证日志服务 - 专门记录登录/登出相关事件
 /// 支持文件日志持久化、开关控制和日志导出
 class AuthLogService {
@@ -143,7 +145,7 @@ class AuthLogService {
       if (await _logFile!.exists()) {
         await SharePlus.instance.share(ShareParams(
           files: [XFile(_logFile!.path)],
-          subject: '认证日志',
+          subject: S.current.auth_logSubject,
         ));
       }
     } catch (e) {

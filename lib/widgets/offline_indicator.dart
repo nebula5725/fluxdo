@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../l10n/s.dart';
 import '../providers/connectivity_provider.dart';
 import '../services/connectivity_service.dart';
 
@@ -36,7 +37,7 @@ class OfflineIndicator extends ConsumerWidget {
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    '网络连接已断开',
+                    context.l10n.common_networkDisconnected,
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                     ),

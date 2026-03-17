@@ -21,6 +21,7 @@ import '../common/topic_badges.dart';
 import '../content/discourse_html_content/discourse_html_content.dart';
 import '../../pages/category_topics_page.dart';
 import '../../pages/tag_topics_page.dart';
+import '../../../../../l10n/s.dart';
 
 /// 预览弹窗中的操作项
 class PreviewAction {
@@ -66,7 +67,7 @@ class TopicPreviewDialog extends ConsumerStatefulWidget {
     return showGeneralDialog(
       context: context,
       barrierDismissible: true,
-      barrierLabel: '关闭预览',
+      barrierLabel: S.current.common_closePreview,
       barrierColor: Colors.black54,
       transitionDuration: const Duration(milliseconds: 200),
       pageBuilder: (context, animation, secondaryAnimation) {
@@ -414,7 +415,7 @@ class _TopicPreviewDialogState extends ConsumerState<TopicPreviewDialog> {
           RelativeTimeText(
             dateTime: topic.createdAt,
             displayStyle: TimeDisplayStyle.prefixed,
-            prefix: '创建于 ',
+            prefix: S.current.topic_createdAt,
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -531,7 +532,7 @@ class _TopicPreviewDialogState extends ConsumerState<TopicPreviewDialog> {
       child: Row(
         children: [
           Text(
-            '参与者',
+            S.current.topic_participants,
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -581,14 +582,14 @@ class _TopicPreviewDialogState extends ConsumerState<TopicPreviewDialog> {
               child: _buildStatItem(
                 context,
                 Icons.chat_bubble_outline_rounded,
-                '${(topic.postsCount - 1).clamp(0, 999999)} 条回复',
+                S.current.topic_replyCount((topic.postsCount - 1).clamp(0, 999999)),
               ),
             ),
             Expanded(
               child: _buildStatItem(
                 context,
                 Icons.favorite_border_rounded,
-                '${NumberUtils.formatCount(topic.likeCount)} 点赞',
+                S.current.topic_likeCount(NumberUtils.formatCount(topic.likeCount)),
               ),
             ),
           ],
@@ -600,7 +601,7 @@ class _TopicPreviewDialogState extends ConsumerState<TopicPreviewDialog> {
               child: _buildStatItem(
                 context,
                 Icons.visibility_outlined,
-                '${NumberUtils.formatCount(topic.views)} 浏览',
+                S.current.topic_viewCount(NumberUtils.formatCount(topic.views)),
               ),
             ),
             Expanded(
@@ -610,7 +611,7 @@ class _TopicPreviewDialogState extends ConsumerState<TopicPreviewDialog> {
                 RelativeTimeText(
                   dateTime: topic.lastPostedAt,
                   displayStyle: TimeDisplayStyle.prefixed,
-                  prefix: '最后回复 ',
+                  prefix: S.current.topic_lastReply,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
@@ -676,7 +677,7 @@ class _TopicPreviewDialogState extends ConsumerState<TopicPreviewDialog> {
           // 关闭按钮
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('关闭'),
+            child: Text(S.current.common_close),
           ),
 
           const Spacer(),
@@ -694,7 +695,7 @@ class _TopicPreviewDialogState extends ConsumerState<TopicPreviewDialog> {
               SharePlus.instance.share(ShareParams(text: url));
             },
             icon: const Icon(Icons.share_outlined, size: 20),
-            tooltip: '分享',
+            tooltip: S.current.common_share,
           ),
 
           const SizedBox(width: 8),
@@ -706,7 +707,7 @@ class _TopicPreviewDialogState extends ConsumerState<TopicPreviewDialog> {
               widget.onOpen?.call();
             },
             icon: const Icon(Icons.open_in_new, size: 18),
-            label: const Text('查看详情'),
+            label: Text(S.current.common_viewDetails),
           ),
         ],
       ),

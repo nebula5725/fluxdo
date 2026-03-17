@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../l10n/ai_l10n.dart';
 import '../models/ai_provider.dart';
 import '../providers/ai_provider_providers.dart';
 import '../services/ai_provider_service.dart';
@@ -28,7 +29,10 @@ class _AiProviderEditPageState extends ConsumerState<AiProviderEditPage> {
   bool _isCheckingConnectivity = false;
   bool _isFetchingModels = false;
   bool _isSaving = false;
-  String? _connectivityResult;
+  /// 连通性检查结果：null=未检查，true=成功，false=失败
+  bool? _connectivitySuccess;
+  /// 连通性检查失败时的错误信息
+  String? _connectivityError;
 
   /// 正在测试的模型 ID
   String? _testingModelId;
@@ -87,13 +91,14 @@ class _AiProviderEditPageState extends ConsumerState<AiProviderEditPage> {
     final apiKey = _apiKeyController.text.trim();
     final baseUrl = _baseUrlController.text.trim();
     if (apiKey.isEmpty || baseUrl.isEmpty) {
-      AiToastDelegate.showInfo('请填写 Base URL 和 API Key');
+      AiToastDelegate.showInfo(AiL10n.current.pleaseEnterBaseUrlAndApiKey);
       return;
     }
 
     setState(() {
       _isCheckingConnectivity = true;
-      _connectivityResult = null;
+      _connectivitySuccess = null;
+      _connectivityError = null;
     });
 
     try {
@@ -102,13 +107,15 @@ class _AiProviderEditPageState extends ConsumerState<AiProviderEditPage> {
           await service.checkConnectivity(_selectedType, baseUrl, apiKey);
       if (mounted) {
         setState(() {
-          _connectivityResult = ok ? '连接成功' : '连接失败';
+          _connectivitySuccess = ok;
+          _connectivityError = ok ? null : '';
         });
       }
     } catch (e) {
       if (mounted) {
         setState(() {
-          _connectivityResult = '连接失败: ${AiProviderApiService.friendlyError(e)}';
+          _connectivitySuccess = false;
+          _connectivityError = AiProviderApiService.friendlyError(e);
         });
       }
     } finally {
@@ -124,7 +131,7 @@ class _AiProviderEditPageState extends ConsumerState<AiProviderEditPage> {
     final apiKey = _apiKeyController.text.trim();
     final baseUrl = _baseUrlController.text.trim();
     if (apiKey.isEmpty || baseUrl.isEmpty) {
-      AiToastDelegate.showInfo('请填写 Base URL 和 API Key');
+      AiToastDelegate.showInfo(AiL10n.current.pleaseEnterBaseUrlAndApiKey);
       return;
     }
 
@@ -148,11 +155,11 @@ class _AiProviderEditPageState extends ConsumerState<AiProviderEditPage> {
         setState(() {
           _models = merged;
         });
-        AiToastDelegate.showSuccess('获取到 ${fetched.length} 个模型');
+        AiToastDelegate.showSuccess(AiL10n.current.fetchedModelsCount(fetched.length));
       }
     } catch (e) {
       if (mounted) {
-        AiToastDelegate.showError('获取模型失败: ${AiProviderApiService.friendlyError(e)}');
+        AiToastDelegate.showError(AiL10n.current.fetchModelsFailed(AiProviderApiService.friendlyError(e)));
       }
     } finally {
       if (mounted) {
@@ -168,20 +175,20 @@ class _AiProviderEditPageState extends ConsumerState<AiProviderEditPage> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('手动添加模型'),
+        title: Text(AiL10n.current.addModelManually),
         content: TextField(
           controller: controller,
-          decoration: const InputDecoration(
-            labelText: '模型 ID',
-            hintText: '例如: gpt-4o',
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            labelText: AiL10n.current.modelId,
+            hintText: AiL10n.current.modelIdHint,
+            border: const OutlineInputBorder(),
           ),
           autofocus: true,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('取消'),
+            child: Text(AiL10n.current.cancel),
           ),
           FilledButton(
             onPressed: () {
@@ -193,7 +200,7 @@ class _AiProviderEditPageState extends ConsumerState<AiProviderEditPage> {
               }
               Navigator.pop(ctx);
             },
-            child: const Text('添加'),
+            child: Text(AiL10n.current.add),
           ),
         ],
       ),
@@ -206,15 +213,15 @@ class _AiProviderEditPageState extends ConsumerState<AiProviderEditPage> {
     final apiKey = _apiKeyController.text.trim();
 
     if (name.isEmpty) {
-      AiToastDelegate.showInfo('请输入供应商名称');
+      AiToastDelegate.showInfo(AiL10n.current.pleaseEnterProviderName);
       return;
     }
     if (baseUrl.isEmpty) {
-      AiToastDelegate.showInfo('请输入 Base URL');
+      AiToastDelegate.showInfo(AiL10n.current.pleaseEnterBaseUrl);
       return;
     }
     if (apiKey.isEmpty) {
-      AiToastDelegate.showInfo('请输入 API Key');
+      AiToastDelegate.showInfo(AiL10n.current.pleaseEnterApiKey);
       return;
     }
 
@@ -245,7 +252,7 @@ class _AiProviderEditPageState extends ConsumerState<AiProviderEditPage> {
       }
     } catch (e) {
       if (mounted) {
-        AiToastDelegate.showError('保存失败: ${AiProviderApiService.friendlyError(e)}');
+        AiToastDelegate.showError(AiL10n.current.saveFailed(AiProviderApiService.friendlyError(e)));
       }
     } finally {
       if (mounted) {
@@ -258,10 +265,10 @@ class _AiProviderEditPageState extends ConsumerState<AiProviderEditPage> {
       WidgetRef ref, String providerId, String modelId, bool isDefault) {
     if (isDefault) {
       clearDefaultAiModel(ref);
-      AiToastDelegate.showInfo('已取消默认模型');
+      AiToastDelegate.showInfo(AiL10n.current.defaultModelCleared);
     } else {
       setDefaultAiModel(ref, providerId, modelId);
-      AiToastDelegate.showSuccess('已设为默认模型');
+      AiToastDelegate.showSuccess(AiL10n.current.setAsDefaultModel);
     }
   }
 
@@ -269,7 +276,7 @@ class _AiProviderEditPageState extends ConsumerState<AiProviderEditPage> {
     final apiKey = _apiKeyController.text.trim();
     final baseUrl = _baseUrlController.text.trim();
     if (apiKey.isEmpty || baseUrl.isEmpty) {
-      AiToastDelegate.showInfo('请先填写 Base URL 和 API Key');
+      AiToastDelegate.showInfo(AiL10n.current.pleaseEnterBaseUrlAndApiKeyFirst);
       return;
     }
 
@@ -288,9 +295,9 @@ class _AiProviderEditPageState extends ConsumerState<AiProviderEditPage> {
           _testingModelId = null;
         });
         if (error == null) {
-          AiToastDelegate.showSuccess('模型 $modelId 可用');
+          AiToastDelegate.showSuccess(AiL10n.current.modelAvailable(modelId));
         } else {
-          AiToastDelegate.showError('模型 $modelId 不可用: $error');
+          AiToastDelegate.showError(AiL10n.current.modelUnavailable(modelId, error));
         }
       }
     } catch (e) {
@@ -309,7 +316,7 @@ class _AiProviderEditPageState extends ConsumerState<AiProviderEditPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_isEditing ? '编辑供应商' : '添加供应商'),
+        title: Text(_isEditing ? AiL10n.current.editProvider : AiL10n.current.addProvider),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 8),
@@ -322,7 +329,7 @@ class _AiProviderEditPageState extends ConsumerState<AiProviderEditPage> {
                       child: CircularProgressIndicator(
                           strokeWidth: 2, color: Colors.white),
                     )
-                  : const Text('保存'),
+                  : Text(AiL10n.current.save),
             ),
           ),
         ],
@@ -348,26 +355,26 @@ class _AiProviderEditPageState extends ConsumerState<AiProviderEditPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('基础配置',
+            Text(AiL10n.current.basicConfig,
                 style: theme.textTheme.titleMedium
                     ?.copyWith(fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
             // 名称
             TextField(
               controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: '名称',
-                hintText: '例如: 我的 OpenAI',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: AiL10n.current.name,
+                hintText: AiL10n.current.nameHint,
+                border: const OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 12),
             // 类型
             DropdownButtonFormField<AiProviderType>(
               initialValue: _selectedType,
-              decoration: const InputDecoration(
-                labelText: '供应商类型',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: AiL10n.current.providerType,
+                border: const OutlineInputBorder(),
               ),
               items: AiProviderType.values
                   .map((t) => DropdownMenuItem(
@@ -423,28 +430,32 @@ class _AiProviderEditPageState extends ConsumerState<AiProviderEditPage> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : const Icon(Icons.wifi_tethering, size: 18),
-                  label: const Text('连通性检查'),
+                  label: Text(AiL10n.current.connectivityCheck),
                 ),
-                if (_connectivityResult != null)
+                if (_connectivitySuccess != null)
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        _connectivityResult == '连接成功'
+                        _connectivitySuccess!
                             ? Icons.check_circle
                             : Icons.error,
                         size: 18,
-                        color: _connectivityResult == '连接成功'
+                        color: _connectivitySuccess!
                             ? Colors.green
                             : theme.colorScheme.error,
                       ),
                       const SizedBox(width: 4),
                       Flexible(
                         child: Text(
-                          _connectivityResult!,
+                          _connectivitySuccess!
+                              ? AiL10n.current.connectionSuccess
+                              : (_connectivityError != null && _connectivityError!.isNotEmpty
+                                  ? AiL10n.current.connectionFailedWithError(_connectivityError!)
+                                  : AiL10n.current.connectionFailed),
                           style: TextStyle(
                             fontSize: 13,
-                            color: _connectivityResult == '连接成功'
+                            color: _connectivitySuccess!
                                 ? Colors.green
                                 : theme.colorScheme.error,
                           ),
@@ -475,7 +486,7 @@ class _AiProviderEditPageState extends ConsumerState<AiProviderEditPage> {
             Row(
               children: [
                 Expanded(
-                  child: Text('模型管理',
+                  child: Text(AiL10n.current.modelManagement,
                       style: theme.textTheme.titleMedium
                           ?.copyWith(fontWeight: FontWeight.bold)),
                 ),
@@ -498,12 +509,12 @@ class _AiProviderEditPageState extends ConsumerState<AiProviderEditPage> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : const Icon(Icons.cloud_download_outlined, size: 18),
-                  label: const Text('获取模型'),
+                  label: Text(AiL10n.current.fetchModels),
                 ),
                 OutlinedButton.icon(
                   onPressed: _addModelManually,
                   icon: const Icon(Icons.add, size: 18),
-                  label: const Text('手动添加'),
+                  label: Text(AiL10n.current.manuallyAdd),
                 ),
               ],
             ),
@@ -623,7 +634,7 @@ class _AiProviderEditPageState extends ConsumerState<AiProviderEditPage> {
                               ? Icons.check_circle
                               : Icons.error_outline)
                           : Icons.play_arrow_rounded,
-                  label: '测试',
+                  label: AiL10n.current.test,
                   isLoading: isTesting,
                   highlightColor: hasTestResult && !isTesting
                       ? (testResult == null ? Colors.green : theme.colorScheme.error)
@@ -634,7 +645,7 @@ class _AiProviderEditPageState extends ConsumerState<AiProviderEditPage> {
                   const SizedBox(width: 8),
                   _ModelActionChip(
                     icon: isDefault ? Icons.star_rounded : Icons.star_outline_rounded,
-                    label: isDefault ? '取消默认' : '设为默认',
+                    label: isDefault ? AiL10n.current.cancelDefault : AiL10n.current.setAsDefault,
                     highlightColor: isDefault ? Colors.amber[700] : null,
                     onTap: () => _setDefaultModel(
                         ref, providerId!, model.id, isDefault),
@@ -643,7 +654,7 @@ class _AiProviderEditPageState extends ConsumerState<AiProviderEditPage> {
                 const Spacer(),
                 _ModelActionChip(
                   icon: Icons.delete_outline,
-                  label: '移除',
+                  label: AiL10n.current.remove,
                   isDestructive: true,
                   onTap: () {
                     setState(() {

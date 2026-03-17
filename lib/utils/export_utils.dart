@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import '../l10n/s.dart';
 import '../models/topic.dart';
 import '../services/discourse/discourse_service.dart';
 import '../constants.dart';
@@ -56,7 +57,7 @@ class ExportUtils {
     if (scope == ExportScope.firstPostOnly) {
       // 仅主帖：取 stream 中的第一个
       if (detail.postStream.stream.isEmpty) {
-        throw Exception('没有可导出的帖子');
+        throw Exception(S.current.export_noPostsToExport);
       }
       postIds = [detail.postStream.stream.first];
     } else {
@@ -65,7 +66,7 @@ class ExportUtils {
     }
 
     if (postIds.isEmpty) {
-      throw Exception('没有可导出的帖子');
+      throw Exception(S.current.export_noPostsToExport);
     }
 
     // Markdown 格式限制最多导出前 N 条（因为需要逐个请求原始内容）
@@ -81,7 +82,7 @@ class ExportUtils {
     );
 
     if (posts.isEmpty) {
-      throw Exception('获取帖子数据失败');
+      throw Exception(S.current.export_fetchPostsFailed);
     }
 
     String content;

@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter_avif/flutter_avif.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import '../l10n/s.dart';
 import 'discourse_cache_manager.dart';
 
 /// 限制并发 AVIF 解码数。
@@ -307,7 +308,7 @@ class _AvifAnimatedImageStreamCompleter extends ImageStreamCompleter {
       _handleFrames,
       onError: (Object error, StackTrace stack) {
         reportError(
-          context: ErrorDescription('解码 AVIF'),
+          context: ErrorDescription(S.current.common_decodeAvif),
           exception: error,
           stack: stack,
         );
@@ -323,8 +324,8 @@ class _AvifAnimatedImageStreamCompleter extends ImageStreamCompleter {
   void _handleFrames(List<AvifFrameInfo> frames) {
     if (frames.isEmpty) {
       reportError(
-        context: ErrorDescription('AVIF 解码失败：无帧数据'),
-        exception: Exception('AVIF 解码失败：无帧数据'),
+        context: ErrorDescription(S.current.error_avifDecodeNoFrames),
+        exception: Exception(S.current.error_avifDecodeNoFrames),
         stack: StackTrace.current,
       );
       return;

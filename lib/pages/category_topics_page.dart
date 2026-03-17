@@ -18,6 +18,7 @@ import 'search_page.dart';
 import '../models/search_filter.dart';
 import 'package:dio/dio.dart';
 import '../services/app_error_handler.dart';
+import '../l10n/s.dart';
 import 'create_topic_page.dart';
 
 /// 分类话题列表页面（独立页面，不影响首页筛选）
@@ -348,7 +349,7 @@ class _CategoryTopicsPageState extends ConsumerState<CategoryTopicsPage> {
                 ),
               )),
             ),
-            tooltip: '搜索',
+            tooltip: context.l10n.common_search,
           ),
         ],
       ),
@@ -413,7 +414,7 @@ class _CategoryTopicsPageState extends ConsumerState<CategoryTopicsPage> {
           children: [
             Icon(Icons.inbox_outlined, size: 48, color: Theme.of(context).colorScheme.outline),
             const SizedBox(height: 12),
-            const Text('该分类下暂无话题'),
+            Text(context.l10n.categoryTopics_empty),
           ],
         ),
       );
@@ -429,10 +430,10 @@ class _CategoryTopicsPageState extends ConsumerState<CategoryTopicsPage> {
         itemBuilder: (context, index) {
           if (index >= _topics.length) {
             if (!_hasMore) {
-              return const Padding(
-                padding: EdgeInsets.all(16.0),
+              return Padding(
+                padding: const EdgeInsets.all(16.0),
                 child: Center(
-                  child: Text('没有更多了', style: TextStyle(color: Colors.grey)),
+                  child: Text(context.l10n.common_noMore, style: const TextStyle(color: Colors.grey)),
                 ),
               );
             }
@@ -451,7 +452,7 @@ class _CategoryTopicsPageState extends ConsumerState<CategoryTopicsPage> {
                         Icon(Icons.refresh, size: 16, color: Theme.of(context).colorScheme.primary),
                         const SizedBox(width: 6),
                         Text(
-                          '加载失败，点击重试',
+                          context.l10n.common_loadFailedTapRetry,
                           style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.primary),
                         ),
                       ],
@@ -511,7 +512,7 @@ class _CreateTopicButton extends StatelessWidget {
               Icon(Icons.edit_outlined, size: 14, color: fgColor),
               const SizedBox(width: 4),
               Text(
-                '发帖',
+                context.l10n.categoryTopics_createPost,
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: fgColor,
                   fontWeight: FontWeight.w500,

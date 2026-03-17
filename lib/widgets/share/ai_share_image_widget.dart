@@ -4,6 +4,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:jovial_svg/jovial_svg.dart';
 import 'package:markdown/markdown.dart' as md;
 import '../../constants.dart';
+import '../../l10n/s.dart';
 import '../../services/emoji_handler.dart';
 import '../../utils/url_helper.dart';
 import '../../utils/time_utils.dart';
@@ -142,7 +143,7 @@ class AiShareImageWidget extends StatelessWidget {
         ),
         const SizedBox(width: 4),
         Text(
-          'AI 助手',
+          S.current.share_aiAssistant,
           style: TextStyle(
             fontSize: 12,
             color: textColor.withValues(alpha: 0.5),
@@ -184,7 +185,7 @@ class AiShareImageWidget extends StatelessWidget {
         ),
         const SizedBox(width: 4),
         Text(
-          isUser ? '提问' : 'AI 回复',
+          isUser ? S.current.share_aiQuestion : S.current.share_aiReply,
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
@@ -291,7 +292,7 @@ class AiShareImageWidget extends StatelessWidget {
             ),
             const SizedBox(width: 4),
             Text(
-              '由 FluxDO AI 助手生成',
+              S.current.share_generatedByAi,
               style: TextStyle(
                 fontSize: 11,
                 color: secondaryTextColor,

@@ -15,6 +15,7 @@ import 'search_page.dart';
 import '../models/search_filter.dart';
 import 'package:dio/dio.dart';
 import '../services/app_error_handler.dart';
+import '../l10n/s.dart';
 
 /// 标签话题列表页面
 class TagTopicsPage extends ConsumerStatefulWidget {
@@ -248,7 +249,7 @@ class _TagTopicsPageState extends ConsumerState<TagTopicsPage> {
                 ),
               )),
             ),
-            tooltip: '搜索',
+            tooltip: context.l10n.common_search,
           ),
         ],
       ),
@@ -294,7 +295,7 @@ class _TagTopicsPageState extends ConsumerState<TagTopicsPage> {
           children: [
             Icon(Icons.inbox_outlined, size: 48, color: Theme.of(context).colorScheme.outline),
             const SizedBox(height: 12),
-            const Text('该标签下暂无话题'),
+            Text(context.l10n.tagTopics_empty),
           ],
         ),
       );
@@ -310,10 +311,10 @@ class _TagTopicsPageState extends ConsumerState<TagTopicsPage> {
         itemBuilder: (context, index) {
           if (index >= _topics.length) {
             if (!_hasMore) {
-              return const Padding(
-                padding: EdgeInsets.all(16.0),
+              return Padding(
+                padding: const EdgeInsets.all(16.0),
                 child: Center(
-                  child: Text('没有更多了', style: TextStyle(color: Colors.grey)),
+                  child: Text(context.l10n.common_noMore, style: const TextStyle(color: Colors.grey)),
                 ),
               );
             }
@@ -332,7 +333,7 @@ class _TagTopicsPageState extends ConsumerState<TagTopicsPage> {
                         Icon(Icons.refresh, size: 16, color: Theme.of(context).colorScheme.primary),
                         const SizedBox(width: 6),
                         Text(
-                          '加载失败，点击重试',
+                          context.l10n.common_loadFailedTapRetry,
                           style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.primary),
                         ),
                       ],

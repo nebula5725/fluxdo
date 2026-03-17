@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../../../../l10n/s.dart';
 import '../../../../models/topic.dart';
 import '../../../../utils/time_utils.dart';
 import '../../../content/discourse_html_content/chunked/chunked_html_content.dart';
@@ -52,18 +53,18 @@ class PostNoticeWidget extends StatelessWidget {
           theme,
           icon: FontAwesomeIcons.handsClapping,
           iconColor: iconColor,
-          text: '这是 $username 的首次发帖——让我们欢迎 TA 加入社区！',
+          text: S.current.post_firstPostNotice(username),
         );
       case 'returning_user':
         final lastTime = TimeUtils.parseUtcTime(notice.lastPostedAt);
         final timeText = lastTime != null
             ? TimeUtils.formatRelativeTime(lastTime)
-            : '很久以前';
+            : S.current.post_longTimeAgo;
         return _buildTextNotice(
           theme,
           icon: FontAwesomeIcons.solidHandPointRight,
           iconColor: iconColor,
-          text: '好久不见 $username——TA 的上一条帖子是 $timeText。',
+          text: S.current.post_returningUserNotice(username, timeText),
         );
       case 'custom':
         if (notice.cooked != null && notice.cooked!.isNotEmpty) {

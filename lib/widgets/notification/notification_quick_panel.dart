@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../l10n/s.dart';
 import '../../providers/discourse_providers.dart';
 import '../../pages/notifications_page.dart';
 import '../../utils/notification_navigation.dart';
@@ -68,14 +69,14 @@ class _NotificationQuickPanelState extends ConsumerState<NotificationQuickPanel>
             padding: const EdgeInsets.fromLTRB(20, 12, 12, 8),
             child: Row(
               children: [
-                Text('通知', style: theme.textTheme.titleLarge),
+                Text(context.l10n.common_notification, style: theme.textTheme.titleLarge),
                 const Spacer(),
                 IconButton(
                   onPressed: () async {
                     await ref.read(recentNotificationsProvider.notifier).markAllAsRead();
                   },
                   icon: const Icon(Icons.done_all, size: 20),
-                  tooltip: '全部标为已读',
+                  tooltip: context.l10n.notification_markAllRead,
                   style: IconButton.styleFrom(
                     foregroundColor: colorScheme.onSurfaceVariant,
                   ),
@@ -92,7 +93,7 @@ class _NotificationQuickPanelState extends ConsumerState<NotificationQuickPanel>
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        '查看全部',
+                        context.l10n.common_viewAll,
                         style: TextStyle(color: colorScheme.onSurfaceVariant),
                       ),
                       const SizedBox(width: 2),
@@ -112,13 +113,13 @@ class _NotificationQuickPanelState extends ConsumerState<NotificationQuickPanel>
             child: notificationsAsync.when(
               data: (notifications) {
                 if (notifications.isEmpty) {
-                  return const Center(
+                  return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.notifications_none, size: 48, color: Colors.grey),
-                        SizedBox(height: 12),
-                        Text('暂无通知', style: TextStyle(color: Colors.grey)),
+                        const Icon(Icons.notifications_none, size: 48, color: Colors.grey),
+                        const SizedBox(height: 12),
+                        Text(context.l10n.notification_empty, style: const TextStyle(color: Colors.grey)),
                       ],
                     ),
                   );
@@ -147,11 +148,11 @@ class _NotificationQuickPanelState extends ConsumerState<NotificationQuickPanel>
                   children: [
                     const Icon(Icons.error_outline, size: 48, color: Colors.grey),
                     const SizedBox(height: 12),
-                    Text('加载失败', style: TextStyle(color: colorScheme.error)),
+                    Text(context.l10n.common_loadFailed, style: TextStyle(color: colorScheme.error)),
                     const SizedBox(height: 8),
                     TextButton(
                       onPressed: () => ref.invalidate(recentNotificationsProvider),
-                      child: const Text('重试'),
+                      child: Text(context.l10n.common_retry),
                     ),
                   ],
                 ),

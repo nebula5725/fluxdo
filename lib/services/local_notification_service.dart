@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import '../l10n/s.dart';
 import '../pages/topic_detail_page/topic_detail_page.dart';
 
 /// 全局 NavigatorKey，用于通知点击时导航
@@ -104,17 +105,17 @@ class LocalNotificationService {
       return;
     }
 
-    const androidDetails = AndroidNotificationDetails(
+    final androidDetails = AndroidNotificationDetails(
       'discourse_notifications',
-      'Discourse 通知',
-      channelDescription: '来自 Discourse 论坛的通知',
+      S.current.notification_channelDiscourse,
+      channelDescription: S.current.notification_channelDiscourseDesc,
       importance: Importance.high,
       priority: Priority.high,
     );
 
     const darwinDetails = DarwinNotificationDetails();
 
-    const details = NotificationDetails(
+    final details = NotificationDetails(
       android: androidDetails,
       iOS: darwinDetails,
       macOS: darwinDetails,

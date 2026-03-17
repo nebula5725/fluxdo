@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/topic.dart';
 import '../../providers/preferences_provider.dart';
 import '../../services/discourse/discourse_service.dart';
+import '../../l10n/s.dart';
 import '../../services/toast_service.dart';
 import '../../utils/screenshot_utils.dart';
 import 'share_image_widget.dart';
@@ -12,55 +13,68 @@ import 'share_image_widget.dart';
 enum ShareImageTheme {
   /// 经典米黄色（浅色）
   classic(
-    name: '经典',
+    nameKey: 'share_themeClassic',
     bgColor: Color(0xFFF9F1E4),
     cardColor: Colors.white,
     isDark: false,
   ),
   /// 纯白色（浅色）
   light(
-    name: '纯白',
+    nameKey: 'share_themeWhite',
     bgColor: Color(0xFFFFFFFF),
     cardColor: Color(0xFFF5F5F5),
     isDark: false,
   ),
   /// 深灰色（深色）
   dark(
-    name: '深色',
+    nameKey: 'share_themeDark',
     bgColor: Color(0xFF1E1E1E),
     cardColor: Color(0xFF2D2D2D),
     isDark: true,
   ),
   /// 纯黑色（深色）
   black(
-    name: '纯黑',
+    nameKey: 'share_themeBlack',
     bgColor: Color(0xFF000000),
     cardColor: Color(0xFF1A1A1A),
     isDark: true,
   ),
   /// 蓝色调（浅色）
   blue(
-    name: '蓝调',
+    nameKey: 'share_themeBlue',
     bgColor: Color(0xFFE8F4FC),
     cardColor: Colors.white,
     isDark: false,
   ),
   /// 绿色调（浅色）
   green(
-    name: '绿野',
+    nameKey: 'share_themeGreen',
     bgColor: Color(0xFFE8F5E9),
     cardColor: Colors.white,
     isDark: false,
   );
 
   const ShareImageTheme({
-    required this.name,
+    required this.nameKey,
     required this.bgColor,
     required this.cardColor,
     required this.isDark,
   });
 
-  final String name;
+  final String nameKey;
+
+  String get name {
+    final l10n = S.current;
+    switch (nameKey) {
+      case 'share_themeClassic': return l10n.share_themeClassic;
+      case 'share_themeWhite': return l10n.share_themeWhite;
+      case 'share_themeDark': return l10n.share_themeDark;
+      case 'share_themeBlack': return l10n.share_themeBlack;
+      case 'share_themeBlue': return l10n.share_themeBlue;
+      case 'share_themeGreen': return l10n.share_themeGreen;
+      default: return nameKey;
+    }
+  }
   final Color bgColor;
   final Color cardColor;
   final bool isDark;
@@ -164,7 +178,7 @@ class _ShareImagePreviewState extends ConsumerState<ShareImagePreview> {
       // stream 中第一个就是主帖的 ID
       final mainPostId = widget.detail.postStream.stream.firstOrNull;
       if (mainPostId == null) {
-        throw Exception('无法获取主帖 ID');
+        throw Exception(S.current.share_cannotGetPostId);
       }
 
       final postStream = await service.getPosts(widget.detail.id, [mainPostId]);
@@ -176,13 +190,13 @@ class _ShareImagePreviewState extends ConsumerState<ShareImagePreview> {
           _isLoadingPost = false;
         });
       } else {
-        throw Exception('获取主帖失败');
+        throw Exception(S.current.share_getPostFailed);
       }
     } catch (e) {
       debugPrint('[ShareImagePreview] fetchMainPost error: $e');
       if (mounted) {
         setState(() {
-          _loadError = '加载失败，请重试';
+          _loadError = S.current.common_loadFailedRetry;
           _isLoadingPost = false;
         });
       }
@@ -214,13 +228,13 @@ class _ShareImagePreviewState extends ConsumerState<ShareImagePreview> {
   Widget _buildPreviewContent(ThemeData theme) {
     // 加载中
     if (_isLoadingPost) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 16),
-            Text('正在加载帖子...'),
+            const CircularProgressIndicator(),
+            const SizedBox(height: 16),
+            Text(S.current.share_loadingPost),
           ],
         ),
       );
@@ -243,7 +257,7 @@ class _ShareImagePreviewState extends ConsumerState<ShareImagePreview> {
             FilledButton.icon(
               onPressed: _fetchMainPost,
               icon: const Icon(Icons.refresh),
-              label: const Text('重试'),
+              label: Text(S.current.common_retry),
             ),
           ],
         ),
@@ -294,21 +308,21 @@ class _ShareImagePreviewState extends ConsumerState<ShareImagePreview> {
     try {
       final bytes = await _captureImage();
       if (bytes == null) {
-        throw Exception('截图失败');
+        throw Exception(S.current.share_screenshotFailed);
       }
 
       final success = await ScreenshotUtils.saveToGallery(bytes);
       if (mounted) {
         if (success) {
-          ToastService.showSuccess('图片已保存到相册');
+          ToastService.showSuccess(S.current.share_imageSaved);
         } else {
-          ToastService.showError('保存失败，请授予相册权限');
+          ToastService.showError(S.current.share_savePermissionDenied);
         }
       }
     } catch (e) {
       debugPrint('[ShareImagePreview] saveImage error: $e');
       if (mounted) {
-        ToastService.showError('保存失败，请重试');
+        ToastService.showError(S.current.share_saveFailed);
       }
     } finally {
       if (mounted) {
@@ -324,14 +338,14 @@ class _ShareImagePreviewState extends ConsumerState<ShareImagePreview> {
     try {
       final bytes = await _captureImage();
       if (bytes == null) {
-        throw Exception('截图失败');
+        throw Exception(S.current.share_screenshotFailed);
       }
 
       await ScreenshotUtils.shareImage(bytes);
     } catch (e) {
       debugPrint('[ShareImagePreview] shareImage error: $e');
       if (mounted) {
-        ToastService.showError('分享失败，请重试');
+        ToastService.showError(S.current.common_shareFailed);
       }
     } finally {
       if (mounted) {
@@ -374,9 +388,9 @@ class _ShareImagePreviewState extends ConsumerState<ShareImagePreview> {
                   onPressed: () => Navigator.pop(context),
                   icon: const Icon(Icons.close),
                 ),
-                const Expanded(
+                Expanded(
                   child: Text(
-                    '分享图片',
+                    context.l10n.share_shareImageTitle,
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
@@ -493,7 +507,7 @@ class _ShareImagePreviewState extends ConsumerState<ShareImagePreview> {
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : const Icon(Icons.save_alt),
-                    label: const Text('保存到相册'),
+                    label: Text(context.l10n.share_saveToGallery),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
@@ -514,7 +528,7 @@ class _ShareImagePreviewState extends ConsumerState<ShareImagePreview> {
                             ),
                           )
                         : const Icon(Icons.share),
-                    label: const Text('分享'),
+                    label: Text(context.l10n.common_share),
                     style: FilledButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),

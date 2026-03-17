@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/s.dart';
 
 /// AI 聊天输入框
 class AiChatInput extends StatefulWidget {
@@ -68,7 +69,7 @@ class _AiChatInputState extends State<AiChatInput> {
             minLines: 1,
             textInputAction: TextInputAction.newline,
             decoration: InputDecoration(
-              hintText: '输入消息...',
+              hintText: context.l10n.ai_inputHint,
               hintStyle: TextStyle(
                 color: theme.colorScheme.onSurfaceVariant
                     .withValues(alpha: 0.5),
@@ -112,7 +113,7 @@ class _AiChatInputState extends State<AiChatInput> {
                         minimumSize: const Size(36, 36),
                         padding: EdgeInsets.zero,
                       ),
-                      tooltip: '停止生成',
+                      tooltip: context.l10n.ai_stopGenerate,
                     )
                   : IconButton.filled(
                       onPressed: _canSend ? _handleSend : null,
@@ -129,7 +130,7 @@ class _AiChatInputState extends State<AiChatInput> {
                         minimumSize: const Size(36, 36),
                         padding: EdgeInsets.zero,
                       ),
-                      tooltip: '发送',
+                      tooltip: context.l10n.ai_sendTooltip,
                     ),
             ],
           ),

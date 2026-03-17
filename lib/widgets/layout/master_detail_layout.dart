@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/s.dart';
 import '../../utils/responsive.dart';
 import '../../utils/layout_lock.dart';
 
@@ -115,7 +116,7 @@ class MasterDetailLayout extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            '选择一个话题查看详情',
+            context.l10n.layout_selectTopicHint,
             style: theme.textTheme.bodyLarge?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),

@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../constants.dart';
+import '../../../l10n/s.dart';
 
 enum UpstreamProxyProtocol {
   http('http', 'HTTP'),
@@ -287,8 +288,8 @@ class ProxySettingsService {
     if (!settings.hasServer) {
       return ProxyTestResult(
         success: false,
-        summary: '未配置代理服务器',
-        detail: '请先填写代理地址和端口',
+        summary: S.current.proxy_notConfigured,
+        detail: S.current.proxy_fillAddressPort,
         targetUrl: targetUri.toString(),
         testedAt: now,
       );
@@ -301,7 +302,7 @@ class ProxySettingsService {
       if (secretError != null) {
         return ProxyTestResult(
           success: false,
-          summary: 'Shadowsocks 配置不完整',
+          summary: S.current.proxy_ssIncomplete,
           detail: secretError,
           targetUrl: targetUri.toString(),
           testedAt: now,
@@ -309,8 +310,8 @@ class ProxySettingsService {
       }
       return ProxyTestResult(
         success: true,
-        summary: 'Shadowsocks 配置已保存',
-        detail: '当前版本会通过本地网关接管 Shadowsocks 出站；请启用代理后返回首页进行实际访问验证',
+        summary: S.current.proxy_ssSaved,
+        detail: S.current.proxy_ssSavedDetail,
         targetUrl: targetUri.toString(),
         testedAt: now,
       );
@@ -367,7 +368,7 @@ class ProxySettingsService {
 
       return ProxyTestResult(
         success: true,
-        summary: '代理可用',
+        summary: S.current.proxy_testSuccess,
         detail: '已通过 ${settings.protocol.displayName} 代理访问 ${targetUri.host}，HTTP $statusCode',
         targetUrl: targetUri.toString(),
         testedAt: DateTime.now(),
@@ -378,7 +379,7 @@ class ProxySettingsService {
       stopwatch.stop();
       return ProxyTestResult(
         success: false,
-        summary: '代理测试超时',
+        summary: S.current.proxy_testTimeout,
         detail: '连接或握手超过 ${timeout.inSeconds} 秒，未能完成 ${targetUri.host} 可用性验证',
         targetUrl: targetUri.toString(),
         testedAt: DateTime.now(),
@@ -388,7 +389,7 @@ class ProxySettingsService {
       stopwatch.stop();
       return ProxyTestResult(
         success: false,
-        summary: 'TLS 握手失败',
+        summary: S.current.proxy_testTlsFailed,
         detail: error.toString(),
         targetUrl: targetUri.toString(),
         testedAt: DateTime.now(),
@@ -398,7 +399,7 @@ class ProxySettingsService {
       stopwatch.stop();
       return ProxyTestResult(
         success: false,
-        summary: '代理测试失败',
+        summary: S.current.proxy_testFailed,
         detail: error.message,
         targetUrl: targetUri.toString(),
         testedAt: DateTime.now(),
@@ -408,7 +409,7 @@ class ProxySettingsService {
       stopwatch.stop();
       return ProxyTestResult(
         success: false,
-        summary: '无法连接代理服务器',
+        summary: S.current.proxy_cannotConnect,
         detail: error.message,
         targetUrl: targetUri.toString(),
         testedAt: DateTime.now(),
@@ -418,7 +419,7 @@ class ProxySettingsService {
       stopwatch.stop();
       return ProxyTestResult(
         success: false,
-        summary: '代理测试失败',
+        summary: S.current.proxy_testFailed,
         detail: error.toString(),
         targetUrl: targetUri.toString(),
         testedAt: DateTime.now(),
@@ -472,7 +473,7 @@ class ProxySettingsService {
         return;
       }
       if (code == 407) {
-        throw HttpException('HTTP 代理认证失败（407）');
+        throw HttpException(S.current.proxy_httpAuthFailed);
       }
       throw HttpException('HTTP 代理 CONNECT 失败：$statusLine');
     } finally {
@@ -503,16 +504,16 @@ class ProxySettingsService {
 
       final greet = await reader.readExact(2, timeout);
       if (greet[0] != 0x05) {
-        throw HttpException('SOCKS5 响应版本无效');
+        throw HttpException(S.current.proxy_socks5InvalidVersion);
       }
       if (greet[1] == 0xFF) {
-        throw HttpException('SOCKS5 不接受当前认证方式');
+        throw HttpException(S.current.proxy_socks5AuthRejected);
       }
       if (greet[1] == 0x02) {
         final usernameBytes = utf8.encode(username);
         final passwordBytes = utf8.encode(password);
         if (usernameBytes.length > 255 || passwordBytes.length > 255) {
-          throw HttpException('SOCKS5 用户名或密码过长');
+          throw HttpException(S.current.proxy_socks5CredentialsTooLong);
         }
         socket.add([
           0x01,
@@ -524,15 +525,15 @@ class ProxySettingsService {
         await socket.flush();
         final authReply = await reader.readExact(2, timeout);
         if (authReply[1] != 0x00) {
-          throw HttpException('SOCKS5 认证失败');
+          throw HttpException(S.current.proxy_socks5AuthFailed);
         }
       } else if (greet[1] != 0x00) {
-        throw HttpException('SOCKS5 返回了不支持的认证方式：0x${greet[1].toRadixString(16)}');
+        throw HttpException('${S.current.proxy_socks5AuthRejected}: 0x${greet[1].toRadixString(16)}');
       }
 
       final hostBytes = utf8.encode(host);
       if (hostBytes.length > 255) {
-        throw HttpException('SOCKS5 目标主机名过长');
+        throw HttpException(S.current.proxy_socks5HostnameTooLong);
       }
       socket.add([
         0x05,
@@ -548,7 +549,7 @@ class ProxySettingsService {
 
       final replyHead = await reader.readExact(4, timeout);
       if (replyHead[0] != 0x05) {
-        throw HttpException('SOCKS5 CONNECT 响应版本无效');
+        throw HttpException(S.current.proxy_socks5ConnectInvalidVersion);
       }
       if (replyHead[1] != 0x00) {
         throw HttpException(
@@ -566,7 +567,7 @@ class ProxySettingsService {
         final hostLength = (await reader.readExact(1, timeout))[0];
         remainLength = hostLength + 2;
       } else {
-        throw HttpException('SOCKS5 返回了未知地址类型：0x${atyp.toRadixString(16)}');
+        throw HttpException('${S.current.proxy_socks5AddrTypeNotSupported}: 0x${atyp.toRadixString(16)}');
       }
       await reader.readExact(remainLength, timeout);
     } finally {
@@ -615,15 +616,15 @@ class ProxySettingsService {
 
   String _describeSocks5Reply(int reply) {
     return switch (reply) {
-      0x01 => '普通失败',
-      0x02 => '规则不允许',
-      0x03 => '网络不可达',
-      0x04 => '主机不可达',
-      0x05 => '目标拒绝连接',
-      0x06 => 'TTL 已过期',
-      0x07 => '命令不支持',
-      0x08 => '地址类型不支持',
-      _ => '未知错误（0x${reply.toRadixString(16)}）',
+      0x01 => S.current.proxy_socks5GeneralFailure,
+      0x02 => S.current.proxy_socks5NotAllowed,
+      0x03 => S.current.proxy_socks5NetworkUnreachable,
+      0x04 => S.current.proxy_socks5HostUnreachable,
+      0x05 => S.current.proxy_socks5ConnectionRefused,
+      0x06 => S.current.proxy_socks5TtlExpired,
+      0x07 => S.current.proxy_socks5CommandNotSupported,
+      0x08 => S.current.proxy_socks5AddrTypeNotSupported,
+      _ => '${S.current.error_unknown}（0x${reply.toRadixString(16)}）',
     };
   }
 
@@ -647,14 +648,14 @@ class ProxySettingsService {
   }) {
     final normalizedCipher = normalizeShadowsocksCipher(cipher);
     if (normalizedCipher.isEmpty) {
-      return '请选择受支持的 Shadowsocks 加密算法';
+      return S.current.proxy_ssSelectCipher;
     }
 
     final normalizedSecret = (secret ?? '').trim();
     if (normalizedSecret.isEmpty) {
       return isShadowsocks2022Cipher(normalizedCipher)
-          ? '请填写 Shadowsocks 2022 的密钥（Base64 PSK）'
-          : '请填写 Shadowsocks 密码';
+          ? S.current.proxy_ss2022KeyHint
+          : S.current.proxy_ssPasswordHint;
     }
 
     final requiredKeyLength = _shadowsocks2022KeyLengths[normalizedCipher];
@@ -664,10 +665,10 @@ class ProxySettingsService {
 
     final decodedKey = _decodeBase64Secret(normalizedSecret);
     if (decodedKey == null) {
-      return 'Shadowsocks 2022 密钥必须是有效的 Base64 字符串';
+      return S.current.proxy_ss2022KeyInvalidBase64;
     }
     if (decodedKey.length != requiredKeyLength) {
-      return 'Shadowsocks 2022 密钥长度无效：解码后必须为 $requiredKeyLength 字节';
+      return S.current.proxy_ss2022KeyInvalidLength(requiredKeyLength);
     }
     return null;
   }
@@ -758,12 +759,12 @@ class _SocketByteReader {
       Error.throwWithStackTrace(_error!, _stackTrace ?? StackTrace.current);
     }
     if (_done) {
-      throw HttpException('连接已被远端关闭');
+      throw HttpException(S.current.proxy_connectionClosed);
     }
 
     final remaining = deadline.difference(DateTime.now());
     if (remaining <= Duration.zero) {
-      throw TimeoutException('等待代理响应超时');
+      throw TimeoutException(S.current.proxy_responseTimeout);
     }
 
     final waiter = _waiter ??= Completer<void>();

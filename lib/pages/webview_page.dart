@@ -8,6 +8,7 @@ import '../constants.dart';
 import '../services/network/cookie/cookie_jar_service.dart';
 import '../services/webview_settings.dart';
 import '../widgets/common/app_link_confirm_dialog.dart';
+import '../l10n/s.dart';
 
 /// 通用内置浏览器页面
 class WebViewPage extends StatefulWidget {
@@ -71,11 +72,11 @@ class _WebViewPageState extends State<WebViewPage> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text(_currentTitle.isEmpty ? '浏览器' : _currentTitle),
+          title: Text(_currentTitle.isEmpty ? context.l10n.webview_browser : _currentTitle),
           leading: IconButton(
             icon: const Icon(Icons.close_rounded),
             onPressed: () => Navigator.of(context).pop(),
-            tooltip: '关闭',
+            tooltip: context.l10n.common_close,
           ),
           actions: [
             IconButton(
@@ -84,7 +85,7 @@ class _WebViewPageState extends State<WebViewPage> {
                 color: _canGoBack ? null : theme.disabledColor,
               ),
               onPressed: _canGoBack ? () => _controller?.goBack() : null,
-              tooltip: '后退',
+              tooltip: context.l10n.webview_goBack,
             ),
             IconButton(
               icon: Icon(
@@ -92,33 +93,33 @@ class _WebViewPageState extends State<WebViewPage> {
                 color: _canGoForward ? null : theme.disabledColor,
               ),
               onPressed: _canGoForward ? () => _controller?.goForward() : null,
-              tooltip: '前进',
+              tooltip: context.l10n.webview_goForward,
             ),
             IconButton(
               icon: const Icon(Icons.refresh),
               onPressed: () => _controller?.reload(),
-              tooltip: '刷新',
+              tooltip: context.l10n.common_refresh,
             ),
             PopupMenuButton<String>(
               onSelected: _handleMenuAction,
               itemBuilder: (context) => [
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'copy_url',
                   child: Row(
                     children: [
-                      Icon(Icons.copy),
-                      SizedBox(width: 8),
-                      Text('复制链接'),
+                      const Icon(Icons.copy),
+                      const SizedBox(width: 8),
+                      Text(context.l10n.common_copyLink),
                     ],
                   ),
                 ),
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'open_external',
                   child: Row(
                     children: [
-                      Icon(Icons.open_in_browser),
-                      SizedBox(width: 8),
-                      Text('在外部浏览器打开'),
+                      const Icon(Icons.open_in_browser),
+                      const SizedBox(width: 8),
+                      Text(context.l10n.webview_openExternal),
                     ],
                   ),
                 ),
@@ -246,7 +247,7 @@ class _WebViewPageState extends State<WebViewPage> {
     if (confirmed == true) {
       final success = await AppLinkService.launchAppLink(urlString);
       if (!success && mounted) {
-        ToastService.showError('未找到可处理此链接的应用');
+        ToastService.showError(S.current.webview_noAppForLink);
       }
     }
 
@@ -297,7 +298,7 @@ class _WebViewPageState extends State<WebViewPage> {
     if (_currentUrl.isNotEmpty) {
       await Clipboard.setData(ClipboardData(text: _currentUrl));
       if (mounted) {
-        ToastService.showSuccess('链接已复制到剪贴板');
+        ToastService.showSuccess(S.current.common_linkCopied);
       }
     }
   }
@@ -308,11 +309,11 @@ class _WebViewPageState extends State<WebViewPage> {
     try {
       final success = await launchInExternalBrowser(_currentUrl);
       if (!success && mounted) {
-        ToastService.showError('无法打开外部浏览器');
+        ToastService.showError(S.current.webview_cannotOpenBrowser);
       }
     } catch (e) {
       if (mounted) {
-        ToastService.showError('打开失败: $e');
+        ToastService.showError(S.current.webview_openFailed(e.toString()));
       }
     }
   }

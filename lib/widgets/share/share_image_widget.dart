@@ -3,6 +3,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jovial_svg/jovial_svg.dart';
 import '../../constants.dart';
+import '../../l10n/s.dart';
 import '../../models/topic.dart';
 import '../../utils/time_utils.dart';
 import '../common/smart_avatar.dart';
@@ -62,7 +63,7 @@ class ShareImageWidget extends ConsumerWidget {
           padding: const EdgeInsets.all(40),
           color: bgColor,
           child: Center(
-            child: Text('暂无内容', style: TextStyle(color: textColor)),
+            child: Text(S.current.common_noContent, style: TextStyle(color: textColor)),
           ),
         ),
       );

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../l10n/s.dart';
 import '../../../services/network_logger.dart';
 import '../../../services/cf_challenge_logger.dart';
 import '../../../services/toast_service.dart';
@@ -30,21 +31,21 @@ class _DebugToolsCardState extends State<DebugToolsCard> {
         children: [
           ListTile(
             leading: const Icon(Icons.article_outlined),
-            title: const Text('查看日志'),
+            title: Text(context.l10n.appLogs_title),
             trailing: const Icon(Icons.chevron_right, size: 20),
             onTap: _showLogSheet,
           ),
           Divider(height: 1, color: theme.colorScheme.outlineVariant.withValues(alpha: 0.2)),
           ListTile(
             leading: const Icon(Icons.share_outlined),
-            title: const Text('分享日志'),
+            title: Text(context.l10n.appLogs_shareLogs),
             trailing: const Icon(Icons.chevron_right, size: 20),
             onTap: _shareLogs,
           ),
           Divider(height: 1, color: theme.colorScheme.outlineVariant.withValues(alpha: 0.2)),
           ListTile(
             leading: Icon(Icons.delete_sweep_outlined, color: theme.colorScheme.error),
-            title: Text('清除日志', style: TextStyle(color: theme.colorScheme.error)),
+            title: Text(context.l10n.appLogs_clearLogs, style: TextStyle(color: theme.colorScheme.error)),
             trailing: Icon(Icons.chevron_right, size: 20, color: theme.colorScheme.error),
             onTap: _clearLogs,
           ),
@@ -123,17 +124,17 @@ class _DebugToolsCardState extends State<DebugToolsCard> {
                       const Spacer(),
                       IconButton(
                         icon: const Icon(Icons.copy),
-                        tooltip: '复制',
+                        tooltip: context.l10n.common_copy,
                         onPressed: logs == null || logs.isEmpty
                             ? null
                             : () {
                                 Clipboard.setData(ClipboardData(text: logs));
-                                ToastService.showSuccess('已复制到剪贴板');
+                                ToastService.showSuccess(S.current.common_copiedToClipboard);
                               },
                       ),
                       IconButton(
                         icon: const Icon(Icons.share),
-                        tooltip: '分享',
+                        tooltip: context.l10n.common_share,
                         onPressed: logs == null || logs.isEmpty
                             ? null
                             : () {
@@ -183,7 +184,7 @@ class _DebugToolsCardState extends State<DebugToolsCard> {
           ),
           const SizedBox(height: 16),
           Text(
-            '暂无日志',
+            context.l10n.appLogs_noLogs,
             style: theme.textTheme.bodyLarge?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -220,19 +221,19 @@ class _DebugToolsCardState extends State<DebugToolsCard> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('清除日志'),
-        content: const Text('确定要清除所有日志吗？'),
+        title: Text(context.l10n.appLogs_clearTitle),
+        content: Text(context.l10n.appLogs_clearContent),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('取消'),
+            child: Text(context.l10n.common_cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
             style: FilledButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.error,
             ),
-            child: const Text('清除'),
+            child: Text(context.l10n.common_clear),
           ),
         ],
       ),
@@ -241,7 +242,7 @@ class _DebugToolsCardState extends State<DebugToolsCard> {
     if (confirm == true) {
       await NetworkLogger.clear();
       if (mounted) {
-        ToastService.showSuccess('日志已清除');
+        ToastService.showSuccess(S.current.appLogs_logsCleared);
       }
     }
   }
@@ -291,17 +292,17 @@ class _DebugToolsCardState extends State<DebugToolsCard> {
                       const Spacer(),
                       IconButton(
                         icon: const Icon(Icons.copy),
-                        tooltip: '复制',
+                        tooltip: context.l10n.common_copy,
                         onPressed: logs == null || logs.isEmpty
                             ? null
                             : () {
                                 Clipboard.setData(ClipboardData(text: logs));
-                                ToastService.showSuccess('已复制到剪贴板');
+                                ToastService.showSuccess(S.current.common_copiedToClipboard);
                               },
                       ),
                       IconButton(
                         icon: const Icon(Icons.share),
-                        tooltip: '分享',
+                        tooltip: context.l10n.common_share,
                         onPressed: logs == null || logs.isEmpty
                             ? null
                             : () {
@@ -388,19 +389,19 @@ class _DebugToolsCardState extends State<DebugToolsCard> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('清除 CF 日志'),
-        content: const Text('确定要清除所有 CF 验证日志吗？'),
+        title: Text(context.l10n.appLogs_clearTitle),
+        content: Text(context.l10n.appLogs_clearContent),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('取消'),
+            child: Text(context.l10n.common_cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
             style: FilledButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.error,
             ),
-            child: const Text('清除'),
+            child: Text(context.l10n.common_clear),
           ),
         ],
       ),
@@ -409,7 +410,7 @@ class _DebugToolsCardState extends State<DebugToolsCard> {
     if (confirm == true) {
       await CfChallengeLogger.clear();
       if (mounted) {
-        ToastService.showSuccess('CF 日志已清除');
+        ToastService.showSuccess(S.current.appLogs_logsCleared);
       }
     }
   }

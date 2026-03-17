@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../l10n/s.dart';
 import '../../services/toast_service.dart';
 import '../../utils/error_utils.dart';
 
@@ -81,13 +82,13 @@ class ErrorView extends StatelessWidget {
                   FilledButton.icon(
                     onPressed: onRetry,
                     icon: const Icon(Icons.refresh, size: 18),
-                    label: const Text('重试'),
+                    label: Text(context.l10n.common_retry),
                   ),
                 if (showDetails)
                   OutlinedButton.icon(
                     onPressed: () => _showErrorDetails(context),
                     icon: const Icon(Icons.info_outline, size: 18),
-                    label: const Text('查看详情'),
+                    label: Text(context.l10n.common_viewDetails),
                   ),
               ],
             ),
@@ -150,7 +151,7 @@ class ErrorDetailsSheet extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  '错误详情',
+                  context.l10n.common_errorDetails,
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -158,15 +159,15 @@ class ErrorDetailsSheet extends StatelessWidget {
                 const Spacer(),
                 IconButton(
                   icon: const Icon(Icons.copy, size: 20),
-                  tooltip: '复制',
+                  tooltip: context.l10n.common_copy,
                   onPressed: () {
                     Clipboard.setData(ClipboardData(text: details));
-                    ToastService.showSuccess('已复制到剪贴板');
+                    ToastService.showSuccess(S.current.common_copiedToClipboard);
                   },
                 ),
                 IconButton(
                   icon: const Icon(Icons.close, size: 20),
-                  tooltip: '关闭',
+                  tooltip: context.l10n.common_close,
                   onPressed: () => Navigator.pop(context),
                 ),
               ],

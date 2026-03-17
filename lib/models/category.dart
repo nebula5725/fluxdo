@@ -1,3 +1,5 @@
+import '../l10n/s.dart';
+
 class Category {
   final int id;
   final String name;
@@ -93,16 +95,34 @@ class RequiredTagGroup {
 
 /// 分类通知级别（比话题多一个 watchingFirstPost）
 enum CategoryNotificationLevel {
-  muted(0, '静音', '不接收此分类的任何通知'),
-  regular(1, '常规', '只在被 @ 提及或回复时通知'),
-  tracking(2, '跟踪', '显示新帖未读计数'),
-  watching(3, '关注', '每个新回复都通知'),
-  watchingFirstPost(4, '关注新话题', '此分类有新话题时通知');
+  muted(0),
+  regular(1),
+  tracking(2),
+  watching(3),
+  watchingFirstPost(4);
 
-  const CategoryNotificationLevel(this.value, this.label, this.description);
+  const CategoryNotificationLevel(this.value);
   final int value;
-  final String label;
-  final String description;
+
+  String get label {
+    switch (this) {
+      case CategoryNotificationLevel.muted: return S.current.category_levelMuted;
+      case CategoryNotificationLevel.regular: return S.current.category_levelRegular;
+      case CategoryNotificationLevel.tracking: return S.current.category_levelTracking;
+      case CategoryNotificationLevel.watching: return S.current.category_levelWatching;
+      case CategoryNotificationLevel.watchingFirstPost: return S.current.category_levelWatchingFirstPost;
+    }
+  }
+
+  String get description {
+    switch (this) {
+      case CategoryNotificationLevel.muted: return S.current.category_levelMutedDesc;
+      case CategoryNotificationLevel.regular: return S.current.category_levelRegularDesc;
+      case CategoryNotificationLevel.tracking: return S.current.category_levelTrackingDesc;
+      case CategoryNotificationLevel.watching: return S.current.category_levelWatchingDesc;
+      case CategoryNotificationLevel.watchingFirstPost: return S.current.category_levelWatchingFirstPostDesc;
+    }
+  }
 
   static CategoryNotificationLevel fromValue(int? value) {
     return CategoryNotificationLevel.values.firstWhere(

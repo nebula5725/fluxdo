@@ -5,6 +5,7 @@ import '../utils/notification_navigation.dart';
 import '../widgets/notification/notification_item.dart';
 import '../widgets/notification/notification_list_skeleton.dart';
 import '../widgets/common/error_view.dart';
+import '../l10n/s.dart';
 
 /// 通知历史列表页面（独立分页，不受 messageBus 干扰）
 class NotificationsPage extends ConsumerStatefulWidget {
@@ -47,7 +48,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('通知'),
+        title: Text(context.l10n.common_notification),
         centerTitle: true,
         actions: [
           IconButton(
@@ -56,7 +57,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
               await ref.read(notificationListProvider.notifier).markAllAsRead();
               // 快捷面板下次打开时会自动 silentRefresh 同步已读状态
             },
-            tooltip: '全部标为已读',
+            tooltip: context.l10n.notification_markAllRead,
           ),
         ],
       ),
@@ -65,13 +66,13 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
         child: notificationsAsync.when(
           data: (notifications) {
             if (notifications.isEmpty) {
-              return const Center(
+              return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.notifications_none, size: 64, color: Colors.grey),
-                    SizedBox(height: 16),
-                    Text('暂无通知', style: TextStyle(color: Colors.grey)),
+                    const Icon(Icons.notifications_none, size: 64, color: Colors.grey),
+                    const SizedBox(height: 16),
+                    Text(context.l10n.notification_empty, style: const TextStyle(color: Colors.grey)),
                   ],
                 ),
               );
@@ -95,7 +96,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
                               Icon(Icons.refresh, size: 16, color: Theme.of(context).colorScheme.primary),
                               const SizedBox(width: 6),
                               Text(
-                                '加载失败，点击重试',
+                                context.l10n.common_loadFailedTapRetry,
                                 style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.primary),
                               ),
                             ],
@@ -105,10 +106,10 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
                     );
                   }
                   if (!notifier.hasMore) {
-                    return const Padding(
-                      padding: EdgeInsets.all(16.0),
+                    return Padding(
+                      padding: const EdgeInsets.all(16.0),
                       child: Center(
-                        child: Text('没有更多了', style: TextStyle(color: Colors.grey)),
+                        child: Text(context.l10n.common_noMore, style: const TextStyle(color: Colors.grey)),
                       ),
                     );
                   }

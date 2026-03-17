@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/topic.dart';
 import '../../models/category.dart';
+import '../../../../../l10n/s.dart';
 
 enum TopicNotificationButtonStyle {
   icon,
@@ -146,7 +147,7 @@ class _NotificationLevelSheet extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
             child: Text(
-              '订阅设置',
+              S.current.topic_notificationSettings,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -315,7 +316,7 @@ class _CategoryNotificationLevelSheet extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
             child: Text(
-              '订阅设置',
+              S.current.topic_notificationSettings,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),

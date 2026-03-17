@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../l10n/s.dart';
 import '../../../services/network/doh/network_settings_service.dart';
 import '../../../services/network/vpn_auto_toggle_service.dart';
 import '../../../services/toast_service.dart';
@@ -48,10 +49,10 @@ class DohSettingsCard extends StatelessWidget {
             title: const Text('DNS over HTTPS'),
             subtitle: Text(
               isSuppressedByVpn
-                  ? '已被 VPN 自动关闭，VPN 断开后将自动恢复'
+                  ? context.l10n.dohSettings_suppressedByVpn
                   : settings.dohEnabled
-                      ? '已启用加密 DNS 解析'
-                      : '使用系统默认 DNS',
+                      ? context.l10n.dohSettings_enabledDesc
+                      : context.l10n.dohSettings_disabledDesc,
             ),
             secondary: Icon(
               settings.dohEnabled ? Icons.shield : Icons.shield_outlined,
@@ -80,8 +81,8 @@ class DohSettingsCard extends StatelessWidget {
             Divider(height: 1, color: theme.colorScheme.outlineVariant.withValues(alpha: 0.2)),
             ListTile(
               leading: const Icon(Icons.tune),
-              title: const Text('更多设置'),
-              subtitle: const Text('服务器、IPv6、ECH 等'),
+              title: Text(context.l10n.dohSettings_moreSettings),
+              subtitle: Text(context.l10n.dohSettings_moreSettingsDesc),
               trailing: const Icon(Icons.chevron_right, size: 20),
               onTap: () {
                 Navigator.push(
@@ -125,7 +126,7 @@ class DohSettingsCard extends StatelessWidget {
                         color: theme.colorScheme.primary,
                       ),
                     ),
-                    label: service.wasRunningBeforeApply ? '正在重启...' : '正在启动...',
+                    label: service.wasRunningBeforeApply ? context.l10n.dohSettings_restarting : context.l10n.dohSettings_starting,
                     color: theme.colorScheme.primary,
                   )
                 : _buildStatusChip(
@@ -136,7 +137,7 @@ class DohSettingsCard extends StatelessWidget {
                         : service.lastStartFailed
                             ? Icons.error
                             : Icons.hourglass_top,
-                    label: isRunning ? '代理运行中' : '代理未启动',
+                    label: isRunning ? context.l10n.dohSettings_proxyRunning : context.l10n.dohSettings_proxyNotStarted,
                     color: isRunning ? Colors.green : theme.colorScheme.error,
                   ),
           ),
@@ -145,7 +146,7 @@ class DohSettingsCard extends StatelessWidget {
             _buildStatusChip(
               theme,
               icon: Icons.lan,
-              label: '端口 $port',
+              label: context.l10n.dohSettings_port(port),
               color: theme.colorScheme.secondary,
             ),
           if (isRunning) ...[
@@ -153,7 +154,7 @@ class DohSettingsCard extends StatelessWidget {
             IconButton(
               onPressed: isApplying ? null : service.restartProxy,
               icon: const Icon(Icons.refresh, size: 20),
-              tooltip: '重启代理',
+              tooltip: context.l10n.dohSettings_restartProxy,
               visualDensity: VisualDensity.compact,
             ),
           ],
@@ -179,7 +180,7 @@ class DohSettingsCard extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  '代理启动失败，DoH/ECH 无法生效',
+                  context.l10n.dohSettings_proxyStartFailed,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.error,
                   ),
@@ -187,7 +188,7 @@ class DohSettingsCard extends StatelessWidget {
               ),
               TextButton(
                 onPressed: isApplying ? null : service.restartProxy,
-                child: const Text('重试'),
+                child: Text(context.l10n.common_retry),
               ),
             ],
           ),
@@ -210,7 +211,7 @@ class DohSettingsCard extends StatelessWidget {
                   GestureDetector(
                     onTap: () {
                       Clipboard.setData(ClipboardData(text: proxyService.lastError!));
-                      ToastService.showInfo('已复制错误信息');
+                      ToastService.showInfo(S.current.dohSettings_errorCopied);
                     },
                     child: Icon(
                       Icons.copy,

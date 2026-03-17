@@ -8,6 +8,7 @@ import '../widgets/common/error_view.dart';
 import '../widgets/post/reply_sheet.dart';
 import '../services/toast_service.dart';
 import '../widgets/common/relative_time_text.dart';
+import '../l10n/s.dart';
 import 'topic_detail_page/topic_detail_page.dart';
 import 'create_topic_page.dart';
 
@@ -32,7 +33,7 @@ class _DraftsPageState extends ConsumerState<DraftsPage> {
     final draftsAsync = ref.watch(draftsProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('我的草稿')),
+      appBar: AppBar(title: Text(context.l10n.drafts_title)),
       body: RefreshIndicator(
         onRefresh: () async {
           ref.invalidate(draftsProvider);
@@ -41,13 +42,13 @@ class _DraftsPageState extends ConsumerState<DraftsPage> {
         child: draftsAsync.when(
           data: (drafts) {
             if (drafts.isEmpty) {
-              return const Center(
+              return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.drafts_outlined, size: 64, color: Colors.grey),
-                    SizedBox(height: 16),
-                    Text('暂无草稿', style: TextStyle(color: Colors.grey)),
+                    const Icon(Icons.drafts_outlined, size: 64, color: Colors.grey),
+                    const SizedBox(height: 16),
+                    Text(context.l10n.drafts_empty, style: const TextStyle(color: Colors.grey)),
                   ],
                 ),
               );
@@ -96,7 +97,7 @@ class _DraftsPageState extends ConsumerState<DraftsPage> {
           targetUsername: recipients.first,
         );
       } else {
-        ToastService.showInfo('私信草稿数据不完整');
+        ToastService.showInfo(S.current.drafts_pmIncomplete);
         return; // 不刷新
       }
     } else if (draftKey.startsWith('topic_')) {
@@ -150,12 +151,12 @@ class _DraftsPageState extends ConsumerState<DraftsPage> {
         bool isDeleting = false;
         return StatefulBuilder(
           builder: (dialogContext, setState) => AlertDialog(
-            title: const Text('删除草稿'),
-            content: const Text('确定要删除这个草稿吗？'),
+            title: Text(dialogContext.l10n.drafts_deleteTitle),
+            content: Text(dialogContext.l10n.drafts_deleteContent),
             actions: [
               TextButton(
                 onPressed: isDeleting ? null : () => Navigator.pop(dialogContext, false),
-                child: const Text('取消'),
+                child: Text(dialogContext.l10n.common_cancel),
               ),
               FilledButton(
                 onPressed: isDeleting
@@ -171,7 +172,7 @@ class _DraftsPageState extends ConsumerState<DraftsPage> {
                         } catch (e) {
                           if (dialogContext.mounted) {
                             setState(() => isDeleting = false);
-                            ToastService.showError('删除失败: $e');
+                            ToastService.showError(S.current.drafts_deleteFailed(e.toString()));
                           }
                         }
                       },
@@ -181,7 +182,7 @@ class _DraftsPageState extends ConsumerState<DraftsPage> {
                         height: 16,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Text('删除'),
+                    : Text(dialogContext.l10n.common_delete),
               ),
             ],
           ),
@@ -191,7 +192,7 @@ class _DraftsPageState extends ConsumerState<DraftsPage> {
 
     if (confirm == true && mounted) {
       ref.invalidate(draftsProvider);
-      ToastService.showSuccess('草稿已删除');
+      ToastService.showSuccess(S.current.drafts_deleted);
     }
   }
 }
@@ -218,21 +219,21 @@ class _DraftCard extends StatelessWidget {
     IconData typeIcon;
 
     if (draft.draftKey == Draft.newTopicKey) {
-      typeLabel = '新话题';
+      typeLabel = context.l10n.drafts_newTopic;
       typeIcon = Icons.add_circle_outline;
     } else if (draft.draftKey == Draft.newPrivateMessageKey) {
-      typeLabel = '私信';
+      typeLabel = context.l10n.drafts_privateMessage;
       typeIcon = Icons.mail_outline;
     } else if (draft.draftKey.startsWith('topic_')) {
       // 区分回复话题和回复帖子
       if (data.replyToPostNumber != null && data.replyToPostNumber! > 0) {
-        typeLabel = '回复 #${data.replyToPostNumber}';
+        typeLabel = context.l10n.drafts_replyToPost(data.replyToPostNumber!);
       } else {
-        typeLabel = '回复';
+        typeLabel = context.l10n.common_reply;
       }
       typeIcon = Icons.reply_outlined;
     } else {
-      typeLabel = '草稿';
+      typeLabel = context.l10n.drafts_draft;
       typeIcon = Icons.drafts_outlined;
     }
 
@@ -296,7 +297,7 @@ class _DraftCard extends StatelessWidget {
                     ),
                     onPressed: onDelete,
                     visualDensity: VisualDensity.compact,
-                    tooltip: '删除草稿',
+                    tooltip: context.l10n.drafts_deleteDraft,
                   ),
                 ],
               ),

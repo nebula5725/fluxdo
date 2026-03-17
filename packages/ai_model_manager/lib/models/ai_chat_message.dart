@@ -1,3 +1,5 @@
+import '../l10n/ai_l10n.dart';
+
 /// 聊天角色
 enum ChatRole { system, user, assistant }
 
@@ -125,12 +127,24 @@ class TopicSessionGroup {
 
 /// 上下文范围
 enum ContextScope {
-  firstPostOnly('仅主帖'),
-  first5('前 5 楼'),
-  first10('前 10 楼'),
-  first20('前 20 楼'),
-  all('全部帖子');
+  firstPostOnly,
+  first5,
+  first10,
+  first20,
+  all;
 
-  final String label;
-  const ContextScope(this.label);
+  String get label {
+    switch (this) {
+      case ContextScope.firstPostOnly:
+        return AiL10n.current.firstPostOnly;
+      case ContextScope.first5:
+        return AiL10n.current.first5Posts;
+      case ContextScope.first10:
+        return AiL10n.current.first10Posts;
+      case ContextScope.first20:
+        return AiL10n.current.first20Posts;
+      case ContextScope.all:
+        return AiL10n.current.allPosts;
+    }
+  }
 }

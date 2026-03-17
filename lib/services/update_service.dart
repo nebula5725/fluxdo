@@ -6,6 +6,8 @@ import 'package:dio/dio.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../l10n/s.dart';
+
 /// APK 资源信息
 class ApkAsset {
   final String downloadUrl;
@@ -235,7 +237,7 @@ class UpdateService {
         if (cachedInfo != null) {
           return cachedInfo;
         }
-        throw Exception('GitHub API 请求过于频繁，请稍后再试');
+        throw Exception(S.current.update_rateLimited);
       }
       rethrow;
     }

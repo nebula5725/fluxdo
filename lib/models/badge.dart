@@ -1,15 +1,23 @@
+import '../l10n/s.dart';
 import '../utils/time_utils.dart';
 import '../utils/url_helper.dart';
 
 /// 徽章类型
 enum BadgeType {
-  gold(1, '金牌'),
-  silver(2, '银牌'),
-  bronze(3, '铜牌');
+  gold(1),
+  silver(2),
+  bronze(3);
 
   final int id;
-  final String label;
-  const BadgeType(this.id, this.label);
+  const BadgeType(this.id);
+
+  String get label {
+    switch (this) {
+      case BadgeType.gold: return S.current.badge_gold;
+      case BadgeType.silver: return S.current.badge_silver;
+      case BadgeType.bronze: return S.current.badge_bronze;
+    }
+  }
 
   static BadgeType fromId(int id) {
     return BadgeType.values.firstWhere(
@@ -215,7 +223,7 @@ class BadgeDetailResponse {
     } else {
       badge = Badge(
         id: 0,
-        name: '徽章',
+        name: S.current.badge_defaultName,
         description: '',
         badgeTypeId: 3,
         grantCount: 0,

@@ -4,6 +4,7 @@ import '../providers/cdk_providers.dart';
 import '../pages/webview_page.dart';
 import '../services/network/exceptions/oauth_exception.dart';
 import 'common/loading_spinner.dart';
+import '../../../../l10n/s.dart';
 
 class CdkBalanceCard extends ConsumerWidget {
   final bool compact;
@@ -75,7 +76,7 @@ class CdkBalanceCard extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'CDK 积分',
+                            S.current.cdk_balance,
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
                             ),
@@ -155,7 +156,7 @@ class CdkBalanceCard extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'CDK 积分',
+                    S.current.cdk_balance,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
@@ -287,7 +288,7 @@ class CdkBalanceCard extends ConsumerWidget {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        '积分',
+                        S.current.cdk_points,
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: Colors.white.withValues(alpha:0.7),
                         ),
@@ -339,13 +340,13 @@ class CdkBalanceCard extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'CDK 积分',
+                          S.current.cdk_balance,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
                           ),
                         ),
                         Text(
-                          isExpired ? '授权已过期' : '加载失败',
+                          isExpired ? S.current.common_authExpired : S.current.common_loadFailed,
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: isExpired
@@ -359,12 +360,12 @@ class CdkBalanceCard extends ConsumerWidget {
                   if (isExpired && onReauthorize != null)
                     TextButton(
                       onPressed: onReauthorize,
-                      child: const Text('重新授权'),
+                      child: Text(S.current.common_reAuth),
                     )
                   else
                     TextButton(
                       onPressed: () => ref.read(cdkUserInfoProvider.notifier).refresh(),
-                      child: const Text('重试'),
+                      child: Text(S.current.common_retry),
                     ),
                 ],
               ),
@@ -424,13 +425,13 @@ class CdkBalanceCard extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'CDK 积分',
+                      S.current.cdk_balance,
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
                     ),
                     Text(
-                      isExpired ? '授权已过期' : '加载失败',
+                      isExpired ? S.current.common_authExpired : S.current.common_loadFailed,
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: isExpired
@@ -444,12 +445,12 @@ class CdkBalanceCard extends ConsumerWidget {
               if (isExpired && onReauthorize != null)
                 TextButton(
                   onPressed: onReauthorize,
-                  child: const Text('重新授权'),
+                  child: Text(S.current.common_reAuth),
                 )
               else
                 TextButton(
                   onPressed: () => ref.read(cdkUserInfoProvider.notifier).refresh(),
-                  child: const Text('重试'),
+                  child: Text(S.current.common_retry),
                 ),
             ],
           ),
@@ -544,7 +545,7 @@ class CdkBalanceCard extends ConsumerWidget {
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    isExpired ? '授权已过期' : '加载失败',
+                    isExpired ? S.current.common_authExpired : S.current.common_loadFailed,
                     style: theme.textTheme.displaySmall?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -553,7 +554,7 @@ class CdkBalanceCard extends ConsumerWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    isExpired ? '请重新授权以查看积分' : '请检查网络后重试',
+                    isExpired ? S.current.cdk_reAuthHint : S.current.common_checkNetworkRetry,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: Colors.white.withValues(alpha: 0.7),
                     ),
@@ -563,7 +564,7 @@ class CdkBalanceCard extends ConsumerWidget {
                     FilledButton.icon(
                       onPressed: onReauthorize,
                       icon: const Icon(Icons.refresh_rounded, size: 18),
-                      label: const Text('重新授权'),
+                      label: Text(S.current.common_reAuth),
                       style: FilledButton.styleFrom(
                         backgroundColor: Colors.white.withValues(alpha: 0.2),
                         foregroundColor: Colors.white,
@@ -573,7 +574,7 @@ class CdkBalanceCard extends ConsumerWidget {
                     FilledButton.icon(
                       onPressed: () => ref.read(cdkUserInfoProvider.notifier).refresh(),
                       icon: const Icon(Icons.refresh_rounded, size: 18),
-                      label: const Text('重试'),
+                      label: Text(S.current.common_retry),
                       style: FilledButton.styleFrom(
                         backgroundColor: Colors.white.withValues(alpha: 0.2),
                         foregroundColor: Colors.white,
@@ -613,7 +614,7 @@ class CdkBalanceCard extends ConsumerWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'CDK 积分',
+                    S.current.cdk_balance,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
@@ -666,7 +667,7 @@ class CdkBalanceCard extends ConsumerWidget {
               ),
               const SizedBox(width: 12),
               Text(
-                'CDK 积分',
+                S.current.cdk_balance,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),

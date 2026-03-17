@@ -3,7 +3,10 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ai_model_manager/ai_model_manager.dart';
 import '../providers/app_icon_provider.dart';
+import '../l10n/s.dart';
+import '../providers/locale_provider.dart';
 import '../providers/preferences_provider.dart';
 import '../providers/theme_provider.dart';
 
@@ -14,49 +17,57 @@ class AppearancePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final themeState = ref.watch(themeProvider);
     final preferences = ref.watch(preferencesProvider);
+    final locale = ref.watch(localeProvider);
     final theme = Theme.of(context);
 
     // Color swatches for selection
+    final l10n = context.l10n;
     final List<ColorOption> colorOptions = [
-      ColorOption(Colors.blue, '蓝色'),
-      ColorOption(Colors.purple, '紫色'),
-      ColorOption(Colors.green, '绿色'),
-      ColorOption(Colors.orange, '橙色'),
-      ColorOption(Colors.pink, '粉色'),
-      ColorOption(Colors.teal, '青色'),
-      ColorOption(Colors.red, '红色'),
-      ColorOption(Colors.indigo, '靛蓝'),
-      ColorOption(Colors.amber, '琥珀'),
+      ColorOption(Colors.blue, l10n.appearance_colorBlue),
+      ColorOption(Colors.purple, l10n.appearance_colorPurple),
+      ColorOption(Colors.green, l10n.appearance_colorGreen),
+      ColorOption(Colors.orange, l10n.appearance_colorOrange),
+      ColorOption(Colors.pink, l10n.appearance_colorPink),
+      ColorOption(Colors.teal, l10n.appearance_colorTeal),
+      ColorOption(Colors.red, l10n.appearance_colorRed),
+      ColorOption(Colors.indigo, l10n.appearance_colorIndigo),
+      ColorOption(Colors.amber, l10n.appearance_colorAmber),
     ];
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('外观'),
+        title: Text(l10n.appearance_title),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          _buildSectionHeader(theme, '主题模式', Icons.brightness_6_outlined),
+          _buildSectionHeader(theme, l10n.appearance_language, Icons.language_outlined),
+          const SizedBox(height: 16),
+          _buildLanguageSelector(context, ref, locale),
+
+          const SizedBox(height: 32),
+
+          _buildSectionHeader(theme, l10n.appearance_themeMode, Icons.brightness_6_outlined),
           const SizedBox(height: 16),
           _buildModeSelector(context, ref, themeState.mode),
-          
+
           const SizedBox(height: 32),
-          
-          _buildSectionHeader(theme, '主题色彩', Icons.color_lens_outlined),
+
+          _buildSectionHeader(theme, l10n.appearance_themeColor, Icons.color_lens_outlined),
           const SizedBox(height: 16),
           _buildColorGrid(context, ref, themeState.seedColor, colorOptions),
 
           // 应用图标（仅 iOS/Android）
           if (!kIsWeb && (Platform.isIOS || Platform.isAndroid)) ...[
             const SizedBox(height: 32),
-            _buildSectionHeader(theme, '应用图标', Icons.app_shortcut_outlined),
+            _buildSectionHeader(theme, l10n.appearance_appIcon, Icons.app_shortcut_outlined),
             const SizedBox(height: 16),
             _buildIconSelector(context, ref),
           ],
 
           const SizedBox(height: 32),
 
-          _buildSectionHeader(theme, '阅读', Icons.chrome_reader_mode_outlined),
+          _buildSectionHeader(theme, l10n.appearance_reading, Icons.chrome_reader_mode_outlined),
           const SizedBox(height: 16),
           Card(
             shape: RoundedRectangleBorder(
@@ -79,7 +90,7 @@ class AppearancePage extends ConsumerWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text('内容字体大小'),
+                            Text(l10n.appearance_contentFontSize),
                             Text(
                               '${(preferences.contentFontScale * 100).round()}%',
                               style: theme.textTheme.bodySmall?.copyWith(
@@ -93,7 +104,7 @@ class AppearancePage extends ConsumerWidget {
                         onPressed: preferences.contentFontScale != 1.0
                             ? () => ref.read(preferencesProvider.notifier).setContentFontScale(1.0)
                             : null,
-                        child: const Text('重置'),
+                        child: Text(l10n.common_reset),
                       ),
                     ],
                   ),
@@ -118,14 +129,14 @@ class AppearancePage extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '小',
+                        l10n.appearance_small,
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                           fontSize: 11,
                         ),
                       ),
                       Text(
-                        '大',
+                        l10n.appearance_large,
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                           fontSize: 15,
@@ -144,8 +155,8 @@ class AppearancePage extends ConsumerWidget {
             ),
             clipBehavior: Clip.antiAlias,
             child: SwitchListTile(
-              title: const Text('阅读混排优化'),
-              subtitle: const Text('浏览帖子时自动优化中英文间距'),
+              title: Text(l10n.appearance_panguSpacing),
+              subtitle: Text(l10n.appearance_panguSpacingDesc),
               secondary: Icon(
                 Icons.auto_fix_high_rounded,
                 color: preferences.displayPanguSpacing
@@ -163,6 +174,78 @@ class AppearancePage extends ConsumerWidget {
     );
   }
 
+  Widget _buildLanguageSelector(BuildContext context, WidgetRef ref, Locale? currentLocale) {
+    final l10n = context.l10n;
+    final currentLabel = _localeLabel(l10n, currentLocale);
+
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      clipBehavior: Clip.antiAlias,
+      child: ListTile(
+        leading: Icon(Icons.translate, color: Theme.of(context).colorScheme.primary),
+        title: Text(currentLabel),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: () => _showLanguagePicker(context, ref, currentLocale),
+      ),
+    );
+  }
+
+  void _showLanguagePicker(BuildContext context, WidgetRef ref, Locale? currentLocale) {
+    final l10n = context.l10n;
+    final options = <(String, Locale?)>[
+      (l10n.appearance_languageSystem, null),
+      (l10n.appearance_languageZhCN, const Locale('zh', 'CN')),
+      (l10n.appearance_languageZhTW, const Locale('zh', 'TW')),
+      (l10n.appearance_languageZhHK, const Locale('zh', 'HK')),
+      (l10n.appearance_languageEn, const Locale('en', 'US')),
+    ];
+
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (final (label, locale) in options)
+                ListTile(
+                  title: Text(label),
+                  trailing: _localeKey(locale) == _localeKey(currentLocale)
+                      ? Icon(Icons.check, color: Theme.of(sheetContext).colorScheme.primary)
+                      : null,
+                  onTap: () {
+                    ref.read(localeProvider.notifier).setLocale(locale);
+                    final effectiveLocale = locale ?? WidgetsBinding.instance.platformDispatcher.locale;
+                    AiL10n.configureLocale(effectiveLocale);
+                    Navigator.pop(sheetContext);
+                  },
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  static String _localeLabel(dynamic l10n, Locale? locale) {
+    if (locale == null) return l10n.appearance_languageSystem;
+    switch ('${locale.languageCode}_${locale.countryCode}') {
+      case 'zh_CN': return l10n.appearance_languageZhCN;
+      case 'zh_TW': return l10n.appearance_languageZhTW;
+      case 'zh_HK': return l10n.appearance_languageZhHK;
+      case 'en_US': return l10n.appearance_languageEn;
+      default: return l10n.appearance_languageSystem;
+    }
+  }
+
+  static String _localeKey(Locale? locale) {
+    if (locale == null) return 'system';
+    return locale.countryCode != null
+        ? '${locale.languageCode}_${locale.countryCode}'
+        : locale.languageCode;
+  }
+
   Widget _buildIconSelector(BuildContext context, WidgetRef ref) {
     final iconState = ref.watch(appIconProvider);
     final theme = Theme.of(context);
@@ -173,7 +256,7 @@ class AppearancePage extends ConsumerWidget {
         _buildIconOption(
           context, ref,
           style: AppIconStyle.classic,
-          label: '经典',
+          label: context.l10n.appearance_iconClassic,
           assetPath: isDark
               ? 'assets/images/icon_default_dark_preview.png'
               : 'assets/images/icon_default_preview.png',
@@ -185,7 +268,7 @@ class AppearancePage extends ConsumerWidget {
         _buildIconOption(
           context, ref,
           style: AppIconStyle.modern,
-          label: '现代',
+          label: context.l10n.appearance_iconModern,
           assetPath: isDark
               ? 'assets/images/icon_modern_preview.png'
               : 'assets/images/icon_modern_light_preview.png',
@@ -216,7 +299,7 @@ class AppearancePage extends ConsumerWidget {
                   .setIconStyle(style);
               if (!success && context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('切换图标失败，请稍后重试')),
+                  SnackBar(content: Text(context.l10n.appearance_switchIconFailed)),
                 );
               }
             },
@@ -306,21 +389,21 @@ class AppearancePage extends ConsumerWidget {
 
   Widget _buildModeSelector(BuildContext context, WidgetRef ref, ThemeMode currentMode) {
     return SegmentedButton<ThemeMode>(
-      segments: const [
+      segments: [
         ButtonSegment(
           value: ThemeMode.system,
-          label: Text('自动'),
-          icon: Icon(Icons.brightness_auto),
+          label: Text(context.l10n.appearance_modeAuto),
+          icon: const Icon(Icons.brightness_auto),
         ),
         ButtonSegment(
           value: ThemeMode.light,
-          label: Text('浅色'),
-          icon: Icon(Icons.wb_sunny_outlined),
+          label: Text(context.l10n.appearance_modeLight),
+          icon: const Icon(Icons.wb_sunny_outlined),
         ),
         ButtonSegment(
           value: ThemeMode.dark,
-          label: Text('深色'),
-          icon: Icon(Icons.dark_mode_outlined),
+          label: Text(context.l10n.appearance_modeDark),
+          icon: const Icon(Icons.dark_mode_outlined),
         ),
       ],
       selected: {currentMode},

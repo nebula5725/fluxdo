@@ -3,6 +3,7 @@ import 'package:flutter/rendering.dart' show SelectedContent;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../models/topic.dart';
 import '../../../pages/topic_detail_page/topic_detail_page.dart';
+import '../../../l10n/s.dart';
 import '../../../providers/preferences_provider.dart';
 import '../../../utils/code_selection_context.dart';
 import '../../content/discourse_html_content/chunked/chunked_html_content.dart';
@@ -205,7 +206,7 @@ class _PostItemState extends ConsumerState<PostItem> {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            '查看隐藏的信息',
+                            context.l10n.post_viewHiddenInfo,
                             style: theme.textTheme.labelSmall?.copyWith(
                               color: theme.colorScheme.primary,
                             ),

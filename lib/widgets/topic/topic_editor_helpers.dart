@@ -9,6 +9,7 @@ import '../../utils/url_helper.dart';
 import '../common/category_selection_sheet.dart';
 import '../common/tag_selection_sheet.dart';
 import '../common/topic_badges.dart';
+import '../../../../../l10n/s.dart';
 
 /// 话题编辑器辅助函数和 Widgets
 /// 用于 CreateTopicPage 和 EditTopicPage 的公共逻辑
@@ -275,7 +276,7 @@ class CategoryTrigger extends StatelessWidget {
                 Icon(Icons.category_outlined, size: 18, color: theme.colorScheme.onSurfaceVariant),
                 const SizedBox(width: 8),
                 Text(
-                  '选择分类',
+                  S.current.topic_selectCategory,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                     fontWeight: FontWeight.w500,
@@ -412,7 +413,7 @@ class TagsArea extends StatelessWidget {
       if (selectedTags.isEmpty) {
         for (final req in selectedCategory!.requiredTagGroups) {
           isGroupsSatisfied = false;
-          missingRequirements.add('从 ${req.name} 选择 ${req.minCount} 个');
+          missingRequirements.add(S.current.topic_tagGroupRequirement(req.name, req.minCount));
         }
       }
     }
@@ -508,10 +509,10 @@ class TagsArea extends StatelessWidget {
     if (currentCount < minTags) {
       final remaining = minTags - currentCount;
       return selectedTags.isEmpty
-          ? '至少选择 $minTags 个标签'
-          : '还需 $remaining 个标签';
+          ? S.current.topic_minTagsRequired(minTags)
+          : S.current.topic_remainingTags(remaining);
     }
-    return '添加标签';
+    return S.current.topic_addTags;
   }
 }
 

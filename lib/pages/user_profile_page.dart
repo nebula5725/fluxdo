@@ -32,6 +32,7 @@ import 'search_page.dart';
 import 'follow_list_page.dart';
 import 'image_viewer_page.dart';
 import 'badge_page.dart';
+import '../l10n/s.dart';
 
 /// 用户个人页
 class UserProfilePage extends ConsumerStatefulWidget {
@@ -232,7 +233,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
           setState(() {
             _user = _user!.copyWith(muted: false, ignored: true);
           });
-          ToastService.showSuccess('已设置为忽略');
+          ToastService.showSuccess(S.current.userProfile_setToIgnore);
         }
       } catch (_) {
         if (mounted) setState(() => _notificationLevel = oldLevel);
@@ -252,7 +253,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
             ignored: false,
           );
         });
-        final label = level == 'mute' ? '已设置为免打扰' : '已恢复常规通知';
+        final label = level == 'mute' ? S.current.userProfile_setToMute : S.current.userProfile_restored;
         ToastService.showSuccess(label);
       }
     } catch (_) {
@@ -264,7 +265,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
   Future<String?> _showIgnoreDurationPicker() async {
     // 与 Discourse 前端 extendedDefaultTimeShortcuts 保持一致
     final now = DateTime.now();
-    const weekdays = ['', '周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+    final weekdays = ['', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
     String formatTarget(DateTime target) {
       // 永久不显示时间
@@ -278,27 +279,27 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
       }
       // 同年显示 月日 周几 时间
       if (target.year == now.year) {
-        return '${target.month}月${target.day}日 ${weekdays[target.weekday]} $time';
+        return '${S.current.time_shortDate(target.month, target.day)} ${weekdays[target.weekday]} $time';
       }
       // 跨年显示完整日期
-      return '${target.year}年${target.month}月${target.day}日 $time';
+      return '${S.current.time_fullDate(target.year, target.month, target.day)} $time';
     }
 
     final options = <(String, Duration)>[
       if (now.hour < 18)
-        ('今天稍后', Duration(hours: 18 - now.hour)),
-      ('明天', Duration(days: 1)),
+        (S.current.userProfile_laterToday, Duration(hours: 18 - now.hour)),
+      (S.current.userProfile_tomorrow, Duration(days: 1)),
       if (now.weekday <= DateTime.wednesday)
-        ('本周稍后', Duration(days: DateTime.thursday - now.weekday)),
-      ('下周一', Duration(days: (DateTime.monday - now.weekday + 7) % 7 == 0 ? 7 : (DateTime.monday - now.weekday + 7) % 7)),
-      ('两周', Duration(days: 14)),
-      ('下个月', Duration(days: 30)),
-      ('两个月', Duration(days: 60)),
-      ('三个月', Duration(days: 90)),
-      ('四个月', Duration(days: 120)),
-      ('六个月', Duration(days: 180)),
-      ('一年', Duration(days: 365)),
-      ('永久', Duration(days: 365000)),
+        (S.current.userProfile_laterThisWeek, Duration(days: DateTime.thursday - now.weekday)),
+      (S.current.userProfile_nextMonday, Duration(days: (DateTime.monday - now.weekday + 7) % 7 == 0 ? 7 : (DateTime.monday - now.weekday + 7) % 7)),
+      (S.current.userProfile_twoWeeks, Duration(days: 14)),
+      (S.current.userProfile_nextMonth, Duration(days: 30)),
+      (S.current.userProfile_twoMonths, Duration(days: 60)),
+      (S.current.userProfile_threeMonths, Duration(days: 90)),
+      (S.current.userProfile_fourMonths, Duration(days: 120)),
+      (S.current.userProfile_sixMonths, Duration(days: 180)),
+      (S.current.userProfile_oneYear, Duration(days: 365)),
+      (S.current.userProfile_permanent, Duration(days: 365000)),
     ];
 
     return showModalBottomSheet<String>(
@@ -312,7 +313,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                 child: Text(
-                  '选择忽略时长',
+                  context.l10n.userProfile_selectIgnoreDuration,
                   style: theme.textTheme.titleMedium,
                 ),
               ),
@@ -401,7 +402,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
                   child: Row(
                     children: [
                       Text(
-                        '关于',
+                        context.l10n.common_about,
                         style: theme.textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -423,10 +424,10 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
                         _buildRestrictionSection(
                           theme,
                           icon: Icons.block_rounded,
-                          title: '封禁状态',
+                          title: context.l10n.userProfile_suspendedStatus,
                           label: _user!.isSuspendedForever
-                              ? '该用户已被永久封禁'
-                              : '封禁至 ${TimeUtils.formatFullDate(_user!.suspendedTill)}',
+                              ? context.l10n.userProfile_permanentlySuspended
+                              : context.l10n.userProfile_suspendedUntil(TimeUtils.formatFullDate(_user!.suspendedTill)),
                           reason: _user!.suspendReason,
                           color: theme.colorScheme.error,
                         ),
@@ -434,10 +435,10 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
                         _buildRestrictionSection(
                           theme,
                           icon: Icons.mic_off_rounded,
-                          title: '禁言状态',
+                          title: context.l10n.userProfile_silencedStatus,
                           label: _user!.isSilencedForever
-                              ? '该用户已被永久禁言'
-                              : '禁言至 ${TimeUtils.formatFullDate(_user!.silencedTill)}',
+                              ? context.l10n.userProfile_permanentlySilenced
+                              : context.l10n.userProfile_silencedUntil(TimeUtils.formatFullDate(_user!.silencedTill)),
                           reason: _user!.silenceReason,
                           color: Colors.orange,
                         ),
@@ -445,7 +446,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
                       // 个人简介
                       if (hasBio) ...[
                         Text(
-                          '个人简介',
+                          context.l10n.userProfile_bio,
                           style: theme.textTheme.titleSmall?.copyWith(
                             color: theme.colorScheme.primary,
                             fontWeight: FontWeight.bold,
@@ -464,7 +465,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
                       // 其他信息列表
                       if (hasLocation || hasWebsite || hasJoinedAt) ...[
                         Text(
-                          '更多信息',
+                          context.l10n.userProfile_moreInfo,
                           style: theme.textTheme.titleSmall?.copyWith(
                             color: theme.colorScheme.primary,
                             fontWeight: FontWeight.bold,
@@ -476,7 +477,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
                           _buildInfoRow(
                             context,
                             Icons.location_on_outlined,
-                            '位置',
+                            context.l10n.userProfile_location,
                             _user!.location!,
                           ),
 
@@ -484,7 +485,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
                           _buildInfoRow(
                             context,
                             Icons.link_rounded,
-                            '网站',
+                            context.l10n.userProfile_website,
                             _user!.websiteName ?? _user!.website!,
                             url: _user!.website,
                             isLink: true,
@@ -494,7 +495,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
                           _buildInfoRow(
                             context,
                             Icons.calendar_today_rounded,
-                            '加入时间',
+                            context.l10n.userProfile_joinDate,
                             TimeUtils.formatFullDate(_user!.createdAt),
                           ),
                       ],
@@ -732,7 +733,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
     if (_error != null) {
       return Scaffold(
         appBar: AppBar(title: Text(widget.username)),
-        body: Center(child: Text('加载失败: $_error')),
+        body: Center(child: Text('${context.l10n.common_loadFailed}: $_error')),
       );
     }
 
@@ -802,7 +803,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
           IconButton(
             onPressed: _openMessageDialog,
             icon: const Icon(Icons.mail_outline_rounded),
-            tooltip: '私信',
+            tooltip: context.l10n.userProfile_message,
           ),
         PopupMenuButton<String>(
           icon: const Icon(Icons.more_vert),
@@ -829,7 +830,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
                   children: [
                     Icon(Icons.info_outline_rounded, size: 20, color: theme.colorScheme.onSurface),
                     const SizedBox(width: 12),
-                    const Text('关于'),
+                    Text(context.l10n.common_about),
                   ],
                 ),
               ),
@@ -839,7 +840,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
                   children: [
                     Icon(Icons.share_outlined, size: 20, color: theme.colorScheme.onSurface),
                     const SizedBox(width: 12),
-                    const Text('分享用户'),
+                    Text(context.l10n.userProfile_shareUser),
                   ],
                 ),
               ),
@@ -852,7 +853,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
                     children: [
                       Icon(Icons.notifications_outlined, size: 20, color: theme.colorScheme.onSurface),
                       const SizedBox(width: 12),
-                      const Expanded(child: Text('常规')),
+                      Expanded(child: Text(context.l10n.userProfile_normal)),
                       if (_notificationLevel == 'normal')
                         Icon(Icons.check, size: 18, color: theme.colorScheme.primary),
                     ],
@@ -865,7 +866,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
                       children: [
                         Icon(Icons.notifications_off_outlined, size: 20, color: theme.colorScheme.onSurface),
                         const SizedBox(width: 12),
-                        const Expanded(child: Text('免打扰')),
+                        Expanded(child: Text(context.l10n.userProfile_mute)),
                         if (_notificationLevel == 'mute')
                           Icon(Icons.check, size: 18, color: theme.colorScheme.primary),
                       ],
@@ -878,7 +879,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
                       children: [
                         Icon(Icons.visibility_off_outlined, size: 20, color: theme.colorScheme.onSurface),
                         const SizedBox(width: 12),
-                        const Expanded(child: Text('已忽略')),
+                        Expanded(child: Text(context.l10n.userProfile_ignored)),
                         if (_notificationLevel == 'ignore')
                           Icon(Icons.check, size: 18, color: theme.colorScheme.primary),
                       ],
@@ -907,13 +908,13 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
             labelPadding: const EdgeInsets.symmetric(horizontal: 12),
             indicatorSize: TabBarIndicatorSize.label,
             dividerColor: Colors.transparent,
-            tabs: const [
-              Tab(height: 36, text: '总结'),
-              Tab(height: 36, text: '动态'),
-              Tab(height: 36, text: '话题'),
-              Tab(height: 36, text: '回复'),
-              Tab(height: 36, text: '赞'),
-              Tab(height: 36, text: '回应'),
+            tabs: [
+              Tab(height: 36, text: context.l10n.userProfile_tabSummary),
+              Tab(height: 36, text: context.l10n.userProfile_tabActivity),
+              Tab(height: 36, text: context.l10n.userProfile_tabTopics),
+              Tab(height: 36, text: context.l10n.userProfile_tabReplies),
+              Tab(height: 36, text: context.l10n.userProfile_tabLikes),
+              Tab(height: 36, text: context.l10n.userProfile_tabReactions),
             ],
           ),
           ),
@@ -1115,8 +1116,8 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
                                 _buildRestrictionBanner(
                                   icon: Icons.block_rounded,
                                   label: _user!.isSuspendedForever
-                                      ? '该用户已被永久封禁'
-                                      : '该用户已被封禁至 ${TimeUtils.formatFullDate(_user!.suspendedTill)}',
+                                      ? context.l10n.userProfile_suspendedBannerForever
+                                      : context.l10n.userProfile_suspendedBannerUntil(TimeUtils.formatFullDate(_user!.suspendedTill)),
                                   reason: _user!.suspendReason,
                                   color: Colors.redAccent,
                                 ),
@@ -1128,8 +1129,8 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
                                 _buildRestrictionBanner(
                                   icon: Icons.mic_off_rounded,
                                   label: _user!.isSilencedForever
-                                      ? '该用户已被永久禁言'
-                                      : '该用户已被禁言至 ${TimeUtils.formatFullDate(_user!.silencedTill)}',
+                                      ? context.l10n.userProfile_silencedBannerForever
+                                      : context.l10n.userProfile_silencedBannerUntil(TimeUtils.formatFullDate(_user!.silencedTill)),
                                   reason: _user!.silenceReason,
                                   color: Colors.orangeAccent,
                                 ),
@@ -1163,7 +1164,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
                                           ),
                                         )
                                       : Text(
-                                          '这个人很懒，什么都没写',
+                                          context.l10n.userProfile_noBio,
                                           maxLines: 2,
                                           overflow: TextOverflow.ellipsis,
                                           style: TextStyle(
@@ -1210,7 +1211,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
                                           ),
                                         ),
                                       ),
-                                      child: _buildStatSlot(NumberUtils.formatCount(_user!.totalFollowing!), '关注', _user!.totalFollowing!),
+                                      child: _buildStatSlot(NumberUtils.formatCount(_user!.totalFollowing!), context.l10n.userProfile_following, _user!.totalFollowing!),
                                     ),
                                   if (_user?.totalFollowers != null)
                                     GestureDetector(
@@ -1223,7 +1224,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
                                           ),
                                         ),
                                       ),
-                                      child: _buildStatSlot(NumberUtils.formatCount(_user!.totalFollowers!), '粉丝', _user!.totalFollowers!),
+                                      child: _buildStatSlot(NumberUtils.formatCount(_user!.totalFollowers!), context.l10n.userProfile_followers, _user!.totalFollowers!),
                                     ),
                                 ],
                               ),
@@ -1233,10 +1234,10 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
                             Wrap(
                               spacing: 16,
                               children: [
-                                _buildStatSlot(NumberUtils.formatCount(_summary!.likesReceived), '获赞', _summary!.likesReceived),
-                                _buildStatSlot(NumberUtils.formatCount(_summary!.daysVisited), '访问', _summary!.daysVisited),
-                                _buildStatSlot(NumberUtils.formatCount(_summary!.topicCount), '话题', _summary!.topicCount),
-                                _buildStatSlot(NumberUtils.formatCount(_summary!.postCount), '回复', _summary!.postCount),
+                                _buildStatSlot(NumberUtils.formatCount(_summary!.likesReceived), context.l10n.userProfile_statsLikes, _summary!.likesReceived),
+                                _buildStatSlot(NumberUtils.formatCount(_summary!.daysVisited), context.l10n.userProfile_statsVisits, _summary!.daysVisited),
+                                _buildStatSlot(NumberUtils.formatCount(_summary!.topicCount), context.l10n.userProfile_statsTopics, _summary!.topicCount),
+                                _buildStatSlot(NumberUtils.formatCount(_summary!.postCount), context.l10n.userProfile_statsReplies, _summary!.postCount),
                               ],
                             ),
                           ],
@@ -1383,7 +1384,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
               _isFollowed ? Icons.check_rounded : Icons.add_rounded,
               size: 16,
             ),
-            label: Text(_isFollowed ? '已关注' : '关注'),
+            label: Text(_isFollowed ? context.l10n.userProfile_followed : context.l10n.userProfile_follow),
             style: TextButton.styleFrom(
               backgroundColor: _isFollowed ? Colors.white.withValues(alpha:0.15) : Colors.white,
               foregroundColor: _isFollowed ? Colors.white : Colors.black87,
@@ -1501,7 +1502,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
           children: [
             Icon(Icons.inbox_outlined, size: 48, color: Colors.grey[400]),
             const SizedBox(height: 8),
-            Text('暂无内容', style: TextStyle(color: Colors.grey[600])),
+            Text(context.l10n.userProfile_noContent, style: TextStyle(color: Colors.grey[600])),
           ],
         ),
       );
@@ -1549,7 +1550,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
       children: [
         // 热门话题
         if (summary.topics.isNotEmpty) ...[
-          _buildSectionHeader(theme, Icons.article_rounded, '热门话题'),
+          _buildSectionHeader(theme, Icons.article_rounded, context.l10n.userProfile_topTopics),
           const SizedBox(height: 8),
           ...summary.topics.map((topic) => _buildSummaryTopicItem(theme, topic)),
           const SizedBox(height: 20),
@@ -1557,7 +1558,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
 
         // 热门回复
         if (summary.replies.isNotEmpty) ...[
-          _buildSectionHeader(theme, Icons.chat_bubble_rounded, '热门回复'),
+          _buildSectionHeader(theme, Icons.chat_bubble_rounded, context.l10n.userProfile_topReplies),
           const SizedBox(height: 8),
           ...summary.replies.map((reply) => _buildSummaryReplyItem(theme, reply)),
           const SizedBox(height: 20),
@@ -1565,7 +1566,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
 
         // 热门链接
         if (summary.links.isNotEmpty) ...[
-          _buildSectionHeader(theme, Icons.link_rounded, '热门链接'),
+          _buildSectionHeader(theme, Icons.link_rounded, context.l10n.userProfile_topLinks),
           const SizedBox(height: 8),
           ...summary.links.map((link) => _buildSummaryLinkItem(theme, link)),
           const SizedBox(height: 20),
@@ -1573,7 +1574,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
 
         // 最多回复至
         if (summary.mostRepliedToUsers.isNotEmpty) ...[
-          _buildSectionHeader(theme, Icons.reply_rounded, '最多回复至'),
+          _buildSectionHeader(theme, Icons.reply_rounded, context.l10n.userProfile_mostRepliedTo),
           const SizedBox(height: 8),
           _buildUserChips(theme, summary.mostRepliedToUsers),
           const SizedBox(height: 20),
@@ -1581,7 +1582,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
 
         // 被谁赞的最多
         if (summary.mostLikedByUsers.isNotEmpty) ...[
-          _buildSectionHeader(theme, Icons.favorite_rounded, '被谁赞的最多'),
+          _buildSectionHeader(theme, Icons.favorite_rounded, context.l10n.userProfile_mostLikedBy),
           const SizedBox(height: 8),
           _buildUserChips(theme, summary.mostLikedByUsers),
           const SizedBox(height: 20),
@@ -1589,7 +1590,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
 
         // 赞最多
         if (summary.mostLikedUsers.isNotEmpty) ...[
-          _buildSectionHeader(theme, Icons.thumb_up_rounded, '赞最多'),
+          _buildSectionHeader(theme, Icons.thumb_up_rounded, context.l10n.userProfile_mostLiked),
           const SizedBox(height: 8),
           _buildUserChips(theme, summary.mostLikedUsers),
           const SizedBox(height: 20),
@@ -1597,7 +1598,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
 
         // 热门类别
         if (summary.topCategories.isNotEmpty) ...[
-          _buildSectionHeader(theme, Icons.category_rounded, '热门类别'),
+          _buildSectionHeader(theme, Icons.category_rounded, context.l10n.userProfile_topCategories),
           const SizedBox(height: 8),
           ...summary.topCategories.map((cat) => _buildSummaryCategoryItem(theme, cat)),
           const SizedBox(height: 20),
@@ -1605,7 +1606,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
 
         // 热门徽章
         if (summary.badges.isNotEmpty) ...[
-          _buildSectionHeader(theme, Icons.military_tech_rounded, '热门徽章'),
+          _buildSectionHeader(theme, Icons.military_tech_rounded, context.l10n.userProfile_topBadges),
           const SizedBox(height: 8),
           _buildBadgeChips(theme, summary.badges),
           const SizedBox(height: 20),
@@ -1627,7 +1628,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
                 children: [
                   Icon(Icons.summarize_outlined, size: 48, color: Colors.grey[400]),
                   const SizedBox(height: 8),
-                  Text('暂无总结数据', style: TextStyle(color: Colors.grey[600])),
+                  Text(context.l10n.userProfile_noSummary, style: TextStyle(color: Colors.grey[600])),
                 ],
               ),
             ),
@@ -1723,7 +1724,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
             children: [
               Expanded(
                 child: Text(
-                  topic?.title ?? '话题 #$targetTopicId',
+                  topic?.title ?? context.l10n.userProfile_topicHash(targetTopicId.toString()),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.bodyMedium?.copyWith(
@@ -1805,7 +1806,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
               if (link.clicks > 0) ...[
                 const SizedBox(width: 8),
                 Text(
-                  '${link.clicks} 次点击',
+                  context.l10n.userProfile_linkClicks(link.clicks),
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: theme.colorScheme.outline,
                   ),
@@ -1903,14 +1904,14 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
               ),
             ),
             Text(
-              '${cat.topicCount} 话题',
+              context.l10n.userProfile_catTopicCount(cat.topicCount),
               style: theme.textTheme.labelSmall?.copyWith(
                 color: theme.colorScheme.outline,
               ),
             ),
             const SizedBox(width: 12),
             Text(
-              '${cat.postCount} 回复',
+              context.l10n.userProfile_catPostCount(cat.postCount),
               style: theme.textTheme.labelSmall?.copyWith(
                 color: theme.colorScheme.outline,
               ),
@@ -1986,7 +1987,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
           children: [
             Icon(Icons.emoji_emotions_outlined, size: 48, color: Colors.grey[400]),
             const SizedBox(height: 8),
-            Text('暂无回应', style: TextStyle(color: Colors.grey[600])),
+            Text(context.l10n.userProfile_noReactions, style: TextStyle(color: Colors.grey[600])),
           ],
         ),
       );
@@ -2149,7 +2150,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
                     const Icon(Icons.emoji_emotions, size: 20),
                   const SizedBox(width: 8),
                   Text(
-                    '回应了',
+                    context.l10n.userProfile_reacted,
                     style: theme.textTheme.labelMedium?.copyWith(
                       color: theme.colorScheme.primary,
                       fontWeight: FontWeight.bold,
@@ -2216,32 +2217,32 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
   String _getTrustLevelLabel(int level) {
     switch (level) {
       case 0:
-        return 'L0 新用户';
+        return S.current.user_trustLevel0;
       case 1:
-        return 'L1 基本用户';
+        return S.current.user_trustLevel1;
       case 2:
-        return 'L2 成员';
+        return S.current.user_trustLevel2;
       case 3:
-        return 'L3 活跃用户';
+        return S.current.user_trustLevel3;
       case 4:
-        return 'L4 领袖';
+        return S.current.user_trustLevel4;
       default:
-        return '等级 $level';
+        return S.current.user_trustLevelUnknown(level);
     }
   }
 
   String _getActionLabel(int? type) {
     switch (type) {
       case UserActionType.like:
-        return '点赞';
+        return S.current.userProfile_actionLike;
       case UserActionType.wasLiked:
-        return '被赞';
+        return S.current.userProfile_actionLiked;
       case UserActionType.newTopic:
-        return '发布了话题';
+        return S.current.userProfile_actionCreatedTopic;
       case UserActionType.reply:
-        return '回复了';
+        return S.current.userProfile_actionReplied;
       default:
-        return '动态';
+        return S.current.userProfile_actionDefault;
     }
   }
 }

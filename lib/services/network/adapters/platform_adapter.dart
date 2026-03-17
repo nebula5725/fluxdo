@@ -10,6 +10,7 @@ import '../proxy/proxy_settings_service.dart';
 import '../rhttp/rhttp_settings_service.dart';
 import 'cronet_fallback_service.dart';
 import 'network_http_adapter.dart';
+import '../../../l10n/s.dart';
 import 'rhttp_adapter.dart';
 import 'webview_http_adapter.dart';
 
@@ -31,13 +32,13 @@ AdapterType? getCurrentAdapterType() => _currentAdapterType;
 String getAdapterDisplayName(AdapterType type) {
   switch (type) {
     case AdapterType.webview:
-      return 'WebView 适配器';
+      return S.current.network_adapterWebView;
     case AdapterType.native:
-      return Platform.isAndroid ? 'Cronet 适配器' : 'Cupertino 适配器';
+      return Platform.isAndroid ? S.current.network_adapterNativeAndroid : S.current.network_adapterNativeIos;
     case AdapterType.network:
-      return 'Network 适配器';
+      return S.current.network_adapterNetwork;
     case AdapterType.rhttp:
-      return 'rhttp 引擎';
+      return S.current.network_adapterRhttp;
   }
 }
 

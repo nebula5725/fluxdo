@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import '../../../l10n/s.dart';
 import 'proxy_settings_service.dart';
 
 class ShadowsocksUriConfig {
@@ -48,10 +49,10 @@ class ShadowsocksUriParser {
   static ShadowsocksUriConfig parse(String input) {
     final raw = input.trim();
     if (raw.isEmpty) {
-      throw const FormatException('链接不能为空');
+      throw FormatException(S.current.proxy_ssLinkEmpty);
     }
     if (!raw.toLowerCase().startsWith('ss://')) {
-      throw const FormatException('仅支持 ss:// 链接');
+      throw FormatException(S.current.proxy_ssOnlySsProtocol);
     }
 
     final payload = raw.substring(5);
@@ -66,7 +67,7 @@ class ShadowsocksUriParser {
         ProxySettingsService.normalizeShadowsocksCipher(decoded.cipher);
     if (cipher.isEmpty) {
       throw FormatException(
-        '当前版本仅支持 ${ProxySettingsService.supportedShadowsocksCiphers.join(' / ')}',
+        S.current.proxy_ssUnsupportedCipher(ProxySettingsService.supportedShadowsocksCiphers.join(' / ')),
       );
     }
 
@@ -82,7 +83,7 @@ class ShadowsocksUriParser {
   static _DecodedShadowsocksBody _parseBody(String body) {
     final cleaned = body.trim();
     if (cleaned.isEmpty) {
-      throw const FormatException('ss:// 链接内容为空');
+      throw FormatException(S.current.proxy_ssLinkContentEmpty);
     }
 
     if (!cleaned.contains('@')) {
@@ -99,7 +100,7 @@ class ShadowsocksUriParser {
 
     final separatorIndex = userInfo.indexOf(':');
     if (separatorIndex <= 0) {
-      throw const FormatException('无法解析加密算法和密码');
+      throw FormatException(S.current.proxy_ssCannotParseCipher);
     }
 
     final hostPort = _parseHostPort(hostPart);
@@ -119,7 +120,7 @@ class ShadowsocksUriParser {
       try {
         return utf8.decode(base64.decode(base64.normalize(normalized)));
       } catch (_) {
-        throw const FormatException('ss:// 链接 Base64 解码失败');
+        throw FormatException(S.current.proxy_ssBase64DecodeFailed);
       }
     }
   }
@@ -127,7 +128,7 @@ class ShadowsocksUriParser {
   static _ParsedHostPort _parseHostPort(String input) {
     final value = input.trim();
     if (value.isEmpty) {
-      throw const FormatException('缺少服务器地址');
+      throw FormatException(S.current.proxy_ssMissingAddress);
     }
 
     if (value.startsWith('[')) {
@@ -135,22 +136,22 @@ class ShadowsocksUriParser {
       if (closing <= 0 ||
           closing + 2 > value.length ||
           value[closing + 1] != ':') {
-        throw const FormatException('IPv6 地址格式无效');
+        throw FormatException(S.current.proxy_ssInvalidIpv6);
       }
       final port = int.tryParse(value.substring(closing + 2));
       if (port == null || port <= 0 || port > 65535) {
-        throw const FormatException('端口无效');
+        throw FormatException(S.current.proxy_ssInvalidPort);
       }
       return _ParsedHostPort(host: value.substring(1, closing), port: port);
     }
 
     final colon = value.lastIndexOf(':');
     if (colon <= 0 || colon == value.length - 1) {
-      throw const FormatException('缺少端口');
+      throw FormatException(S.current.proxy_ssMissingPort);
     }
     final port = int.tryParse(value.substring(colon + 1));
     if (port == null || port <= 0 || port > 65535) {
-      throw const FormatException('端口无效');
+      throw FormatException(S.current.proxy_ssInvalidPort);
     }
     return _ParsedHostPort(host: value.substring(0, colon), port: port);
   }

@@ -8,6 +8,7 @@ import '../../constants.dart';
 import '../network/adapters/cronet_fallback_service.dart';
 import '../network/doh/network_settings_service.dart';
 import '../network/proxy/proxy_settings_service.dart';
+import '../../l10n/s.dart';
 import 'log_writer.dart';
 
 /// 日志文件管理工具
@@ -194,7 +195,7 @@ class LoggerUtils {
       if (doh.preferIPv6) parts.add('IPv6');
       lines.add('DOH: ${parts.join(', ')}');
     } else {
-      lines.add('DOH: 关闭');
+      lines.add(S.current.deviceInfo_dohOff);
     }
 
     // HTTP 代理
@@ -202,7 +203,7 @@ class LoggerUtils {
     if (proxy.isValid) {
       lines.add('代理: ${proxy.host}:${proxy.port}');
     } else {
-      lines.add('代理: 关闭');
+      lines.add(S.current.deviceInfo_proxyOff);
     }
 
     return lines;

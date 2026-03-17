@@ -11,6 +11,7 @@ import 'package:flutter/services.dart';
 import '../services/toast_service.dart';
 import '../widgets/common/image_context_menu.dart';
 import '../widgets/common/loading_spinner.dart';
+import '../l10n/s.dart';
 
 class ImageViewerPage extends StatefulWidget {
   final String? imageUrl;
@@ -222,7 +223,7 @@ class _ImageViewerPageState extends State<ImageViewerPage>
         final granted = await Gal.requestAccess();
         if (!granted) {
           if (mounted) {
-            ToastService.showInfo('请授予相册访问权限');
+            ToastService.showInfo(S.current.imageViewer_grantPermission);
           }
           return;
         }
@@ -233,7 +234,7 @@ class _ImageViewerPageState extends State<ImageViewerPage>
       final Uint8List? imageBytes = await _cacheManager.getImageBytes(imageUrl);
 
       if (imageBytes == null || imageBytes.isEmpty) {
-        throw Exception('获取图片失败');
+        throw Exception(S.current.image_fetchFailed);
       }
 
       // 使用 putImageBytes 直接保存字节数据到相册
@@ -241,16 +242,16 @@ class _ImageViewerPageState extends State<ImageViewerPage>
       await Gal.putImageBytes(imageBytes, name: 'fluxdo_${DateTime.now().millisecondsSinceEpoch}.$ext');
 
       if (mounted) {
-        ToastService.showSuccess('图片已保存到相册');
+        ToastService.showSuccess(S.current.imageViewer_imageSaved);
       }
     } on GalException catch (e) {
       if (mounted) {
-        ToastService.showError('保存失败: ${e.type.message}');
+        ToastService.showError(S.current.imageViewer_saveFailed(e.type.message));
       }
     } catch (e) {
       debugPrint('Save image error: $e');
       if (mounted) {
-        ToastService.showError('保存失败，请重试');
+        ToastService.showError(S.current.imageViewer_saveFailedRetry);
       }
     } finally {
       if (mounted) {
@@ -266,13 +267,13 @@ class _ImageViewerPageState extends State<ImageViewerPage>
     try {
       final hasAccess = await Gal.hasAccess() || await Gal.requestAccess();
       if (!hasAccess) {
-        if (mounted) ToastService.showInfo('请授予相册访问权限');
+        if (mounted) ToastService.showInfo(S.current.imageViewer_grantPermission);
         return;
       }
       await Gal.putImageBytes(widget.imageBytes!, name: 'fluxdo_${DateTime.now().millisecondsSinceEpoch}.png');
-      if (mounted) ToastService.showSuccess('图片已保存到相册');
+      if (mounted) ToastService.showSuccess(S.current.imageViewer_imageSaved);
     } catch (e) {
-      if (mounted) ToastService.showError('保存失败，请重试');
+      if (mounted) ToastService.showError(S.current.imageViewer_saveFailedRetry);
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
@@ -307,7 +308,7 @@ class _ImageViewerPageState extends State<ImageViewerPage>
     } catch (e) {
       debugPrint('Share image error: $e');
       if (mounted) {
-        ToastService.showError('分享失败，请重试');
+        ToastService.showError(S.current.common_shareFailed);
       }
     } finally {
       if (mounted) {

@@ -271,11 +271,11 @@ extension PostUpdateMethods on TopicDetailNotifier {
   /// 添加话题书签
   Future<int> addTopicBookmark() async {
     final currentDetail = state.value;
-    if (currentDetail == null) throw Exception('话题详情为空');
+    if (currentDetail == null) throw Exception(S.current.error_topicDetailEmpty);
 
     final service = ref.read(discourseServiceProvider);
     final newBookmarkId = await service.bookmarkTopic(currentDetail.id);
-    if (!ref.mounted) throw Exception('Provider 已销毁');
+    if (!ref.mounted) throw Exception(S.current.error_providerDisposed);
 
     state = AsyncValue.data(currentDetail.copyWith(
       bookmarked: true,

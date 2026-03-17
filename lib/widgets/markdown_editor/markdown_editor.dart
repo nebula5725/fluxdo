@@ -18,6 +18,7 @@ import 'emoji_sticker_panel.dart';
 import 'markdown_renderer.dart';
 import 'markdown_toolbar.dart';
 import 'package:pangutext/pangutext.dart';
+import '../../../../../l10n/s.dart';
 
 /// 编辑器面板类型
 enum EditorPanelType { none, keyboard, emoji }
@@ -64,7 +65,7 @@ class MarkdownEditor extends ConsumerStatefulWidget {
     super.key,
     required this.controller,
     this.focusNode,
-    this.hintText = '说点什么吧... (支持 Markdown)',
+    this.hintText = '',
     this.minLines = 5,
     this.expands = false,
     this.emojiPanelHeight = 280.0,
@@ -462,7 +463,7 @@ class MarkdownEditorState extends ConsumerState<MarkdownEditor> {
               ? [
                   ...items,
                   ContextMenuButtonItem(
-                    label: '粘贴',
+                    label: S.current.common_paste,
                     type: ContextMenuButtonType.paste,
                     onPressed: () => _handleCustomPaste(editableTextState),
                   ),
@@ -525,7 +526,7 @@ class MarkdownEditorState extends ConsumerState<MarkdownEditor> {
         onContentInserted: _handleContentInserted,
       ),
       decoration: InputDecoration(
-        hintText: widget.hintText,
+        hintText: widget.hintText.isEmpty ? S.current.editor_hintText : widget.hintText,
         border: InputBorder.none,
       ),
     );
@@ -608,7 +609,7 @@ class MarkdownEditorState extends ConsumerState<MarkdownEditor> {
                   padding: const EdgeInsets.all(16),
                   child: widget.controller.text.isEmpty
                       ? Text(
-                          '（无内容）',
+                          S.current.editor_noContent,
                           style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
                         )
                       : MarkdownBody(data: widget.controller.text),

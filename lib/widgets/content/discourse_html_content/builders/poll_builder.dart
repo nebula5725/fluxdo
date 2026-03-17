@@ -3,6 +3,7 @@ import '../../../../models/topic.dart';
 import 'package:dio/dio.dart';
 import '../../../../services/app_error_handler.dart';
 import '../../../../services/discourse/discourse_service.dart';
+import '../../../../l10n/s.dart';
 
 /// 构建投票块
 Widget buildPoll({
@@ -270,7 +271,7 @@ class _PollWidgetState extends State<_PollWidget> {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  '${_poll.voters} 投票人',
+                  S.current.poll_voters(_poll.voters),
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -278,7 +279,7 @@ class _PollWidgetState extends State<_PollWidget> {
                 if (isClosed) ...[
                   const SizedBox(width: 8),
                   Text(
-                    '• 已关闭',
+                    '• ${S.current.poll_closed}',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
@@ -296,7 +297,7 @@ class _PollWidgetState extends State<_PollWidget> {
                       foregroundColor: theme.colorScheme.onPrimary,
                     ),
                     child: Text(
-                      '投票',
+                      S.current.poll_vote,
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onPrimary,
                       ),
@@ -311,7 +312,7 @@ class _PollWidgetState extends State<_PollWidget> {
                       minimumSize: const Size(0, 32),
                     ),
                     child: Text(
-                      '撤销',
+                      S.current.poll_undo,
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.error,
                       ),
@@ -326,7 +327,7 @@ class _PollWidgetState extends State<_PollWidget> {
                       minimumSize: const Size(0, 32),
                     ),
                     child: Text(
-                      _showPercentage ? '计数' : '百分比',
+                      _showPercentage ? S.current.poll_count : S.current.poll_percentage,
                       style: theme.textTheme.bodySmall,
                     ),
                   ),
@@ -339,7 +340,7 @@ class _PollWidgetState extends State<_PollWidget> {
                       minimumSize: const Size(0, 32),
                     ),
                     child: Text(
-                      _showResults ? '投票' : '查看结果',
+                      _showResults ? S.current.poll_vote : S.current.poll_viewResults,
                       style: theme.textTheme.bodySmall,
                     ),
                   ),

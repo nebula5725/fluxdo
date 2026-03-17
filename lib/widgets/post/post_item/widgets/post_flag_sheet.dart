@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import '../../../../l10n/s.dart';
 import '../../../../models/topic.dart';
 import '../../../../utils/url_helper.dart';
 import '../../../../services/preloaded_data_service.dart';
@@ -96,7 +97,7 @@ class _PostFlagSheetState extends State<PostFlagSheet> {
       }
     } catch (e) {
       if (mounted) {
-        final message = e is Exception ? e.toString().replaceFirst('Exception: ', '') : '举报失败，请稍后重试';
+        final message = e is Exception ? e.toString().replaceFirst('Exception: ', '') : S.current.post_flagFailed;
         ToastService.showError(message);
       }
     } finally {
@@ -131,7 +132,7 @@ class _PostFlagSheetState extends State<PostFlagSheet> {
                   Icon(Icons.flag_outlined, color: theme.colorScheme.error),
                   const SizedBox(width: 8),
                   Text(
-                    '举报帖子',
+                    context.l10n.post_flagTitle,
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -165,7 +166,7 @@ class _PostFlagSheetState extends State<PostFlagSheet> {
                       // 向用户发送消息分组
                       if (_notifyUserTypes.isNotEmpty) ...[
                         _buildSectionHeader(
-                          '向 @${widget.postUsername} 发送消息',
+                          context.l10n.post_flagMessageUser(widget.postUsername),
                           theme,
                         ),
                         ..._notifyUserTypes.map((type) => _buildFlagOption(type, theme)),
@@ -175,7 +176,7 @@ class _PostFlagSheetState extends State<PostFlagSheet> {
                       ],
                       // 私下通知管理人员分组
                       if (_moderatorTypes.isNotEmpty) ...[
-                        _buildSectionHeader('私下通知管理人员', theme),
+                        _buildSectionHeader(context.l10n.post_flagNotifyModerators, theme),
                         ..._moderatorTypes.map((type) => _buildFlagOption(type, theme)),
                       ],
                     ],
@@ -187,7 +188,7 @@ class _PostFlagSheetState extends State<PostFlagSheet> {
                         controller: _messageController,
                         maxLines: 3,
                         decoration: InputDecoration(
-                          hintText: '请描述具体问题...',
+                          hintText: context.l10n.post_flagDescriptionHint,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -213,7 +214,7 @@ class _PostFlagSheetState extends State<PostFlagSheet> {
                           height: 20,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : const Text('提交举报'),
+                      : Text(context.l10n.post_submitFlag),
                 ),
               ),
             ),

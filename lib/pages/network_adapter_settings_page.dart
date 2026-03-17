@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../l10n/s.dart';
 import '../services/network/adapters/cronet_fallback_service.dart';
 import '../services/network/adapters/platform_adapter.dart';
 import '../services/toast_service.dart';
@@ -30,7 +31,7 @@ class _NetworkAdapterSettingsPageState extends State<NetworkAdapterSettingsPage>
 
         return Scaffold(
           appBar: AppBar(
-            title: const Text('网络适配器'),
+            title: Text(context.l10n.networkAdapter_title),
           ),
           body: ListView(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -89,7 +90,7 @@ class _NetworkAdapterSettingsPageState extends State<NetworkAdapterSettingsPage>
                 Icon(Icons.info_outline, color: theme.colorScheme.primary),
                 const SizedBox(width: 12),
                 Text(
-                  '当前状态',
+                  context.l10n.networkAdapter_currentStatus,
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
@@ -100,14 +101,14 @@ class _NetworkAdapterSettingsPageState extends State<NetworkAdapterSettingsPage>
           Divider(height: 1, color: theme.colorScheme.outlineVariant.withValues(alpha:0.2)),
           ListTile(
             leading: const Icon(Icons.settings_ethernet),
-            title: const Text('适配器类型'),
+            title: Text(context.l10n.networkAdapter_adapterType),
             subtitle: Text(
-              displayType != null ? getAdapterDisplayName(displayType) : '未知',
+              displayType != null ? getAdapterDisplayName(displayType) : context.l10n.common_unknown,
             ),
             trailing: _buildStatusChip(
               theme,
               icon: isNative ? Icons.check_circle : Icons.info,
-              label: isNative ? '原生' : '备用',
+              label: isNative ? context.l10n.networkAdapter_native : context.l10n.networkAdapter_fallback,
               color: isNative
                   ? Colors.green
                   : theme.colorScheme.secondary,
@@ -133,7 +134,7 @@ class _NetworkAdapterSettingsPageState extends State<NetworkAdapterSettingsPage>
                 Icon(Icons.tune, color: theme.colorScheme.primary),
                 const SizedBox(width: 12),
                 Text(
-                  '控制选项',
+                  context.l10n.networkAdapter_controlOptions,
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
@@ -144,13 +145,13 @@ class _NetworkAdapterSettingsPageState extends State<NetworkAdapterSettingsPage>
           Divider(height: 1, color: theme.colorScheme.outlineVariant.withValues(alpha:0.2)),
           SwitchListTile(
             secondary: const Icon(Icons.swap_horiz),
-            title: const Text('强制使用备用适配器'),
-            subtitle: const Text('禁用 Cronet，使用 NetworkHttpAdapter'),
+            title: Text(context.l10n.networkAdapter_forceFallback),
+            subtitle: Text(context.l10n.networkAdapter_forceFallbackDesc),
             value: forceFallback,
             onChanged: (value) async {
               await fallbackService.setForceFallback(value);
               if (mounted) {
-                ToastService.showSuccess('设置已保存，重启应用后生效');
+                ToastService.showSuccess(S.current.networkAdapter_settingSaved);
               }
             },
           ),
@@ -175,7 +176,7 @@ class _NetworkAdapterSettingsPageState extends State<NetworkAdapterSettingsPage>
                 Icon(Icons.warning_amber, color: theme.colorScheme.error),
                 const SizedBox(width: 12),
                 Text(
-                  '降级状态',
+                  context.l10n.networkAdapter_fallbackStatus,
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: theme.colorScheme.error,
@@ -187,14 +188,14 @@ class _NetworkAdapterSettingsPageState extends State<NetworkAdapterSettingsPage>
           Divider(height: 1, color: theme.colorScheme.error.withValues(alpha:0.2)),
           ListTile(
             leading: Icon(Icons.info_outline, color: theme.colorScheme.error),
-            title: const Text('已自动降级'),
-            subtitle: const Text('检测到 Cronet 不可用，已切换到备用适配器'),
+            title: Text(context.l10n.networkAdapter_autoFallback),
+            subtitle: Text(context.l10n.networkAdapter_autoFallbackDesc),
           ),
           if (failureReason != null) ...[
             Divider(height: 1, indent: 56, color: theme.colorScheme.error.withValues(alpha:0.2)),
             ListTile(
               leading: const Icon(Icons.bug_report),
-              title: const Text('查看降级原因'),
+              title: Text(context.l10n.networkAdapter_viewReason),
               trailing: const Icon(Icons.chevron_right, size: 20),
               onTap: () => _showFailureReasonDialog(failureReason),
             ),
@@ -202,8 +203,8 @@ class _NetworkAdapterSettingsPageState extends State<NetworkAdapterSettingsPage>
           Divider(height: 1, indent: 56, color: theme.colorScheme.error.withValues(alpha:0.2)),
           ListTile(
             leading: const Icon(Icons.refresh),
-            title: const Text('重置降级状态'),
-            subtitle: const Text('清除降级记录，下次启动重新尝试 Cronet'),
+            title: Text(context.l10n.networkAdapter_resetFallback),
+            subtitle: Text(context.l10n.networkAdapter_resetFallbackDesc),
             trailing: const Icon(Icons.chevron_right, size: 20),
             onTap: () => _resetFallbackState(fallbackService),
           ),
@@ -228,7 +229,7 @@ class _NetworkAdapterSettingsPageState extends State<NetworkAdapterSettingsPage>
                 Icon(Icons.science, color: theme.colorScheme.tertiary),
                 const SizedBox(width: 12),
                 Text(
-                  '开发者测试',
+                  context.l10n.networkAdapter_devTest,
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: theme.colorScheme.tertiary,
@@ -240,8 +241,8 @@ class _NetworkAdapterSettingsPageState extends State<NetworkAdapterSettingsPage>
           Divider(height: 1, color: theme.colorScheme.tertiary.withValues(alpha:0.2)),
           ListTile(
             leading: Icon(Icons.bug_report, color: theme.colorScheme.tertiary),
-            title: const Text('模拟 Cronet 错误'),
-            subtitle: const Text('触发降级流程，测试自动降级功能'),
+            title: Text(context.l10n.networkAdapter_simulateError),
+            subtitle: Text(context.l10n.networkAdapter_simulateErrorDesc),
             trailing: const Icon(Icons.chevron_right, size: 20),
             onTap: () => _simulateCronetError(fallbackService),
           ),
@@ -311,7 +312,7 @@ class _NetworkAdapterSettingsPageState extends State<NetworkAdapterSettingsPage>
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Cronet 降级原因'),
+        title: Text(context.l10n.networkAdapter_degradeReason),
         content: SingleChildScrollView(
           child: SelectableText(
             reason,
@@ -321,14 +322,14 @@ class _NetworkAdapterSettingsPageState extends State<NetworkAdapterSettingsPage>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('关闭'),
+            child: Text(context.l10n.common_close),
           ),
           FilledButton(
             onPressed: () {
               Clipboard.setData(ClipboardData(text: reason));
-              ToastService.showSuccess('已复制到剪贴板');
+              ToastService.showSuccess(S.current.common_copiedToClipboard);
             },
-            child: const Text('复制'),
+            child: Text(context.l10n.common_copy),
           ),
         ],
       ),
@@ -339,16 +340,16 @@ class _NetworkAdapterSettingsPageState extends State<NetworkAdapterSettingsPage>
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('重置降级状态'),
-        content: const Text('这将清除降级记录，下次启动时会重新尝试使用 Cronet。\n\n重启应用后生效。'),
+        title: Text(context.l10n.networkAdapter_resetFallback),
+        content: Text(context.l10n.networkAdapter_resetFallbackDesc),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('取消'),
+            child: Text(context.l10n.common_cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('重置'),
+            child: Text(context.l10n.common_reset),
           ),
         ],
       ),
@@ -357,7 +358,7 @@ class _NetworkAdapterSettingsPageState extends State<NetworkAdapterSettingsPage>
     if (confirm == true) {
       await fallbackService.reset();
       if (mounted) {
-        ToastService.showSuccess('已重置，重启应用后生效');
+        ToastService.showSuccess(S.current.networkAdapter_resetSuccess);
       }
     }
   }
@@ -366,7 +367,7 @@ class _NetworkAdapterSettingsPageState extends State<NetworkAdapterSettingsPage>
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('模拟 Cronet 错误'),
+        title: Text(context.l10n.networkAdapter_simulateError),
         content: const Text(
           '这将模拟一个 Cronet 错误并触发降级流程。\n\n'
           '降级后，应用将使用 NetworkHttpAdapter 作为备用适配器。\n\n'
@@ -375,14 +376,14 @@ class _NetworkAdapterSettingsPageState extends State<NetworkAdapterSettingsPage>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('取消'),
+            child: Text(context.l10n.common_cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
             style: FilledButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.tertiary,
             ),
-            child: const Text('模拟'),
+            child: Text(context.l10n.common_confirm),
           ),
         ],
       ),
@@ -391,7 +392,7 @@ class _NetworkAdapterSettingsPageState extends State<NetworkAdapterSettingsPage>
     if (confirm == true) {
       await fallbackService.simulateCronetError();
       if (mounted) {
-        ToastService.showInfo('已触发模拟降级，请查看降级状态');
+        ToastService.showInfo(S.current.networkAdapter_simulateSuccess);
       }
     }
   }

@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:ota_update/ota_update.dart';
 
+import '../l10n/s.dart';
 import 'update_service.dart';
 
 /// APK 下载状态
@@ -93,35 +94,35 @@ class ApkDownloadService {
           case OtaStatus.ALREADY_RUNNING_ERROR:
             yield ApkDownloadProgress(
               status: ApkDownloadStatus.error,
-              error: '已有下载任务正在进行',
+              error: S.current.download_alreadyInProgress,
             );
             break;
 
           case OtaStatus.PERMISSION_NOT_GRANTED_ERROR:
             yield ApkDownloadProgress(
               status: ApkDownloadStatus.error,
-              error: '未授予安装权限，请在设置中允许安装未知应用',
+              error: S.current.download_noInstallPermission,
             );
             break;
 
           case OtaStatus.INTERNAL_ERROR:
             yield ApkDownloadProgress(
               status: ApkDownloadStatus.error,
-              error: event.value ?? '下载安装过程中发生内部错误',
+              error: event.value ?? S.current.download_internalError,
             );
             break;
 
           case OtaStatus.DOWNLOAD_ERROR:
             yield ApkDownloadProgress(
               status: ApkDownloadStatus.error,
-              error: '下载失败: ${event.value ?? '未知错误'}',
+              error: S.current.download_failedWithError(event.value ?? S.current.error_unknown),
             );
             break;
 
           case OtaStatus.CHECKSUM_ERROR:
             yield ApkDownloadProgress(
               status: ApkDownloadStatus.error,
-              error: '文件校验失败，下载的文件可能已损坏',
+              error: S.current.download_checksumFailed,
             );
             break;
 
@@ -135,7 +136,7 @@ class ApkDownloadService {
           case OtaStatus.INSTALLATION_ERROR:
             yield ApkDownloadProgress(
               status: ApkDownloadStatus.error,
-              error: '安装失败: ${event.value ?? '未知错误'}',
+              error: S.current.download_installFailed(event.value ?? S.current.error_unknown),
             );
             break;
 
@@ -147,7 +148,7 @@ class ApkDownloadService {
     } catch (e) {
       yield ApkDownloadProgress(
         status: ApkDownloadStatus.error,
-        error: '下载失败: $e',
+        error: S.current.download_failed('$e'),
       );
     }
   }

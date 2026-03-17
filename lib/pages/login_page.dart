@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/s.dart';
 import 'webview_login_page.dart';
 
 /// 登录页面 - 仅支持 WebView 登录
@@ -31,7 +32,7 @@ class LoginPage extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                '真诚、友善、团结、专业',
+                context.l10n.login_slogan,
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -41,14 +42,14 @@ class LoginPage extends StatelessWidget {
               FilledButton.icon(
                 onPressed: () => _loginWithWebView(context),
                 icon: const Icon(Icons.login),
-                label: const Text('登录'),
+                label: Text(context.l10n.common_login),
                 style: FilledButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
               ),
               const SizedBox(height: 16),
               Text(
-                '将在浏览器中打开登录页面',
+                context.l10n.login_browserHint,
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodySmall,
               ),

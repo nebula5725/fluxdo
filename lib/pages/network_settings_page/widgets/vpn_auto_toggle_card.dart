@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../l10n/s.dart';
 import '../../../services/network/vpn_auto_toggle_service.dart';
 
 /// VPN 自动切换设置卡片
@@ -31,8 +32,8 @@ class VpnAutoToggleCard extends StatelessWidget {
           child: Column(
             children: [
               SwitchListTile(
-                title: const Text('VPN 自动切换'),
-                subtitle: const Text('检测到 VPN 时自动关闭 DOH 和代理，断开后恢复'),
+                title: Text(context.l10n.vpnToggle_title),
+                subtitle: Text(context.l10n.vpnToggle_subtitle),
                 secondary: Icon(
                   enabled ? Icons.swap_horiz : Icons.swap_horiz_outlined,
                   color: enabled ? theme.colorScheme.primary : null,
@@ -58,7 +59,7 @@ class VpnAutoToggleCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        vpnActive ? 'VPN 已连接' : 'VPN 未连接',
+                        vpnActive ? context.l10n.vpnToggle_connected : context.l10n.vpnToggle_disconnected,
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: vpnActive
                               ? theme.colorScheme.tertiary
@@ -108,7 +109,7 @@ class VpnAutoToggleCard extends StatelessWidget {
   String _buildSuppressedText(bool dohSuppressed, bool proxySuppressed) {
     final items = <String>[];
     if (dohSuppressed) items.add('DOH');
-    if (proxySuppressed) items.add('上游代理');
-    return '${items.join(' 和 ')}已被自动关闭，VPN 断开后将自动恢复';
+    if (proxySuppressed) items.add(S.current.vpnToggle_upstreamProxy);
+    return '${items.join(S.current.vpnToggle_and)}${S.current.vpnToggle_suppressedSuffix}';
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../l10n/s.dart';
 import '../../../../models/topic.dart';
 import '../../../../services/discourse_cache_manager.dart';
 import '../../../../services/emoji_handler.dart';
@@ -243,7 +244,7 @@ class PostActionBar extends StatelessWidget {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    '回复',
+                    context.l10n.common_reply,
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.bold,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/s.dart';
 import '../../models/topic.dart';
 import '../common/relative_time_text.dart';
 import '../common/smart_avatar.dart';
@@ -41,36 +42,39 @@ const Map<String, IconData> _actionCodeIcons = {
   'category_changed': Icons.category_outlined,
 };
 
-/// action_code 对应的中文描述
-const Map<String, String> _actionCodeDescriptions = {
-  'closed.enabled': '关闭了话题',
-  'closed.disabled': '打开了话题',
-  'autoclosed.enabled': '话题被自动关闭',
-  'autoclosed.disabled': '话题被自动打开',
-  'archived.enabled': '归档了话题',
-  'archived.disabled': '取消归档了话题',
-  'pinned.enabled': '置顶了话题',
-  'pinned.disabled': '取消置顶了话题',
-  'pinned_globally.enabled': '全站置顶了话题',
-  'pinned_globally.disabled': '取消全站置顶',
-  'banner.enabled': '将话题设为横幅',
-  'banner.disabled': '移除了横幅',
-  'visible.enabled': '公开了话题',
-  'visible.disabled': '取消公开了话题',
-  'split_topic': '拆分了话题',
-  'invited_user': '邀请了',
-  'invited_group': '邀请了',
-  'user_left': '离开了对话',
-  'removed_user': '移除了',
-  'removed_group': '移除了',
-  'public_topic': '转换为公开话题',
-  'open_topic': '转换为话题',
-  'private_topic': '转换为私信',
-  'autobumped': '自动顶帖',
-  'tags_changed': '更新了标签',
-  'category_changed': '更新了类别',
-  'forwarded': '转发了邮件',
-};
+/// action_code 对应的本地化描述
+Map<String, String> _getActionCodeDescriptions() {
+  final l10n = S.current;
+  return {
+    'closed.enabled': l10n.smallAction_closedEnabled,
+    'closed.disabled': l10n.smallAction_closedDisabled,
+    'autoclosed.enabled': l10n.smallAction_autoclosedEnabled,
+    'autoclosed.disabled': l10n.smallAction_autoclosedDisabled,
+    'archived.enabled': l10n.smallAction_archivedEnabled,
+    'archived.disabled': l10n.smallAction_archivedDisabled,
+    'pinned.enabled': l10n.smallAction_pinnedEnabled,
+    'pinned.disabled': l10n.smallAction_pinnedDisabled,
+    'pinned_globally.enabled': l10n.smallAction_pinnedGloballyEnabled,
+    'pinned_globally.disabled': l10n.smallAction_pinnedGloballyDisabled,
+    'banner.enabled': l10n.smallAction_bannerEnabled,
+    'banner.disabled': l10n.smallAction_bannerDisabled,
+    'visible.enabled': l10n.smallAction_visibleEnabled,
+    'visible.disabled': l10n.smallAction_visibleDisabled,
+    'split_topic': l10n.smallAction_splitTopic,
+    'invited_user': l10n.smallAction_invitedUser,
+    'invited_group': l10n.smallAction_invitedGroup,
+    'user_left': l10n.smallAction_userLeft,
+    'removed_user': l10n.smallAction_removedUser,
+    'removed_group': l10n.smallAction_removedGroup,
+    'public_topic': l10n.smallAction_publicTopic,
+    'open_topic': l10n.smallAction_openTopic,
+    'private_topic': l10n.smallAction_privateTopic,
+    'autobumped': l10n.smallAction_autobumped,
+    'tags_changed': l10n.smallAction_tagsChanged,
+    'category_changed': l10n.smallAction_categoryChanged,
+    'forwarded': l10n.smallAction_forwarded,
+  };
+}
 
 /// 系统操作帖子组件（small_action）
 /// 用于显示置顶、关闭、邀请等系统操作
@@ -92,7 +96,7 @@ class SmallActionItem extends StatelessWidget {
   String get _description {
     final code = post.actionCode ?? '';
     final who = post.actionCodeWho;
-    String base = _actionCodeDescriptions[code] ?? code;
+    String base = _getActionCodeDescriptions()[code] ?? code;
     
     // 如果有操作者信息，且描述需要包含操作者
     if (who != null && who.isNotEmpty) {

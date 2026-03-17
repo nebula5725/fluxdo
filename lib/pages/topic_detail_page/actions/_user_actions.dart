@@ -64,9 +64,9 @@ extension _UserActions on _TopicDetailPageState {
       } else {
         if (mounted) {
           ToastService.show(
-            '回复已发送',
+            S.current.post_replySent,
             type: ToastType.success,
-            actionLabel: '查看',
+            actionLabel: S.current.post_replySentAction,
             onAction: () => _scrollToPost(newPost.postNumber),
           );
         }
@@ -162,7 +162,7 @@ extension _UserActions on _TopicDetailPageState {
       try {
         final newBookmarkId = await notifier.addTopicBookmark();
         if (!mounted) return;
-        ToastService.showSuccess('已添加书签');
+        ToastService.showSuccess(S.current.common_bookmarkAdded);
 
         // 弹出编辑 BottomSheet
         final result = await BookmarkEditSheet.show(
@@ -195,7 +195,7 @@ extension _UserActions on _TopicDetailPageState {
     if (notifier.contains(widget.topicId)) {
       // 已在列表中 → 移除
       notifier.remove(widget.topicId);
-      ToastService.showSuccess('已从浮窗移除');
+      ToastService.showSuccess(S.current.topicDetail_removeFromReadLaterSuccess);
     } else {
       // 不在列表中 → 添加
       final item = ReadLaterItem(
@@ -206,9 +206,9 @@ extension _UserActions on _TopicDetailPageState {
       );
       final success = notifier.add(item);
       if (success) {
-        ToastService.showSuccess('已加入浮窗');
+        ToastService.showSuccess(S.current.topicDetail_addToReadLaterSuccess);
       } else {
-        ToastService.showError('浮窗已满（最多 $maxReadLaterItems 个）');
+        ToastService.showError(S.current.topicDetail_readLaterFull(maxReadLaterItems));
       }
     }
   }
@@ -232,7 +232,7 @@ extension _UserActions on _TopicDetailPageState {
     try {
       await notifier.updateNotificationLevel(level);
       if (mounted) {
-        ToastService.showSuccess('已设置为${level.label}');
+        ToastService.showSuccess(S.current.topicDetail_setToLevel(level.label));
       }
     } on DioException catch (e) {
       // 网络错误已由 ErrorInterceptor 处理
@@ -266,7 +266,7 @@ extension _UserActions on _TopicDetailPageState {
 
     final success = await launchInExternalBrowser(url);
     if (!success && mounted) {
-      ToastService.showError('无法打开浏览器');
+      ToastService.showError(S.current.topicDetail_cannotOpenBrowser);
     }
   }
 
@@ -360,9 +360,9 @@ extension _UserActions on _TopicDetailPageState {
       } else {
         if (mounted) {
           ToastService.show(
-            '回复已发送',
+            S.current.post_replySent,
             type: ToastType.success,
-            actionLabel: '查看',
+            actionLabel: S.current.post_replySentAction,
             onAction: () => _scrollToPost(newPost.postNumber),
           );
         }
@@ -400,9 +400,9 @@ extension _UserActions on _TopicDetailPageState {
       } else {
         if (mounted) {
           ToastService.show(
-            '回复已发送',
+            S.current.post_replySent,
             type: ToastType.success,
-            actionLabel: '查看',
+            actionLabel: S.current.post_replySentAction,
             onAction: () => _scrollToPost(newPost.postNumber),
           );
         }

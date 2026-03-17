@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../l10n/s.dart';
 import '../models/reward_request.dart';
 import '../models/reward_result.dart';
 import '../services/ldc_reward_service.dart';
@@ -107,7 +108,7 @@ Future<LdcRewardResult> executeReward({
   // 防重复检查
   final remaining = _RewardCooldown.check(topicId, postId, userId);
   if (remaining != null) {
-    return LdcRewardResult.error('请勿重复打赏，$remaining秒后可再次操作');
+    return LdcRewardResult.error(S.current.reward_duplicateWarning(remaining));
   }
 
   final service = LdcRewardService(

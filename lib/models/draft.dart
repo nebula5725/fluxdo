@@ -1,5 +1,6 @@
 // 草稿数据模型
 import 'dart:convert';
+import '../l10n/s.dart';
 import '../utils/time_utils.dart';
 
 /// 草稿操作类型
@@ -189,9 +190,9 @@ class Draft {
     if (data.title != null && data.title!.isNotEmpty) return data.title!;
     // 回复草稿没有标题时显示话题 ID
     if (draftKey.startsWith('topic_')) {
-      return '话题 #${draftKey.replaceFirst('topic_', '')}';
+      return S.current.draft_topicTitle(draftKey.replaceFirst('topic_', ''));
     }
-    return '无标题';
+    return S.current.draft_untitled;
   }
 
   /// 复制并修改部分字段

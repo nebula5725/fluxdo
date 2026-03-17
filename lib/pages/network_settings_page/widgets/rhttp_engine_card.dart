@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../l10n/s.dart';
 import '../../../services/network/adapters/platform_adapter.dart';
 import '../../../services/network/doh/network_settings_service.dart';
 import '../../../services/network/proxy/proxy_settings_service.dart';
@@ -56,11 +57,11 @@ class RhttpEngineCard extends StatelessWidget {
           child: Column(
             children: [
               SwitchListTile(
-                title: const Text('rhttp 引擎'),
+                title: Text(context.l10n.rhttpEngine_title),
                 subtitle: Text(
                   enabled
-                      ? 'HTTP/2 多路复用 · Rust reqwest'
-                      : '启用后使用 Rust 网络引擎',
+                      ? context.l10n.rhttpEngine_enabledDesc
+                      : context.l10n.rhttpEngine_disabledDesc,
                 ),
                 secondary: Icon(
                   enabled ? Icons.rocket_launch : Icons.rocket_launch_outlined,
@@ -83,7 +84,7 @@ class RhttpEngineCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '使用模式',
+                        context.l10n.rhttpEngine_useMode,
                         style: theme.textTheme.labelMedium?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
@@ -92,14 +93,14 @@ class RhttpEngineCard extends StatelessWidget {
                       SizedBox(
                         width: double.infinity,
                         child: SegmentedButton<RhttpMode>(
-                          segments: const [
+                          segments: [
                             ButtonSegment(
                               value: RhttpMode.always,
-                              label: Text('始终使用'),
+                              label: Text(context.l10n.rhttpEngine_alwaysUse),
                             ),
                             ButtonSegment(
                               value: RhttpMode.proxyOnly,
-                              label: Text('仅代理/DOH'),
+                              label: Text(context.l10n.rhttpEngine_proxyDohOnly),
                             ),
                           ],
                           selected: {settings.mode},
@@ -130,7 +131,7 @@ class RhttpEngineCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        '当前: ${getAdapterDisplayName(effectiveType)}',
+                        context.l10n.rhttpEngine_currentAdapter(getAdapterDisplayName(effectiveType)),
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
@@ -153,7 +154,7 @@ class RhttpEngineCard extends StatelessWidget {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            'ECH 启用时 WebView 仍通过本地代理兜底；rhttp 直连会优先尝试自身的 ECH',
+                            context.l10n.rhttpEngine_echFallbackHint,
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: theme.colorScheme.tertiary,
                               fontSize: 11,

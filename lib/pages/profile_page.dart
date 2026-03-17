@@ -34,6 +34,7 @@ import '../providers/cdk_providers.dart';
 import '../widgets/cdk_balance_card.dart';
 import '../services/ldc_oauth_service.dart';
 import '../services/cdk_oauth_service.dart';
+import '../l10n/s.dart';
 import '../services/toast_service.dart';
 import '../utils/number_utils.dart';
 import '../services/emoji_handler.dart';
@@ -99,7 +100,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       MaterialPageRoute(builder: (_) => const WebViewLoginPage()),
     );
     if (result == true && mounted) {
-      LoadingDialog.show(context, message: '加载数据...');
+      LoadingDialog.show(context, message: context.l10n.profile_loadingData);
 
       AppStateRefresher.refreshAll(ref);
 
@@ -122,17 +123,17 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('确认退出'),
-        content: const Text('确定要退出登录吗？'),
+        title: Text(context.l10n.profile_confirmLogout),
+        content: Text(context.l10n.profile_logoutContent),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('取消')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('退出')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(context.l10n.common_cancel)),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: Text(context.l10n.common_exit)),
         ],
       ),
     );
 
     if (confirmed == true && mounted) {
-      LoadingDialog.show(context, message: '正在退出...');
+      LoadingDialog.show(context, message: context.l10n.profile_loggingOut);
 
       // 记录主动退出日志
       LogWriter.instance.write({
@@ -165,7 +166,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     final result = await service.authorize(context);
     if (result && mounted) {
       ref.read(ldcUserInfoProvider.notifier).refresh();
-      ToastService.showSuccess('LDC 重新授权成功');
+      ToastService.showSuccess(S.current.profile_ldcReauthSuccess);
     }
   }
 
@@ -180,7 +181,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     final result = await service.authorize(context);
     if (result && mounted) {
       ref.read(cdkUserInfoProvider.notifier).refresh();
-      ToastService.showSuccess('CDK 重新授权成功');
+      ToastService.showSuccess(S.current.profile_cdkReauthSuccess);
     }
   }
 
@@ -190,7 +191,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       await WebViewPage.open(
         context, 
         'https://linux.do/u/$username/preferences/account',
-        title: '编辑资料',
+        title: context.l10n.profile_editProfile,
         injectCss: '''
           .new-user-content-wrapper {
             position: fixed !important;
@@ -286,7 +287,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           ),
           IconButton(
             icon: const Icon(Icons.manage_accounts_rounded),
-            tooltip: '编辑资料',
+            tooltip: context.l10n.profile_editProfile,
             onPressed: _openProfileEdit,
           ),
           const Padding(
@@ -398,10 +399,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           children: [
             Icon(Icons.error_outline, color: theme.colorScheme.error),
             const SizedBox(width: 12),
-            Expanded(child: Text('加载失败: $error', style: theme.textTheme.bodySmall)),
+            Expanded(child: Text('${context.l10n.common_loadFailed}: $error', style: theme.textTheme.bodySmall)),
             TextButton(
-              onPressed: () => ref.invalidate(currentUserProvider), 
-              child: const Text('重试')
+              onPressed: () => ref.invalidate(currentUserProvider),
+              child: Text(context.l10n.common_retry)
             ),
           ],
         ),
@@ -420,13 +421,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _buildCompactStatItem(theme, NumberUtils.formatCount(summary.daysVisited), '访问天数', summary.daysVisited),
+            _buildCompactStatItem(theme, NumberUtils.formatCount(summary.daysVisited), context.l10n.profile_daysVisited, summary.daysVisited),
             _buildVerticalDivider(theme),
-            _buildCompactStatItem(theme, NumberUtils.formatCount(summary.postsReadCount), '阅读帖子', summary.postsReadCount),
+            _buildCompactStatItem(theme, NumberUtils.formatCount(summary.postsReadCount), context.l10n.profile_postsRead, summary.postsReadCount),
             _buildVerticalDivider(theme),
-            _buildCompactStatItem(theme, NumberUtils.formatCount(summary.likesReceived), '获得点赞', summary.likesReceived),
+            _buildCompactStatItem(theme, NumberUtils.formatCount(summary.likesReceived), context.l10n.profile_likesReceived, summary.likesReceived),
             _buildVerticalDivider(theme),
-            _buildCompactStatItem(theme, NumberUtils.formatCount(summary.postCount), '发表回复', summary.postCount),
+            _buildCompactStatItem(theme, NumberUtils.formatCount(summary.postCount), context.l10n.profile_postCount, summary.postCount),
           ],
         ),
       ),
@@ -477,38 +478,38 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           _buildOptionTile(
             icon: Icons.bookmark_rounded,
             iconColor: Colors.orange,
-            title: '我的书签',
+            title: context.l10n.profile_myBookmarks,
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BookmarksPage()))
           ),
           _buildOptionTile(
             icon: Icons.drafts_rounded,
             iconColor: Colors.teal,
-            title: '我的草稿',
+            title: context.l10n.profile_myDrafts,
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DraftsPage()))
           ),
           _buildOptionTile(
             icon: Icons.article_rounded, 
             iconColor: Colors.blue,
-            title: '我的话题', 
+            title: context.l10n.profile_myTopics,
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MyTopicsPage()))
           ),
           _buildOptionTile(
             icon: Icons.military_tech_rounded, 
             iconColor: Colors.amber[700]!,
-            title: '我的徽章', 
+            title: context.l10n.profile_myBadges,
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MyBadgesPage()))
           ),
           _buildOptionTile(
             icon: Icons.verified_user_rounded, 
             iconColor: Colors.green,
-            title: '信任要求', 
+            title: context.l10n.profile_trustRequirements,
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TrustLevelRequirementsPage()))
           ),
           if (canAccessInviteLinks)
             _buildOptionTile(
               icon: Icons.link_rounded,
               iconColor: Colors.cyan,
-              title: '邀请链接',
+              title: context.l10n.profile_inviteLinks,
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const InviteLinksPage()),
@@ -517,13 +518,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           _buildOptionTile(
             icon: Icons.history_rounded,
             iconColor: Colors.purple,
-            title: '浏览历史',
+            title: context.l10n.profile_browsingHistory,
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BrowsingHistoryPage()))
           ),
           _buildOptionTile(
             icon: Icons.explore_rounded,
             iconColor: Colors.deepOrange,
-            title: '元宇宙',
+            title: context.l10n.profile_metaverse,
             showDivider: false,
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MetaversePage()))
           ),
@@ -543,7 +544,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           _buildOptionTile(
             icon: Icons.smart_toy_rounded,
             iconColor: Colors.cyan,
-            title: 'AI 模型服务',
+            title: context.l10n.profile_aiModelService,
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => AiProvidersPage(
               onOpenSession: (ctx, topicId, sessionId) {
                 Navigator.push(ctx, MaterialPageRoute(
@@ -559,31 +560,31 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           _buildOptionTile(
             icon: Icons.color_lens_rounded,
             iconColor: Colors.teal,
-            title: '外观设置',
+            title: context.l10n.profile_appearance,
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AppearancePage()))
           ),
           _buildOptionTile(
             icon: Icons.network_check_rounded,
             iconColor: Colors.blueGrey,
-            title: '网络设置',
+            title: context.l10n.profile_networkSettings,
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const NetworkSettingsPage())),
           ),
           _buildOptionTile(
             icon: Icons.tune_rounded,
             iconColor: Colors.deepPurple,
-            title: '功能设置',
+            title: context.l10n.profile_preferences,
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PreferencesPage())),
           ),
           _buildOptionTile(
             icon: Icons.storage_rounded,
             iconColor: Colors.brown,
-            title: '数据管理',
+            title: context.l10n.profile_dataManagement,
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DataManagementPage())),
           ),
           _buildOptionTile(
             icon: Icons.info_rounded,
             iconColor: Colors.indigo,
-            title: '关于 FluxDO',
+            title: context.l10n.profile_aboutFluxDO,
             showDivider: false,
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AboutPage())),
           ),
@@ -660,7 +661,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         child: TextButton.icon(
           onPressed: _logout,
           icon: Icon(Icons.logout_rounded, size: 18, color: theme.colorScheme.error.withValues(alpha:0.8)),
-          label: Text('退出当前账号', style: TextStyle(color: theme.colorScheme.error.withValues(alpha:0.8), fontWeight: FontWeight.w600)),
+          label: Text(context.l10n.profile_logoutCurrentAccount, style: TextStyle(color: theme.colorScheme.error.withValues(alpha:0.8), fontWeight: FontWeight.w600)),
           style: TextButton.styleFrom(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             backgroundColor: theme.colorScheme.errorContainer.withValues(alpha:0.1),
@@ -674,7 +675,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         child: FilledButton.icon(
           onPressed: _goToLogin,
           icon: const Icon(Icons.login_rounded, size: 20),
-          label: const Text('登录 Linux.do', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          label: Text(context.l10n.profile_loginLinuxDo, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           style: FilledButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 16),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -776,7 +777,7 @@ class _ProfileInfoSection extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          name ?? username ?? (isLoggedIn ? '加载中...' : '未登录'),
+          name ?? username ?? (isLoggedIn ? context.l10n.common_loading : context.l10n.profile_notLoggedIn),
           style: theme.textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.bold,
             fontSize: 22,
@@ -818,7 +819,7 @@ class _ProfileInfoSection extends ConsumerWidget {
         ] else ...[
           const SizedBox(height: 4),
           Text(
-            '登录后体验更多功能',
+            context.l10n.profile_loginForMore,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -914,15 +915,15 @@ class _ProfileAvatarState extends State<_ProfileAvatar> with AutomaticKeepAliveC
 String _getTrustLevelLabel(int level) {
   switch (level) {
     case 0:
-      return 'L0 新 user';
+      return S.current.user_trustLevel0;
     case 1:
-      return 'L1 基本用户';
+      return S.current.user_trustLevel1;
     case 2:
-      return 'L2 成员';
+      return S.current.user_trustLevel2;
     case 3:
-      return 'L3 活跃用户';
+      return S.current.user_trustLevel3;
     case 4:
-      return 'L4 领袖';
+      return S.current.user_trustLevel4;
     default:
       return 'L$level';
   }

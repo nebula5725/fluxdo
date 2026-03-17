@@ -13,6 +13,7 @@ import '../providers/preferences_provider.dart';
 import 'topic_detail_page/topic_detail_page.dart';
 import 'package:dio/dio.dart';
 import '../services/app_error_handler.dart';
+import '../l10n/s.dart';
 import 'user_profile_page.dart';
 
 /// 搜索页面
@@ -499,7 +500,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
           textAlignVertical: TextAlignVertical.center,
           style: Theme.of(context).textTheme.bodyLarge,
           decoration: InputDecoration(
-            hintText: '搜索 @用户 #分类 tags:标签',
+            hintText: context.l10n.search_hintText,
             border: InputBorder.none,
             isDense: true,
             contentPadding: const EdgeInsets.symmetric(
@@ -521,7 +522,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () => _onSearch(_searchController.text),
-            tooltip: '搜索',
+            tooltip: context.l10n.common_search,
           ),
           // 过滤器按钮
           Stack(
@@ -529,7 +530,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               IconButton(
                 icon: const Icon(Icons.tune),
                 onPressed: _openFilterPanel,
-                tooltip: '高级搜索',
+                tooltip: context.l10n.search_advancedSearch,
               ),
               if (_filter.isNotEmpty)
                 Positioned(
@@ -588,7 +589,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '最近搜索',
+                  context.l10n.search_recentSearches,
                   style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: theme.colorScheme.onSurfaceVariant,
@@ -608,7 +609,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                           ),
                         )
                       : Text(
-                          '清空',
+                          context.l10n.common_clear,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.primary,
                           ),
@@ -633,7 +634,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
           Icon(Icons.search, size: 64, color: theme.colorScheme.outline),
           const SizedBox(height: 16),
           Text(
-            '输入关键词搜索',
+            context.l10n.search_emptyHint,
             style: theme.textTheme.bodyLarge?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -709,7 +710,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             child: Row(
               children: [
                 Text(
-                  '排序：',
+                  context.l10n.search_sortLabel,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -775,7 +776,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                   const SizedBox(width: 8),
                 ],
                 Text(
-                  '${_allPosts.length}${_hasMorePosts ? '+' : ''} 条结果',
+                  context.l10n.search_resultCount(_allPosts.length, _hasMorePosts ? '+' : ''),
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.outline,
                   ),
@@ -841,7 +842,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                 return Padding(
                   padding: const EdgeInsets.only(top: 16, bottom: 8),
                   child: _buildSectionHeader(
-                    '用户',
+                    context.l10n.search_users,
                     _allUsers.length,
                     _hasMoreUsers,
                   ),
@@ -884,7 +885,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                           Icon(Icons.refresh, size: 16, color: Theme.of(context).colorScheme.primary),
                           const SizedBox(width: 6),
                           Text(
-                            '加载失败，点击重试',
+                            context.l10n.common_loadFailedTapRetry,
                             style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.primary),
                           ),
                         ],
@@ -918,7 +919,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         children: [
           Icon(Icons.error_outline, size: 48, color: theme.colorScheme.error),
           const SizedBox(height: 16),
-          Text('搜索出错', style: theme.textTheme.titleMedium),
+          Text(context.l10n.search_error, style: theme.textTheme.titleMedium),
           const SizedBox(height: 8),
           Text(
             error,
@@ -941,14 +942,14 @@ class _SearchPageState extends ConsumerState<SearchPage> {
           Icon(Icons.search_off, size: 64, color: theme.colorScheme.outline),
           const SizedBox(height: 16),
           Text(
-            '没有找到相关结果',
+            context.l10n.search_noResults,
             style: theme.textTheme.bodyLarge?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            '请尝试其他关键词',
+            context.l10n.search_tryOtherKeywords,
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.outline,
             ),

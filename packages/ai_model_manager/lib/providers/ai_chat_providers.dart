@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:uuid/uuid.dart';
 
+import '../l10n/ai_l10n.dart';
 import '../models/ai_provider.dart';
 import '../models/ai_chat_message.dart';
 import '../services/ai_chat_service.dart';
@@ -521,13 +522,14 @@ class TopicAiChatNotifier extends StateNotifier<TopicAiChatState> {
 
   /// 构建系统提示
   String _buildSystemPrompt(TopicContext? topicContext) {
+    final l10n = AiL10n.current;
     final buffer = StringBuffer();
-    buffer.writeln('你是一个有帮助的 AI 助手，正在帮助用户理解和讨论一个论坛话题。');
+    buffer.writeln(l10n.systemPromptIntro);
     if (topicContext != null) {
-      buffer.writeln('话题标题：${topicContext.title}');
-      buffer.writeln('用户可能会就话题内容向你提问，请基于提供的上下文回答。');
+      buffer.writeln(l10n.systemPromptTopicTitle(topicContext.title));
+      buffer.writeln(l10n.systemPromptContextHint);
     }
-    buffer.writeln('请用 Markdown 格式回复。');
+    buffer.writeln(l10n.systemPromptMarkdown);
     return buffer.toString();
   }
 
@@ -542,10 +544,10 @@ class TopicAiChatNotifier extends StateNotifier<TopicAiChatState> {
     if (topicContext != null) {
       final contextText = _buildContextText(topicContext, contextScope);
       if (contextText.isNotEmpty) {
-        result.add({'role': 'user', 'content': '以下是话题内容：\n$contextText'});
+        result.add({'role': 'user', 'content': AiL10n.current.contextContentPrefix(contextText)});
         result.add({
           'role': 'assistant',
-          'content': '好的，我已经阅读了话题内容。请问你有什么问题？',
+          'content': AiL10n.current.contextReadyResponse,
         });
       }
     }
@@ -648,7 +650,7 @@ class TopicAiChatNotifier extends StateNotifier<TopicAiChatState> {
         messages: [
           {'role': 'user', 'content': userMsg},
         ],
-        systemPrompt: '请用不超过15个字概括用户这段话的主题，直接输出标题文字，不要加标点符号和引号。',
+        systemPrompt: AiL10n.current.titleGenerationPrompt,
       );
 
       final buffer = StringBuffer();

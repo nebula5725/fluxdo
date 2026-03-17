@@ -1,20 +1,22 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import '../l10n/ai_l10n.dart';
 import '../models/ai_provider.dart';
 
 /// AI 供应商 API 服务
 class AiProviderApiService {
   /// 从 DioException 中提取用户友好的错误信息
   static String friendlyError(Object error) {
+    final l10n = AiL10n.current;
     if (error is DioException) {
       switch (error.type) {
         case DioExceptionType.connectionTimeout:
         case DioExceptionType.sendTimeout:
         case DioExceptionType.receiveTimeout:
-          return '连接超时，请检查网络或 Base URL 是否正确';
+          return l10n.connectionTimeoutError;
         case DioExceptionType.connectionError:
-          return '无法连接到服务器，请检查 Base URL 是否正确';
+          return l10n.cannotConnectError;
         case DioExceptionType.badResponse:
           final statusCode = error.response?.statusCode;
           final body = error.response?.data;
@@ -27,29 +29,29 @@ class AiProviderApiService {
             apiMessage ??= body['message'] as String?;
           }
           if (statusCode == 401) {
-            return 'API Key 无效或已过期 (401)';
+            return l10n.apiKeyInvalidError;
           } else if (statusCode == 403) {
-            return '没有访问权限，请检查 API Key (403)';
+            return l10n.noAccessPermissionError;
           } else if (statusCode == 404) {
-            return '接口地址不存在，请检查 Base URL (404)';
+            return l10n.endpointNotFoundError;
           } else if (statusCode == 429) {
-            return '请求过于频繁，请稍后重试 (429)';
+            return l10n.tooManyRequestsError;
           } else if (statusCode != null && statusCode >= 500) {
-            return '服务器内部错误 ($statusCode)';
+            return l10n.serverInternalError(statusCode);
           }
           if (apiMessage != null) {
             return apiMessage;
           }
-          return '请求失败 ($statusCode)';
+          return l10n.requestFailed(statusCode ?? 0);
         case DioExceptionType.cancel:
-          return '请求已取消';
+          return l10n.requestCancelled;
         case DioExceptionType.badCertificate:
-          return 'SSL 证书验证失败';
+          return l10n.sslCertificateError;
         case DioExceptionType.unknown:
           if (error.error is SocketException) {
-            return '网络连接失败，请检查网络设置';
+            return l10n.networkConnectionFailed;
           }
-          return '未知网络错误';
+          return l10n.unknownNetworkError;
       }
     }
     return error.toString();

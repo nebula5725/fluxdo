@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../l10n/s.dart';
 import '../../../services/network/proxy/proxy_settings_service.dart';
 import '../../../services/network/proxy/shadowsocks_uri_parser.dart';
 import '../../../services/network/vpn_auto_toggle_service.dart';
@@ -47,13 +48,13 @@ class HttpProxyCard extends StatelessWidget {
           child: Column(
             children: [
               SwitchListTile(
-                title: const Text('上游代理'),
+                title: Text(context.l10n.httpProxy_title),
                 subtitle: Text(
                   isSuppressedByVpn
-                      ? '已被 VPN 自动关闭，VPN 断开后将自动恢复'
+                      ? context.l10n.httpProxy_suppressedByVpn
                       : proxySettings.enabled
-                          ? '已启用 ${proxySettings.protocol.displayName} 上游代理，由本地网关统一转发'
-                          : '为本地网关配置远端 HTTP / SOCKS5 / Shadowsocks 代理',
+                          ? context.l10n.httpProxy_enabledDesc(proxySettings.protocol.displayName)
+                          : context.l10n.httpProxy_disabledDesc,
                 ),
                 secondary: Icon(
                   proxySettings.enabled ? Icons.vpn_key : Icons.vpn_key_outlined,
@@ -99,11 +100,11 @@ class HttpProxyCard extends StatelessWidget {
                 ),
                 ListTile(
                   leading: const Icon(Icons.dns),
-                  title: const Text('上游代理服务器'),
+                  title: Text(context.l10n.httpProxy_server),
                   subtitle: Text(
                     proxySettings.host.isNotEmpty
                         ? _buildProxySummary(proxySettings)
-                        : '未配置',
+                        : context.l10n.common_notConfigured,
                   ),
                   trailing: const Icon(Icons.edit, size: 20),
                   onTap: () => _showProxyConfigDialog(context, proxySettings),
@@ -117,8 +118,8 @@ class HttpProxyCard extends StatelessWidget {
                   ),
                   ListTile(
                     leading: const Icon(Icons.person),
-                    title: const Text('认证'),
-                    subtitle: Text('用户名: ${proxySettings.username}'),
+                    title: Text(context.l10n.httpProxy_auth),
+                    subtitle: Text(context.l10n.httpProxy_username(proxySettings.username!)),
                     dense: true,
                   ),
                 ],
@@ -131,7 +132,7 @@ class HttpProxyCard extends StatelessWidget {
                     _resolveTestIcon(isTesting, testResult),
                     color: _resolveTestColor(theme, isTesting, testResult),
                   ),
-                  title: const Text('测试代理可用性'),
+                  title: Text(context.l10n.httpProxy_testAvailability),
                   subtitle: Text(
                     _buildTestSubtitle(
                       isTesting: isTesting,
@@ -147,7 +148,7 @@ class HttpProxyCard extends StatelessWidget {
                         )
                       : TextButton(
                           onPressed: () => _runProxyTest(showToast: true),
-                          child: const Text('测试'),
+                          child: Text(context.l10n.common_test),
                         ),
                   onTap: isTesting ? null : () => _runProxyTest(showToast: true),
                 ),
@@ -164,7 +165,7 @@ class HttpProxyCard extends StatelessWidget {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            '当前会通过本地 DoH 网关转发到上游代理；关闭 DoH 时会切换为纯代理转发',
+                            context.l10n.httpProxy_dohProxyHint,
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
                             ),
@@ -187,7 +188,7 @@ class HttpProxyCard extends StatelessWidget {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          '开启后会保留代理模式开关，由本地网关统一接管 Dio、WebView 和 Shadowsocks 出口',
+                          context.l10n.httpProxy_disabledHint,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
                           ),
@@ -250,14 +251,14 @@ class HttpProxyCard extends StatelessWidget {
             final isShadowsocks2022 =
                 ProxySettingsService.isShadowsocks2022Cipher(selectedCipher);
             return AlertDialog(
-              title: const Text('配置上游代理'),
+              title: Text(dialogContext.l10n.httpProxy_configTitle),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     DropdownButtonFormField<UpstreamProxyProtocol>(
                       value: selectedProtocol,
-                      decoration: const InputDecoration(labelText: '协议'),
+                      decoration: InputDecoration(labelText: dialogContext.l10n.httpProxy_protocol),
                       items: UpstreamProxyProtocol.values
                           .map(
                             (item) => DropdownMenuItem<UpstreamProxyProtocol>(
@@ -303,21 +304,21 @@ class HttpProxyCard extends StatelessWidget {
                             });
                             ToastService.showSuccess(
                               imported.remarks?.isNotEmpty == true
-                                  ? '已导入节点：${imported.remarks}'
-                                  : 'Shadowsocks 链接导入成功',
+                                  ? S.current.httpProxy_importedNode(imported.remarks!)
+                                  : S.current.httpProxy_ssImportSuccess,
                             );
                           },
                           icon: const Icon(Icons.download_rounded),
-                          label: const Text('导入 ss:// 链接'),
+                          label: Text(S.current.httpProxy_importSsLink),
                         ),
                       ),
                     ],
                     const SizedBox(height: 12),
                     TextField(
                       controller: hostController,
-                      decoration: const InputDecoration(
-                        labelText: '服务器地址',
-                        hintText: '例如：192.168.1.1 或 proxy.example.com',
+                      decoration: InputDecoration(
+                        labelText: dialogContext.l10n.httpProxy_serverAddress,
+                        hintText: dialogContext.l10n.httpProxy_serverAddressHint,
                       ),
                       keyboardType: TextInputType.url,
                       textInputAction: TextInputAction.next,
@@ -325,9 +326,9 @@ class HttpProxyCard extends StatelessWidget {
                     const SizedBox(height: 12),
                     TextField(
                       controller: portController,
-                      decoration: const InputDecoration(
-                        labelText: '端口',
-                        hintText: '例如：8080 或 1080',
+                      decoration: InputDecoration(
+                        labelText: dialogContext.l10n.httpProxy_port,
+                        hintText: dialogContext.l10n.httpProxy_portHint,
                       ),
                       keyboardType: TextInputType.number,
                       textInputAction: TextInputAction.next,
@@ -336,7 +337,7 @@ class HttpProxyCard extends StatelessWidget {
                     if (isShadowsocks) ...[
                       DropdownButtonFormField<String>(
                         value: selectedCipher,
-                        decoration: const InputDecoration(labelText: '加密算法'),
+                        decoration: InputDecoration(labelText: dialogContext.l10n.httpProxy_cipher),
                         items: ProxySettingsService.supportedShadowsocksCiphers
                             .map(
                               (item) => DropdownMenuItem<String>(
@@ -359,9 +360,9 @@ class HttpProxyCard extends StatelessWidget {
                         controller: passwordController,
                         decoration: InputDecoration(
                           labelText:
-                              isShadowsocks2022 ? '密钥（Base64 PSK）' : '密码',
+                              isShadowsocks2022 ? dialogContext.l10n.httpProxy_keyBase64Psk : dialogContext.l10n.httpProxy_password,
                           hintText: isShadowsocks2022
-                              ? '请输入 Base64 编码后的 32 字节预共享密钥'
+                              ? dialogContext.l10n.httpProxy_base64PskHint
                               : null,
                         ),
                         obscureText: true,
@@ -377,20 +378,20 @@ class HttpProxyCard extends StatelessWidget {
                               });
                             },
                           ),
-                          const Text('需要认证'),
+                          Text(dialogContext.l10n.httpProxy_requireAuth),
                         ],
                       ),
                       if (requireAuth) ...[
                         const SizedBox(height: 8),
                         TextField(
                           controller: usernameController,
-                          decoration: const InputDecoration(labelText: '用户名'),
+                          decoration: InputDecoration(labelText: dialogContext.l10n.httpProxy_usernameLabel),
                           textInputAction: TextInputAction.next,
                         ),
                         const SizedBox(height: 12),
                         TextField(
                           controller: passwordController,
-                          decoration: const InputDecoration(labelText: '密码'),
+                          decoration: InputDecoration(labelText: dialogContext.l10n.httpProxy_password),
                           obscureText: true,
                         ),
                       ],
@@ -401,19 +402,19 @@ class HttpProxyCard extends StatelessWidget {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(dialogContext, false),
-                  child: const Text('取消'),
+                  child: Text(dialogContext.l10n.common_cancel),
                 ),
                 FilledButton(
                   onPressed: () {
                     final host = hostController.text.trim();
                     final portText = portController.text.trim();
                     if (host.isEmpty || portText.isEmpty) {
-                      ToastService.showInfo('请填写服务器地址和端口');
+                      ToastService.showInfo(S.current.httpProxy_fillServerAndPort);
                       return;
                     }
                     final port = int.tryParse(portText);
                     if (port == null || port <= 0 || port > 65535) {
-                      ToastService.showError('端口无效');
+                      ToastService.showError(S.current.httpProxy_portInvalid);
                       return;
                     }
                     if (isShadowsocks) {
@@ -422,7 +423,7 @@ class HttpProxyCard extends StatelessWidget {
                         selectedCipher,
                       );
                       if (normalizedCipher.isEmpty) {
-                        ToastService.showError('请选择受支持的 Shadowsocks 加密算法');
+                        ToastService.showError(S.current.httpProxy_selectSsCipher);
                         return;
                       }
                       final secretError =
@@ -437,7 +438,7 @@ class HttpProxyCard extends StatelessWidget {
                     }
                     Navigator.pop(dialogContext, true);
                   },
-                  child: const Text('保存'),
+                  child: Text(dialogContext.l10n.common_save),
                 ),
               ],
             );
@@ -479,11 +480,11 @@ class HttpProxyCard extends StatelessWidget {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('导入 ss:// 链接'),
+          title: Text(dialogContext.l10n.httpProxy_importSsLink),
           content: TextField(
             controller: linkController,
-            decoration: const InputDecoration(
-              labelText: 'Shadowsocks 链接',
+            decoration: InputDecoration(
+              labelText: dialogContext.l10n.httpProxy_ssLink,
               hintText: 'ss://...',
             ),
             minLines: 2,
@@ -492,12 +493,12 @@ class HttpProxyCard extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('取消'),
+              child: Text(dialogContext.l10n.common_cancel),
             ),
             FilledButton(
               onPressed: () =>
                   Navigator.pop(dialogContext, linkController.text.trim()),
-              child: const Text('导入'),
+              child: Text(dialogContext.l10n.common_import),
             ),
           ],
         );
@@ -522,7 +523,7 @@ class HttpProxyCard extends StatelessWidget {
 
   String _buildProxySummary(ProxySettings settings) {
     if (settings.isShadowsocks) {
-      final cipher = settings.cipher.trim().isEmpty ? '未设置算法' : settings.cipher;
+      final cipher = settings.cipher.trim().isEmpty ? S.current.httpProxy_cipherNotSet : settings.cipher;
       return '${settings.protocol.displayName} · ${settings.host}:${settings.port} · $cipher';
     }
     return '${settings.protocol.displayName} · ${settings.host}:${settings.port}';
@@ -556,13 +557,13 @@ class HttpProxyCard extends StatelessWidget {
   }) {
     if (isTesting) {
       return protocol == UpstreamProxyProtocol.shadowsocks
-          ? '正在校验 Shadowsocks 配置是否可由本地网关接管'
-          : '正在验证是否能通过当前代理访问 linux.do';
+          ? S.current.httpProxy_testingSsConfig
+          : S.current.httpProxy_testingProxy;
     }
     if (testResult == null) {
       return protocol == UpstreamProxyProtocol.shadowsocks
-          ? '保存后会校验 Shadowsocks 配置，并建议返回首页做实际访问验证'
-          : '保存后会自动测试，也可以手动重新测试';
+          ? S.current.httpProxy_ssConfigSaved
+          : S.current.httpProxy_proxyAutoTest;
     }
 
     final latency = testResult.latency == null

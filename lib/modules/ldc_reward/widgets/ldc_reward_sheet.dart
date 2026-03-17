@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../l10n/s.dart';
 import '../../../services/discourse_cache_manager.dart';
 import '../../../services/toast_service.dart';
 import '../providers/ldc_reward_provider.dart';
@@ -95,18 +96,18 @@ class _LdcRewardSheetState extends ConsumerState<_LdcRewardSheet> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('确认打赏'),
+        title: Text(context.l10n.reward_confirmTitle),
         content: Text(
-          '确定向 ${target.name ?? target.username} 打赏 $amount LDC 吗？',
+          context.l10n.reward_confirmMessage(target.name ?? target.username, amount.toInt()),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('取消'),
+            child: Text(context.l10n.common_cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('确认'),
+            child: Text(context.l10n.common_confirm),
           ),
         ],
       ),
@@ -119,7 +120,7 @@ class _LdcRewardSheetState extends ConsumerState<_LdcRewardSheet> {
     try {
       final credentials = ref.read(ldcRewardCredentialsProvider).value;
       if (credentials == null) {
-        ToastService.showError('请先配置打赏凭证');
+        ToastService.showError(S.current.toast_rewardNotConfigured);
         return;
       }
 
@@ -138,14 +139,14 @@ class _LdcRewardSheetState extends ConsumerState<_LdcRewardSheet> {
       if (!mounted) return;
 
       if (result.success) {
-        ToastService.showSuccess('打赏成功！');
+        ToastService.showSuccess(S.current.toast_rewardSuccess);
         Navigator.pop(context);
       } else {
-        ToastService.showError(result.errorMsg ?? '打赏失败');
+        ToastService.showError(result.errorMsg ?? S.current.toast_rewardFailed);
       }
     } catch (e) {
       if (mounted) {
-        ToastService.showError('打赏失败: $e');
+        ToastService.showError(S.current.toast_rewardError(e.toString()));
       }
     } finally {
       if (mounted) {
@@ -175,7 +176,7 @@ class _LdcRewardSheetState extends ConsumerState<_LdcRewardSheet> {
             // 标题
             Center(
               child: Text(
-                '打赏 LDC',
+                context.l10n.reward_sheetTitle,
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -216,7 +217,7 @@ class _LdcRewardSheetState extends ConsumerState<_LdcRewardSheet> {
             const SizedBox(height: 20),
 
             // 快捷金额
-            Text('选择金额', style: theme.textTheme.labelLarge),
+            Text(context.l10n.reward_selectAmount, style: theme.textTheme.labelLarge),
             const SizedBox(height: 8),
             Row(
               children: _quickAmounts.map((amount) {
@@ -258,7 +259,7 @@ class _LdcRewardSheetState extends ConsumerState<_LdcRewardSheet> {
                 FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
               ],
               decoration: InputDecoration(
-                labelText: '自定义金额',
+                labelText: context.l10n.reward_customAmount,
                 hintText: '$_minAmount - $_maxAmount',
                 suffixText: 'LDC',
                 border: const OutlineInputBorder(),
@@ -271,10 +272,10 @@ class _LdcRewardSheetState extends ConsumerState<_LdcRewardSheet> {
             TextField(
               controller: _remarkController,
               maxLength: 50,
-              decoration: const InputDecoration(
-                labelText: '备注（可选）',
-                hintText: '感谢分享！',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: context.l10n.reward_noteLabel,
+                hintText: context.l10n.reward_noteHint,
+                border: const OutlineInputBorder(),
                 isDense: true,
               ),
             ),
@@ -296,8 +297,8 @@ class _LdcRewardSheetState extends ConsumerState<_LdcRewardSheet> {
                       )
                     : Text(
                         _isAmountValid
-                            ? '打赏 $_currentAmount LDC'
-                            : '请选择或输入金额',
+                            ? context.l10n.reward_submitWithAmount(_currentAmount!.toInt())
+                            : context.l10n.reward_selectOrInputAmount,
                       ),
               ),
             ),

@@ -17,6 +17,7 @@ import '../widgets/topic/topic_item_builder.dart';
 import '../widgets/topic/topic_list_skeleton.dart';
 import '../widgets/topic/topic_preview_dialog.dart';
 import '../widgets/common/error_view.dart';
+import '../l10n/s.dart';
 import 'topic_detail_page/topic_detail_page.dart';
 
 /// 我的书签页面
@@ -85,7 +86,7 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> {
       },
       child: Scaffold(
         appBar: SearchableAppBar(
-          title: '我的书签',
+          title: context.l10n.bookmarks_title,
           isSearchMode: searchState.isSearchMode,
           onSearchPressed: () => ref
               .read(userContentSearchProvider(SearchInType.bookmarks).notifier)
@@ -100,7 +101,7 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> {
           filterActive: searchState.filter.isNotEmpty,
           onFilterPressed: () =>
               showSearchFilterPanel(context, ref, SearchInType.bookmarks),
-          searchHint: '在书签中搜索...',
+          searchHint: context.l10n.bookmarks_searchHint,
         ),
         body: Stack(
           children: [
@@ -110,9 +111,9 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> {
               child: _buildTopicList(bookmarksAsync),
             ),
             if (searchState.isSearchMode)
-              const UserContentSearchView(
+              UserContentSearchView(
                 inType: SearchInType.bookmarks,
-                emptySearchHint: '输入关键词搜索书签',
+                emptySearchHint: context.l10n.bookmarks_emptySearchHint,
               ),
           ],
         ),
@@ -164,7 +165,7 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> {
               ),
               TextSpan(
                 text: isExpired
-                    ? ' 已过期'
+                    ? context.l10n.bookmarks_expired
                     : ' ${TimeUtils.formatDetailTime(topic.bookmarkReminderAt!)}',
               ),
             ],
@@ -221,19 +222,19 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> {
     return [
       PreviewAction(
         icon: Icons.edit_outlined,
-        label: '编辑书签',
+        label: context.l10n.bookmark_editBookmark,
         color: theme.colorScheme.primary,
         onTap: () => _editBookmark(topic),
       ),
       if (topic.bookmarkReminderAt != null)
         PreviewAction(
           icon: Icons.alarm_off,
-          label: '取消提醒',
+          label: context.l10n.bookmarks_cancelReminder,
           onTap: () => _clearReminder(topic),
         ),
       PreviewAction(
         icon: Icons.delete_outline,
-        label: '删除书签',
+        label: context.l10n.common_deleteBookmark,
         color: theme.colorScheme.error,
         onTap: () => _deleteBookmark(topic),
       ),
@@ -276,7 +277,7 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> {
         bookmarkId,
         clearReminderAt: true,
       );
-      ToastService.showSuccess('已取消提醒');
+      ToastService.showSuccess(S.current.bookmarks_reminderCancelled);
     } on DioException catch (_) {
       // 网络错误已由 ErrorInterceptor 处理
     } catch (e, s) {
@@ -292,7 +293,7 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> {
       await DiscourseService().deleteBookmark(bookmarkId);
       if (!mounted) return;
       ref.read(bookmarksProvider.notifier).removeBookmarkById(bookmarkId);
-      ToastService.showSuccess('已删除书签');
+      ToastService.showSuccess(S.current.bookmarks_deleted);
     } on DioException catch (_) {
       // 网络错误已由 ErrorInterceptor 处理
     } catch (e, s) {
@@ -306,13 +307,13 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> {
       child: bookmarksAsync.when(
         data: (topics) {
           if (topics.isEmpty) {
-            return const Center(
+            return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.bookmark_border, size: 64, color: Colors.grey),
-                  SizedBox(height: 16),
-                  Text('暂无书签', style: TextStyle(color: Colors.grey)),
+                  const Icon(Icons.bookmark_border, size: 64, color: Colors.grey),
+                  const SizedBox(height: 16),
+                  Text(context.l10n.bookmarks_empty, style: const TextStyle(color: Colors.grey)),
                 ],
               ),
             );
@@ -326,12 +327,12 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> {
               if (index == topics.length) {
                 final notifier = ref.watch(bookmarksProvider.notifier);
                 if (!notifier.hasMore) {
-                  return const Padding(
-                    padding: EdgeInsets.all(16.0),
+                  return Padding(
+                    padding: const EdgeInsets.all(16.0),
                     child: Center(
                       child: Text(
-                        '没有更多了',
-                        style: TextStyle(color: Colors.grey),
+                        context.l10n.common_noMore,
+                        style: const TextStyle(color: Colors.grey),
                       ),
                     ),
                   );
@@ -348,7 +349,7 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> {
                             Icon(Icons.refresh, size: 16, color: Theme.of(context).colorScheme.primary),
                             const SizedBox(width: 6),
                             Text(
-                              '加载失败，点击重试',
+                              context.l10n.common_loadFailedTapRetry,
                               style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.primary),
                             ),
                           ],

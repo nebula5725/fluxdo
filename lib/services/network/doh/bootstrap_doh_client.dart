@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 
+import '../../../l10n/s.dart';
 import '../../network_logger.dart';
 
 /// DNS 记录类型
@@ -154,7 +155,7 @@ class BootstrapDohClient {
     }
 
     if (socket == null) {
-      throw lastError ?? SocketException('无法连接到 DOH 服务');
+      throw lastError ?? SocketException(S.current.doh_cannotConnect);
     }
 
     _cachedSocket = socket;
@@ -191,7 +192,7 @@ class BootstrapDohClient {
           }
 
           if (socket == null) {
-            throw const SocketException('无法连接到 DOH 服务');
+            throw SocketException(S.current.doh_cannotConnect);
           }
 
           // 发送 HTTP/1.1 请求，使用 keep-alive
@@ -213,7 +214,7 @@ class BootstrapDohClient {
               _closeSocket();
               continue;
             }
-            throw const HttpException('无效的 HTTP 响应');
+            throw HttpException(S.current.doh_invalidHttpResponse);
           }
 
           return _parseDnsResponse(responseBytes);
@@ -228,7 +229,7 @@ class BootstrapDohClient {
         }
       }
 
-      throw const SocketException('DOH 查询失败');
+      throw SocketException(S.current.doh_queryFailed);
     } catch (e) {
       NetworkLogger.log('[DOH] 查询失败: $host | $e');
       rethrow;
@@ -260,7 +261,7 @@ class BootstrapDohClient {
           subscription?.cancel();
           if (!completer.isCompleted) {
             completer.completeError(
-                HttpException('DOH 服务器返回错误: $statusLine'));
+                HttpException(S.current.doh_serverError(statusLine)));
           }
           return;
         }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../l10n/s.dart';
 import '../../../../models/topic.dart';
 import '../../../../providers/discourse_providers.dart';
 import '../../../../providers/preferences_provider.dart';
@@ -156,7 +157,7 @@ class _PostHeaderSectionState extends ConsumerState<PostHeaderSection> {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            widget.showStamp ? '已解决' : '待解决',
+                            widget.showStamp ? context.l10n.post_solved : context.l10n.post_unsolved,
                             style: TextStyle(
                               color: widget.showStamp ? Colors.green : theme.colorScheme.outline,
                               fontSize: 22,

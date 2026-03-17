@@ -11,6 +11,7 @@ import 'package:fluxdo/services/app_error_handler.dart';
 import 'package:fluxdo/services/toast_service.dart';
 import 'package:fluxdo/widgets/markdown_editor/markdown_renderer.dart';
 import 'package:fluxdo/widgets/topic/topic_editor_helpers.dart';
+import '../l10n/s.dart';
 
 /// 编辑话题结果
 class EditTopicResult {
@@ -143,7 +144,7 @@ class _EditTopicPageState extends ConsumerState<EditTopicPage> {
       }
     } catch (e) {
       if (mounted) {
-        ToastService.showError('加载内容失败: ${e.toString().replaceAll('Exception: ', '')}');
+        ToastService.showError(S.current.editTopic_loadContentFailed(e.toString().replaceAll('Exception: ', '')));
       }
     } finally {
       if (mounted) setState(() => _isLoadingContent = false);
@@ -181,7 +182,7 @@ class _EditTopicPageState extends ConsumerState<EditTopicPage> {
       // 预览模式下验证错误不可见，切回编辑模式并提示
       if (_showPreview) {
         _togglePreview();
-        ToastService.showInfo('请检查输入');
+        ToastService.showInfo(S.current.common_checkInput);
       }
       return;
     }
@@ -194,12 +195,12 @@ class _EditTopicPageState extends ConsumerState<EditTopicPage> {
       final contentText = _contentController.text.trim();
       if (contentText.isEmpty) {
         if (_showPreview) _togglePreview();
-        ToastService.showInfo('请输入内容');
+        ToastService.showInfo(S.current.createTopic_enterContent);
         return;
       }
       if (contentText.length < minContentLength) {
         if (_showPreview) _togglePreview();
-        ToastService.showInfo('内容至少需要 $minContentLength 个字符');
+        ToastService.showInfo(S.current.createTopic_minContentLength(minContentLength));
         return;
       }
     }
@@ -207,7 +208,7 @@ class _EditTopicPageState extends ConsumerState<EditTopicPage> {
     // 只有在有权限编辑元数据且不是私信时才验证分类
     if (_canEditMetadata && !_isPrivateMessage && _selectedCategory == null) {
       if (_showPreview) _togglePreview();
-      ToastService.showInfo('请选择分类');
+      ToastService.showInfo(S.current.createTopic_selectCategory);
       return;
     }
 
@@ -218,7 +219,7 @@ class _EditTopicPageState extends ConsumerState<EditTopicPage> {
         _selectedCategory!.minimumRequiredTags > 0 &&
         _selectedTags.length < _selectedCategory!.minimumRequiredTags) {
       if (_showPreview) _togglePreview();
-      ToastService.showInfo('此分类至少需要 ${_selectedCategory!.minimumRequiredTags} 个标签');
+      ToastService.showInfo(S.current.createTopic_minTags(_selectedCategory!.minimumRequiredTags));
       return;
     }
 
@@ -310,7 +311,7 @@ class _EditTopicPageState extends ConsumerState<EditTopicPage> {
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
-          title: Text(_isPrivateMessage ? '编辑私信' : '编辑话题'),
+          title: Text(_isPrivateMessage ? context.l10n.editTopic_editPm : context.l10n.editTopic_editTopic),
           scrolledUnderElevation: 0,
           actions: [
             Padding(
@@ -327,7 +328,7 @@ class _EditTopicPageState extends ConsumerState<EditTopicPage> {
                         height: 16,
                         child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                       )
-                    : const Text('保存'),
+                    : Text(context.l10n.common_save),
               ),
             ),
           ],
@@ -337,7 +338,7 @@ class _EditTopicPageState extends ConsumerState<EditTopicPage> {
             : categoriesAsync.when(
                 data: (categories) => _buildBody(theme, categories, canTagTopics, tagsAsync, minTitleLength),
                 loading: () => const Center(child: LoadingSpinner()),
-                error: (err, stack) => Center(child: Text('加载分类失败: $err')),
+                error: (err, stack) => Center(child: Text(context.l10n.createTopic_loadCategoryFailed(err.toString()))),
               ),
       ),
     );
@@ -358,7 +359,7 @@ class _EditTopicPageState extends ConsumerState<EditTopicPage> {
             controller: _titleController,
             enabled: _canEditMetadata,
             decoration: InputDecoration(
-              hintText: '键入一个吸引人的标题...',
+              hintText: context.l10n.createTopic_titleHint,
               hintStyle: TextStyle(
                 color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
                 fontWeight: FontWeight.normal,
@@ -376,8 +377,8 @@ class _EditTopicPageState extends ConsumerState<EditTopicPage> {
             maxLength: 200,
             buildCounter: (context, {required currentLength, required isFocused, maxLength}) => null,
             validator: _canEditMetadata ? (value) {
-              if (value == null || value.trim().isEmpty) return '请输入标题';
-              if (value.trim().length < minTitleLength) return '标题至少需要 $minTitleLength 个字符';
+              if (value == null || value.trim().isEmpty) return context.l10n.createTopic_enterTitle;
+              if (value.trim().length < minTitleLength) return context.l10n.createTopic_minTitleLength(minTitleLength);
               return null;
             } : null,
             onTap: () {
@@ -483,7 +484,7 @@ class _EditTopicPageState extends ConsumerState<EditTopicPage> {
                         child: Align(
                           alignment: Alignment.centerRight,
                           child: Text(
-                            '$_contentLength 字符',
+                            context.l10n.createTopic_charCount(_contentLength),
                             style: theme.textTheme.labelSmall?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
                             ),
@@ -497,7 +498,7 @@ class _EditTopicPageState extends ConsumerState<EditTopicPage> {
                           key: _editorKey,
                           controller: _contentController,
                           focusNode: _contentFocusNode,
-                          hintText: '正文内容 (支持 Markdown)...',
+                          hintText: context.l10n.createTopic_contentHint,
                           expands: true,
                           emojiPanelHeight: 350,
                           onTogglePreview: _togglePreview,
@@ -522,7 +523,7 @@ class _EditTopicPageState extends ConsumerState<EditTopicPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          _titleController.text.isEmpty ? '（无标题）' : _titleController.text,
+                          _titleController.text.isEmpty ? context.l10n.createTopic_noTitle : _titleController.text,
                           style: theme.textTheme.headlineSmall?.copyWith(
                             fontWeight: FontWeight.w900,
                             letterSpacing: -0.5,
@@ -549,7 +550,7 @@ class _EditTopicPageState extends ConsumerState<EditTopicPage> {
                         ),
                         if (_contentController.text.isEmpty)
                           Text(
-                            '（无内容）',
+                            context.l10n.createTopic_noContent,
                             style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
                           )
                         else
@@ -569,7 +570,7 @@ class _EditTopicPageState extends ConsumerState<EditTopicPage> {
             bottom: MediaQuery.paddingOf(context).bottom + 16,
             child: FloatingActionButton.small(
               onPressed: _togglePreview,
-              tooltip: '退出预览',
+              tooltip: context.l10n.common_exitPreview,
               child: const Icon(Icons.edit_outlined),
             ),
           ),

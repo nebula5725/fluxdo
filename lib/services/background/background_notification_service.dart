@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:workmanager/workmanager.dart';
 
+import '../../l10n/s.dart';
 import 'notification_task_handler.dart';
 import 'ios_background_fetch.dart';
 
@@ -64,8 +65,8 @@ class BackgroundNotificationService {
     FlutterForegroundTask.init(
       androidNotificationOptions: AndroidNotificationOptions(
         channelId: 'foreground_service',
-        channelName: '后台运行',
-        channelDescription: '保持 FluxDO 在后台接收通知',
+        channelName: S.current.notification_channelBackground,
+        channelDescription: S.current.notification_channelBackgroundDesc,
         channelImportance: NotificationChannelImportance.LOW,
         priority: NotificationPriority.LOW,
         // 使用应用默认图标
@@ -95,7 +96,7 @@ class BackgroundNotificationService {
     await FlutterForegroundTask.startService(
       serviceId: 200,
       notificationTitle: 'FluxDO',
-      notificationText: '正在后台运行，保持通知接收',
+      notificationText: S.current.notification_backgroundRunning,
       callback: startNotificationTaskHandler,
     );
     debugPrint('[BackgroundNotification] Android 前台服务已启动');

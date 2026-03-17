@@ -1,3 +1,5 @@
+import '../l10n/s.dart';
+
 /// 书签提醒的快捷选项
 enum BookmarkReminderOption {
   twoHours,    // 2小时后
@@ -23,15 +25,15 @@ extension BookmarkReminderOptionExt on BookmarkReminderOption {
   String get label {
     switch (this) {
       case BookmarkReminderOption.twoHours:
-        return '2小时后';
+        return S.current.bookmark_reminderTwoHours;
       case BookmarkReminderOption.tomorrow:
-        return '明天';
+        return S.current.bookmark_reminderTomorrow;
       case BookmarkReminderOption.threeDays:
-        return '3天后';
+        return S.current.bookmark_reminderThreeDays;
       case BookmarkReminderOption.nextWeek:
-        return '下周';
+        return S.current.bookmark_reminderNextWeek;
       case BookmarkReminderOption.custom:
-        return '自定义';
+        return S.current.bookmark_reminderCustom;
     }
   }
 

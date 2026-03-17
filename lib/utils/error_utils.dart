@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 import '../services/network/exceptions/api_exception.dart';
+import '../l10n/s.dart';
 
 /// 结构化错误信息（图标 + 标题 + 描述）
 class ErrorInfo {
@@ -25,10 +26,10 @@ class ErrorUtils {
   /// 获取结构化的错误信息（图标 + 标题 + 描述）
   static ErrorInfo getErrorInfo(Object? error) {
     if (error == null) {
-      return const ErrorInfo(
+      return ErrorInfo(
         icon: Icons.error_outline_rounded,
-        title: '加载失败',
-        message: '未知错误',
+        title: S.current.error_loadFailed,
+        message: S.current.error_unknown,
       );
     }
 
@@ -36,21 +37,21 @@ class ErrorUtils {
     if (error is RateLimitException) {
       return ErrorInfo(
         icon: Icons.speed_rounded,
-        title: '请求过于频繁',
+        title: S.current.error_tooManyRequests,
         message: error.toString(),
       );
     }
     if (error is ServerException) {
       return ErrorInfo(
         icon: Icons.cloud_off_rounded,
-        title: '服务器不可用',
+        title: S.current.error_serverUnavailable,
         message: error.toString(),
       );
     }
     if (error is CfChallengeException) {
       return ErrorInfo(
         icon: Icons.shield_rounded,
-        title: '安全验证',
+        title: S.current.error_securityChallenge,
         message: error.toString(),
       );
     }
@@ -62,21 +63,21 @@ class ErrorUtils {
       if (innerError is CfChallengeException) {
         return ErrorInfo(
           icon: Icons.shield_rounded,
-          title: '安全验证',
+          title: S.current.error_securityChallenge,
           message: innerError.toString(),
         );
       }
       if (innerError is RateLimitException) {
         return ErrorInfo(
           icon: Icons.speed_rounded,
-          title: '请求过于频繁',
+          title: S.current.error_tooManyRequests,
           message: innerError.toString(),
         );
       }
       if (innerError is ServerException) {
         return ErrorInfo(
           icon: Icons.cloud_off_rounded,
-          title: '服务器不可用',
+          title: S.current.error_serverUnavailable,
           message: innerError.toString(),
         );
       }
@@ -85,31 +86,31 @@ class ErrorUtils {
 
     // 网络相关异常
     if (error is SocketException) {
-      return const ErrorInfo(
+      return ErrorInfo(
         icon: Icons.signal_wifi_off_rounded,
-        title: '网络不可用',
-        message: '网络连接失败，请检查网络设置',
+        title: S.current.error_networkUnavailable,
+        message: S.current.error_networkCheckSettings,
       );
     }
     if (error is TimeoutException) {
-      return const ErrorInfo(
+      return ErrorInfo(
         icon: Icons.timer_off_rounded,
-        title: '连接超时',
-        message: '请求超时，请稍后重试',
+        title: S.current.error_connectionTimeout,
+        message: S.current.error_requestTimeoutRetry,
       );
     }
     if (error is HttpException) {
-      return const ErrorInfo(
+      return ErrorInfo(
         icon: Icons.public_off_rounded,
-        title: '请求失败',
-        message: '网络请求失败',
+        title: S.current.error_requestFailed,
+        message: S.current.error_networkRequestFailed,
       );
     }
     if (error is FormatException) {
-      return const ErrorInfo(
+      return ErrorInfo(
         icon: Icons.data_object_rounded,
-        title: '数据异常',
-        message: '服务器返回了无法识别的数据格式',
+        title: S.current.error_dataException,
+        message: S.current.error_unrecognizedDataFormat,
       );
     }
 
@@ -121,14 +122,14 @@ class ErrorUtils {
           : message;
       return ErrorInfo(
         icon: Icons.error_outline_rounded,
-        title: '加载失败',
+        title: S.current.error_loadFailed,
         message: cleaned,
       );
     }
 
     return ErrorInfo(
       icon: Icons.error_outline_rounded,
-      title: '加载失败',
+      title: S.current.error_loadFailed,
       message: error.toString(),
     );
   }
@@ -174,52 +175,52 @@ class ErrorUtils {
     switch (error.type) {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
-        return const ErrorInfo(
+        return ErrorInfo(
           icon: Icons.timer_off_rounded,
-          title: '连接超时',
-          message: '无法在规定时间内连接到服务器，请检查网络',
+          title: S.current.error_connectionTimeout,
+          message: S.current.error_cannotConnectCheckNetwork,
         );
       case DioExceptionType.receiveTimeout:
-        return const ErrorInfo(
+        return ErrorInfo(
           icon: Icons.hourglass_disabled_rounded,
-          title: '响应超时',
-          message: '服务器响应时间过长，请稍后重试',
+          title: S.current.error_responseTimeout,
+          message: S.current.error_serverResponseTooLong,
         );
       case DioExceptionType.connectionError:
-        return const ErrorInfo(
+        return ErrorInfo(
           icon: Icons.signal_wifi_off_rounded,
-          title: '网络不可用',
-          message: '网络连接失败，请检查网络设置',
+          title: S.current.error_networkUnavailable,
+          message: S.current.error_networkCheckSettings,
         );
       case DioExceptionType.badCertificate:
-        return const ErrorInfo(
+        return ErrorInfo(
           icon: Icons.gpp_bad_rounded,
-          title: '证书异常',
-          message: '服务器证书验证失败，请检查网络环境',
+          title: S.current.error_certificateError,
+          message: S.current.error_certificateVerifyFailed,
         );
       case DioExceptionType.cancel:
-        return const ErrorInfo(
+        return ErrorInfo(
           icon: Icons.cancel_outlined,
-          title: '请求取消',
-          message: '请求已取消',
+          title: S.current.error_requestCancelled,
+          message: S.current.error_requestCancelledMsg,
         );
       default:
         // unknown 类型，检查内部 error
         if (error.error is SocketException) {
-          return const ErrorInfo(
+          return ErrorInfo(
             icon: Icons.signal_wifi_off_rounded,
-            title: '网络不可用',
-            message: '网络连接失败，请检查网络设置',
+            title: S.current.error_networkUnavailable,
+            message: S.current.error_networkCheckSettings,
           );
         }
         // 检查错误信息中的网络错误模式（如 Chromium/Cronet 的 net:: 错误）
         final errorStr = error.error?.toString().toUpperCase() ?? '';
         if (errorStr.contains('TIMED_OUT') ||
             errorStr.contains('TIMEOUT')) {
-          return const ErrorInfo(
+          return ErrorInfo(
             icon: Icons.timer_off_rounded,
-            title: '连接超时',
-            message: '无法在规定时间内连接到服务器，请检查网络',
+            title: S.current.error_connectionTimeout,
+            message: S.current.error_cannotConnectCheckNetwork,
           );
         }
         if (errorStr.contains('CONNECTION_REFUSED') ||
@@ -230,19 +231,19 @@ class ErrorUtils {
             errorStr.contains('ADDRESS_UNREACHABLE') ||
             errorStr.contains('INTERNET_DISCONNECTED') ||
             errorStr.contains('NETWORK_CHANGED')) {
-          return const ErrorInfo(
+          return ErrorInfo(
             icon: Icons.signal_wifi_off_rounded,
-            title: '网络不可用',
-            message: '网络连接失败，请检查网络设置',
+            title: S.current.error_networkUnavailable,
+            message: S.current.error_networkCheckSettings,
           );
         }
         if (errorStr.contains('SSL') ||
             errorStr.contains('CERT') ||
             errorStr.contains('CERTIFICATE')) {
-          return const ErrorInfo(
+          return ErrorInfo(
             icon: Icons.gpp_bad_rounded,
-            title: '证书异常',
-            message: '服务器证书验证失败，请检查网络环境',
+            title: S.current.error_certificateError,
+            message: S.current.error_certificateVerifyFailed,
           );
         }
         // 尝试从响应中提取错误信息
@@ -252,7 +253,7 @@ class ErrorUtils {
           if (errorMsg is String && errorMsg.isNotEmpty) {
             return ErrorInfo(
               icon: Icons.error_outline_rounded,
-              title: '请求失败',
+              title: S.current.error_requestFailed,
               message: errorMsg,
             );
           }
@@ -260,15 +261,15 @@ class ErrorUtils {
           if (errors is List && errors.isNotEmpty) {
             return ErrorInfo(
               icon: Icons.error_outline_rounded,
-              title: '请求失败',
+              title: S.current.error_requestFailed,
               message: errors.first.toString(),
             );
           }
         }
-        return const ErrorInfo(
+        return ErrorInfo(
           icon: Icons.public_off_rounded,
-          title: '请求失败',
-          message: '网络请求失败',
+          title: S.current.error_requestFailed,
+          message: S.current.error_networkRequestFailed,
         );
     }
   }
@@ -293,64 +294,64 @@ class ErrorUtils {
       case 400:
         return ErrorInfo(
           icon: Icons.error_outline_rounded,
-          title: '请求错误',
-          message: serverMessage ?? '请求参数错误',
+          title: S.current.error_badRequest,
+          message: serverMessage ?? S.current.error_badRequestParams,
         );
       case 401:
         return ErrorInfo(
           icon: Icons.lock_outline_rounded,
-          title: '未登录',
-          message: serverMessage ?? '未登录或登录已过期',
+          title: S.current.error_unauthorized,
+          message: serverMessage ?? S.current.error_unauthorizedExpired,
         );
       case 403:
         return ErrorInfo(
           icon: Icons.block_rounded,
-          title: '没有权限',
-          message: serverMessage ?? '没有权限访问',
+          title: S.current.error_forbidden,
+          message: serverMessage ?? S.current.error_forbiddenAccess,
         );
       case 404:
         return ErrorInfo(
           icon: Icons.explore_off_rounded,
-          title: '内容不存在',
-          message: serverMessage ?? '内容不存在或已被删除',
+          title: S.current.error_notFound,
+          message: serverMessage ?? S.current.error_notFoundOrDeleted,
         );
       case 410:
         return ErrorInfo(
           icon: Icons.delete_outline_rounded,
-          title: '已删除',
-          message: serverMessage ?? '内容已被删除',
+          title: S.current.error_gone,
+          message: serverMessage ?? S.current.error_contentDeleted,
         );
       case 422:
         return ErrorInfo(
           icon: Icons.warning_amber_rounded,
-          title: '无法处理',
-          message: serverMessage ?? '请求无法处理',
+          title: S.current.error_unprocessable,
+          message: serverMessage ?? S.current.error_requestUnprocessable,
         );
       case 429:
         return ErrorInfo(
           icon: Icons.speed_rounded,
-          title: '请求过于频繁',
-          message: serverMessage ?? '请求过于频繁，请稍后再试',
+          title: S.current.error_rateLimited,
+          message: serverMessage ?? S.current.error_rateLimitedRetryLater,
         );
       case 500:
         return ErrorInfo(
           icon: Icons.cloud_off_rounded,
-          title: '服务器错误',
-          message: serverMessage ?? '服务器内部错误',
+          title: S.current.error_serverError,
+          message: serverMessage ?? S.current.error_internalServerError,
         );
       case 502:
       case 503:
       case 504:
         return ErrorInfo(
           icon: Icons.cloud_off_rounded,
-          title: '服务器不可用',
-          message: serverMessage ?? '服务器暂时不可用，请稍后重试',
+          title: S.current.error_serviceUnavailable,
+          message: serverMessage ?? S.current.error_serviceUnavailableRetry,
         );
       default:
         return ErrorInfo(
           icon: Icons.error_outline_rounded,
-          title: '请求失败',
-          message: serverMessage ?? '请求失败 ($statusCode)',
+          title: S.current.error_requestFailed,
+          message: serverMessage ?? S.current.error_requestFailedWithCode(statusCode ?? 0),
         );
     }
   }

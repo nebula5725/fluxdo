@@ -207,18 +207,18 @@ mixin _UploadsMixin on _DiscourseServiceBase {
         }
       }
 
-      throw Exception('上传响应中未包含 URL');
+      throw Exception(S.current.error_uploadNoUrl);
     } on DioException catch (e) {
       debugPrint('[DiscourseService] Upload image failed: $e');
       if (e.response?.statusCode == 413) {
-        throw Exception('图片文件过大，请压缩后重试');
+        throw Exception(S.current.error_imageTooBig);
       }
       if (e.response?.statusCode == 422) {
         final data = e.response?.data;
         if (data is Map && data['errors'] != null) {
           throw Exception((data['errors'] as List).join('\n'));
         }
-        throw Exception('图片格式不支持或不符合要求');
+        throw Exception(S.current.error_imageFormatUnsupported);
       }
       rethrow;
     } catch (e) {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:url_launcher/url_launcher.dart';
+import '../l10n/s.dart';
 import '../services/update_service.dart';
 
 class UpdateDialog extends StatelessWidget {
@@ -84,7 +85,7 @@ class UpdateDialog extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '发现新版本',
+                            context.l10n.update_newVersionFound,
                             style: theme.textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.bold,
                               fontSize: 18,
@@ -119,7 +120,7 @@ class UpdateDialog extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
                     child: Text(
-                      '更新内容',
+                      context.l10n.update_changelog,
                       style: theme.textTheme.labelMedium?.copyWith(
                         color: colorScheme.primary,
                         fontWeight: FontWeight.bold,
@@ -167,8 +168,8 @@ class UpdateDialog extends StatelessWidget {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: const Text('立即更新',
-                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        child: Text(context.l10n.update_now,
+                            style: const TextStyle(fontWeight: FontWeight.bold)),
                       ),
                       const SizedBox(height: 12),
                       Row(
@@ -184,7 +185,7 @@ class UpdateDialog extends StatelessWidget {
                                 minimumSize: Size.zero,
                                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                               ),
-                              child: const Text('不再提醒', style: TextStyle(fontSize: 13)),
+                              child: Text(context.l10n.update_dontRemind, style: const TextStyle(fontSize: 13)),
                             ),
                           if (onOpenReleasePage != null)
                              TextButton(
@@ -196,7 +197,7 @@ class UpdateDialog extends StatelessWidget {
                                  minimumSize: Size.zero,
                                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                               ),
-                              child: const Text('查看详情', style: TextStyle(fontSize: 13)),
+                              child: Text(context.l10n.common_viewDetails, style: const TextStyle(fontSize: 13)),
                             ),
                           const Spacer(),
                           TextButton(
@@ -208,7 +209,7 @@ class UpdateDialog extends StatelessWidget {
                                minimumSize: Size.zero,
                                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                             ),
-                            child: const Text('稍后', style: TextStyle(fontSize: 13)),
+                            child: Text(context.l10n.common_later, style: const TextStyle(fontSize: 13)),
                           ),
                         ],
                       ),

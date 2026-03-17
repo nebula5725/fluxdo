@@ -1,5 +1,6 @@
 // 帖子数据模型
 import 'package:flutter/foundation.dart' show listEquals;
+import '../l10n/s.dart';
 import '../utils/time_utils.dart';
 import '../utils/url_helper.dart';
 import 'user.dart';
@@ -49,15 +50,31 @@ class Tag {
 
 /// 话题订阅级别
 enum TopicNotificationLevel {
-  muted(0, '静音', '不接收任何通知'),
-  regular(1, '常规', '只在被 @ 提及或回复时通知'),
-  tracking(2, '跟踪', '显示未读计数'),
-  watching(3, '关注', '每个新回复都通知');
+  muted(0),
+  regular(1),
+  tracking(2),
+  watching(3);
 
-  const TopicNotificationLevel(this.value, this.label, this.description);
+  const TopicNotificationLevel(this.value);
   final int value;
-  final String label;
-  final String description;
+
+  String get label {
+    switch (this) {
+      case TopicNotificationLevel.muted: return S.current.topic_levelMuted;
+      case TopicNotificationLevel.regular: return S.current.topic_levelRegular;
+      case TopicNotificationLevel.tracking: return S.current.topic_levelTracking;
+      case TopicNotificationLevel.watching: return S.current.topic_levelWatching;
+    }
+  }
+
+  String get description {
+    switch (this) {
+      case TopicNotificationLevel.muted: return S.current.topic_levelMutedDesc;
+      case TopicNotificationLevel.regular: return S.current.topic_levelRegularDesc;
+      case TopicNotificationLevel.tracking: return S.current.topic_levelTrackingDesc;
+      case TopicNotificationLevel.watching: return S.current.topic_levelWatchingDesc;
+    }
+  }
 
   static TopicNotificationLevel fromValue(int? value) {
     return TopicNotificationLevel.values.firstWhere(
@@ -1491,36 +1508,36 @@ class FlagType {
   bool get appliesToPost => appliesTo.contains('Post');
 
   /// 默认的举报类型列表（作为后备）
-  static const List<FlagType> defaultTypes = [
+  static List<FlagType> get defaultTypes => [
     FlagType(
       id: 3,
       nameKey: 'off_topic',
-      name: '离题',
-      description: '此帖子与当前讨论无关，应该移动到其他话题',
+      name: S.current.topic_flagOffTopic,
+      description: S.current.topic_flagOffTopicDesc,
       isFlag: true,
       position: 1,
     ),
     FlagType(
       id: 4,
       nameKey: 'inappropriate',
-      name: '不当内容',
-      description: '此帖子包含不适当的内容',
+      name: S.current.topic_flagInappropriate,
+      description: S.current.topic_flagInappropriateDesc,
       isFlag: true,
       position: 2,
     ),
     FlagType(
       id: 8,
       nameKey: 'spam',
-      name: '垃圾信息',
-      description: '此帖子是广告或垃圾信息',
+      name: S.current.topic_flagSpam,
+      description: S.current.topic_flagSpamDesc,
       isFlag: true,
       position: 3,
     ),
     FlagType(
       id: 7,
       nameKey: 'notify_moderators',
-      name: '其他问题',
-      description: '需要版主关注的其他问题',
+      name: S.current.topic_flagOther,
+      description: S.current.topic_flagOtherDesc,
       isFlag: true,
       requireMessage: true,
       position: 4,

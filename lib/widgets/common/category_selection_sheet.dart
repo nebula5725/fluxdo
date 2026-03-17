@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:fluxdo/l10n/s.dart';
 import 'package:fluxdo/models/category.dart';
 import 'package:fluxdo/utils/font_awesome_helper.dart';
 import 'package:fluxdo/services/discourse_cache_manager.dart';
@@ -133,7 +134,7 @@ class _CategorySelectionSheetState extends State<CategorySelectionSheet> {
                               textAlignVertical: TextAlignVertical.center,
                               style: const TextStyle(fontSize: 16),
                               decoration: InputDecoration(
-                                hintText: '搜索分类...',
+                                hintText: context.l10n.category_searchHint,
                                 hintStyle: TextStyle(color: theme.colorScheme.onSurfaceVariant),
                                 border: InputBorder.none,
                                 isDense: true,
@@ -161,7 +162,7 @@ class _CategorySelectionSheetState extends State<CategorySelectionSheet> {
                             visualDensity: VisualDensity.compact,
                             padding: const EdgeInsets.symmetric(horizontal: 8),
                           ),
-                          child: const Text('取消'),
+                          child: Text(context.l10n.common_cancel),
                         ),
                       ],
                     ),
@@ -174,7 +175,7 @@ class _CategorySelectionSheetState extends State<CategorySelectionSheet> {
                 child: items.isEmpty
                   ? Center(
                       child: Text(
-                        _searchQuery.isEmpty ? '暂无分类' : '未找到相关分类',
+                        _searchQuery.isEmpty ? context.l10n.category_noCategories : context.l10n.category_noCategoriesFound,
                         style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
                       ),
                     )

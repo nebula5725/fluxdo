@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../l10n/s.dart';
 
 /// 解决方案跳转横幅（仅在主贴显示）
 class PostSolutionBanner extends StatelessWidget {
@@ -77,7 +78,7 @@ class PostSolutionBanner extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '此话题已解决',
+                          context.l10n.post_topicSolved,
                           style: theme.textTheme.titleSmall?.copyWith(
                             color: Colors.green.shade800,
                             fontWeight: FontWeight.w800,
@@ -88,7 +89,7 @@ class PostSolutionBanner extends StatelessWidget {
                         Row(
                           children: [
                             Text(
-                              '查看最佳答案',
+                              context.l10n.post_viewBestAnswer,
                               style: theme.textTheme.bodySmall?.copyWith(
                                 color: Colors.green.shade700,
                                 fontWeight: FontWeight.w500,

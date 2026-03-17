@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/toast_service.dart';
 import 'image_compression_strategy.dart';
 import 'image_editor_i18n_zh.dart';
+import '../../../../../l10n/s.dart';
 
 /// 图片上传确认弹框结果
 class ImageUploadResult {
@@ -93,7 +94,7 @@ class _ImageUploadDialogState extends State<ImageUploadDialog> {
 
   Future<void> _editImage() async {
     if (!_compressionStrategy.canEdit) {
-      ToastService.showError('${_compressionStrategy.displayName} 暂不支持编辑，否则会丢失动画');
+      ToastService.showError(S.current.imageUpload_editNotSupported(_compressionStrategy.displayName));
       return;
     }
 
@@ -107,7 +108,7 @@ class _ImageUploadDialogState extends State<ImageUploadDialog> {
             },
           ),
           configs: ProImageEditorConfigs(
-            i18n: kImageEditorI18nZh,
+            i18n: buildImageEditorI18nZh(),
             imageGeneration: ImageGenerationConfigs(
               outputFormat: _editorOutputFormat,
               maxOutputSize: Size(1920, 1920),
@@ -122,7 +123,7 @@ class _ImageUploadDialogState extends State<ImageUploadDialog> {
       final tempDir = await getTemporaryDirectory();
       final editedPath = p.join(
         tempDir.path,
-        'edited_${DateTime.now().millisecondsSinceEpoch}.${_editorExtension}',
+        'edited_${DateTime.now().millisecondsSinceEpoch}.$_editorExtension',
       );
       await File(editedPath).writeAsBytes(result);
 
@@ -162,7 +163,7 @@ class _ImageUploadDialogState extends State<ImageUploadDialog> {
       ));
     } catch (e) {
       if (!mounted) return;
-      ToastService.showError('处理图片失败: $e');
+      ToastService.showError(S.current.imageUpload_processFailed(e.toString()));
       setState(() => _isProcessing = false);
     }
   }
@@ -172,7 +173,7 @@ class _ImageUploadDialogState extends State<ImageUploadDialog> {
     final theme = Theme.of(context);
 
     return AlertDialog(
-      title: const Text('上传图片确认'),
+      title: Text(S.current.imageUpload_confirmTitle),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -206,7 +207,7 @@ class _ImageUploadDialogState extends State<ImageUploadDialog> {
               Padding(
                 padding: const EdgeInsets.only(bottom: 12),
                 child: Text(
-                  '${_compressionStrategy.displayName} 将保留原图上传，不执行客户端压缩。',
+                  S.current.imageUpload_keepOriginal(_compressionStrategy.displayName),
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.outline,
                   ),
@@ -216,7 +217,7 @@ class _ImageUploadDialogState extends State<ImageUploadDialog> {
             // 压缩质量滑块
             Row(
               children: [
-                Text('压缩质量：', style: theme.textTheme.bodyMedium),
+                Text(S.current.imageUpload_compressionQuality, style: theme.textTheme.bodyMedium),
                 Expanded(
                   child: Slider(
                     value: _quality.toDouble(),
@@ -268,7 +269,7 @@ class _ImageUploadDialogState extends State<ImageUploadDialog> {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      '原始大小：${_formatFileSize(_originalSize!)}',
+                      S.current.imageUpload_originalSize(_formatFileSize(_originalSize!)),
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.outline,
                       ),
@@ -284,7 +285,7 @@ class _ImageUploadDialogState extends State<ImageUploadDialog> {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        '约 ${_formatFileSize(_estimatedSize!)}',
+                        S.current.imageUpload_estimatedSize(_formatFileSize(_estimatedSize!)),
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.primary,
                           fontWeight: FontWeight.w500,
@@ -301,7 +302,7 @@ class _ImageUploadDialogState extends State<ImageUploadDialog> {
             OutlinedButton.icon(
               onPressed: _isProcessing || !_compressionStrategy.canEdit ? null : _editImage,
               icon: const Icon(Icons.edit),
-              label: Text(_compressionStrategy.canEdit ? '编辑图片' : '当前格式不支持编辑'),
+              label: Text(_compressionStrategy.canEdit ? S.current.imageUpload_editImage : S.current.imageUpload_editNotSupportedLabel),
             ),
           ],
         ),
@@ -309,7 +310,7 @@ class _ImageUploadDialogState extends State<ImageUploadDialog> {
       actions: [
         TextButton(
           onPressed: _isProcessing ? null : () => Navigator.of(context).pop(),
-          child: const Text('取消'),
+          child: Text(S.current.common_cancel),
         ),
         FilledButton(
           onPressed: _isProcessing ? null : _submit,
@@ -319,7 +320,7 @@ class _ImageUploadDialogState extends State<ImageUploadDialog> {
                   height: 16,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : const Text('上传'),
+              : Text(S.current.common_upload),
         ),
       ],
     );
@@ -445,7 +446,7 @@ class _MultiImageUploadDialogState extends State<MultiImageUploadDialog> {
 
   void _removeItem(int index) {
     if (_items.length <= 1) {
-      ToastService.showInfo('至少需要保留一张图片');
+      ToastService.showInfo(S.current.imageUpload_keepAtLeastOne);
       return;
     }
     setState(() => _items.removeAt(index));
@@ -470,7 +471,7 @@ class _MultiImageUploadDialogState extends State<MultiImageUploadDialog> {
       Navigator.of(context).pop(results);
     } catch (e) {
       if (!mounted) return;
-      ToastService.showError('处理图片失败: $e');
+      ToastService.showError(S.current.imageUpload_processFailed(e.toString()));
       setState(() => _isProcessing = false);
     }
   }
@@ -480,7 +481,7 @@ class _MultiImageUploadDialogState extends State<MultiImageUploadDialog> {
     final theme = Theme.of(context);
 
     return AlertDialog(
-      title: Text('上传 ${_items.length} 张图片'),
+      title: Text(S.current.imageUpload_multiTitle(_items.length)),
       content: SizedBox(
         width: double.maxFinite,
         child: SingleChildScrollView(
@@ -575,7 +576,7 @@ class _MultiImageUploadDialogState extends State<MultiImageUploadDialog> {
               // 压缩质量滑块
               Row(
                 children: [
-                  Text('压缩质量：', style: theme.textTheme.bodyMedium),
+                  Text(S.current.imageUpload_compressionQuality, style: theme.textTheme.bodyMedium),
                   Expanded(
                     child: Slider(
                       value: _quality.toDouble(),
@@ -620,7 +621,7 @@ class _MultiImageUploadDialogState extends State<MultiImageUploadDialog> {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        '总大小：${_formatFileSize(_totalOriginalSize)}',
+                        S.current.imageUpload_totalOriginalSize(_formatFileSize(_totalOriginalSize)),
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.outline,
                         ),
@@ -634,7 +635,7 @@ class _MultiImageUploadDialogState extends State<MultiImageUploadDialog> {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          '约 ${_formatFileSize(_totalEstimatedSize)}',
+                          S.current.imageUpload_totalEstimatedSize(_formatFileSize(_totalEstimatedSize)),
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.primary,
                             fontWeight: FontWeight.w500,
@@ -659,7 +660,7 @@ class _MultiImageUploadDialogState extends State<MultiImageUploadDialog> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          '上传后将自动使用 [grid] 网格布局',
+                          S.current.imageUpload_gridLayoutHint,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.primary,
                           ),
@@ -675,7 +676,7 @@ class _MultiImageUploadDialogState extends State<MultiImageUploadDialog> {
       actions: [
         TextButton(
           onPressed: _isProcessing ? null : () => Navigator.of(context).pop(),
-          child: const Text('取消'),
+          child: Text(S.current.common_cancel),
         ),
         FilledButton(
           onPressed: _isProcessing ? null : _submit,
@@ -685,7 +686,7 @@ class _MultiImageUploadDialogState extends State<MultiImageUploadDialog> {
                   height: 16,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : Text('上传 ${_items.length} 张'),
+              : Text(S.current.imageUpload_uploadCount(_items.length)),
         ),
       ],
     );

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:super_clipboard/super_clipboard.dart';
+import '../../l10n/s.dart';
 import '../../models/topic.dart';
 import '../../pages/image_viewer_page.dart';
 import '../../services/discourse_cache_manager.dart';
@@ -42,7 +43,7 @@ class ImageContextMenu {
               if (showViewFullImage)
                 ListTile(
                   leading: const Icon(Icons.zoom_in),
-                  title: const Text('查看大图'),
+                  title: Text(S.current.image_viewFull),
                   onTap: () {
                     Navigator.pop(ctx);
                     ImageViewerPage.open(
@@ -54,7 +55,7 @@ class ImageContextMenu {
                 ),
               ListTile(
                 leading: const Icon(Icons.copy),
-                title: const Text('复制图片'),
+                title: Text(S.current.image_copyImage),
                 onTap: () {
                   Navigator.pop(ctx);
                   _copyImage(originalUrl);
@@ -62,16 +63,16 @@ class ImageContextMenu {
               ),
               ListTile(
                 leading: const Icon(Icons.link),
-                title: const Text('复制链接'),
+                title: Text(S.current.image_copyLink),
                 onTap: () {
                   Navigator.pop(ctx);
                   Clipboard.setData(ClipboardData(text: originalUrl));
-                  ToastService.showSuccess('链接已复制');
+                  ToastService.showSuccess(S.current.common_linkCopied);
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.share),
-                title: const Text('分享图片'),
+                title: Text(S.current.common_shareImage),
                 onTap: () {
                   Navigator.pop(ctx);
                   _shareImage(originalUrl);
@@ -80,7 +81,7 @@ class ImageContextMenu {
               if (post != null && topicId != null && onQuoteImage != null)
                 ListTile(
                   leading: const Icon(Icons.format_quote),
-                  title: const Text('引用'),
+                  title: Text(S.current.common_quote),
                   onTap: () {
                     Navigator.pop(ctx);
                     final quote = QuoteBuilder.build(
@@ -95,7 +96,7 @@ class ImageContextMenu {
               if (post != null && topicId != null)
                 ListTile(
                   leading: const Icon(Icons.copy_all),
-                  title: const Text('复制引用'),
+                  title: Text(S.current.common_copyQuote),
                   onTap: () {
                     Navigator.pop(ctx);
                     final quote = QuoteBuilder.build(
@@ -105,7 +106,7 @@ class ImageContextMenu {
                       topicId: topicId,
                     );
                     Clipboard.setData(ClipboardData(text: quote));
-                    ToastService.showSuccess('已复制引用');
+                    ToastService.showSuccess(S.current.common_quoteCopied);
                   },
                 ),
             ],
@@ -120,21 +121,21 @@ class ImageContextMenu {
     try {
       final bytes = await DiscourseCacheManager().getImageBytes(imageUrl);
       if (bytes == null || bytes.isEmpty) {
-        ToastService.showError('获取图片失败');
+        ToastService.showError(S.current.image_fetchFailed);
         return;
       }
       final clipboard = SystemClipboard.instance;
       if (clipboard == null) {
-        ToastService.showError('剪贴板不可用');
+        ToastService.showError(S.current.common_clipboardUnavailable);
         return;
       }
       final item = DataWriterItem();
       item.add(Formats.png(bytes));
       await clipboard.write([item]);
-      ToastService.showSuccess('图片已复制');
+      ToastService.showSuccess(S.current.image_copied);
     } catch (e) {
       debugPrint('[ImageContextMenu] copyImage error: $e');
-      ToastService.showError('复制图片失败');
+      ToastService.showError(S.current.image_copyFailed);
     }
   }
 
@@ -147,7 +148,7 @@ class ImageContextMenu {
       await SharePlus.instance.share(ShareParams(files: [xFile]));
     } catch (e) {
       debugPrint('[ImageContextMenu] shareImage error: $e');
-      ToastService.showError('分享失败');
+      ToastService.showError(S.current.common_shareFailed);
     }
   }
 

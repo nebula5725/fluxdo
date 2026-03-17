@@ -7,6 +7,7 @@ import 'local_notification_service.dart'; // 用于获取全局 navigatorKey
 import 'cf_challenge_logger.dart';
 import 'cf_clearance_refresh_service.dart';
 import 'toast_service.dart';
+import '../l10n/s.dart';
 import '../widgets/draggable_floating_pill.dart';
 
 /// CF 验证服务
@@ -484,7 +485,7 @@ class _CfChallengePageState extends State<CfChallengePage> {
             success: false,
             reason: 'timeout after $_activeMaxCheckCount seconds');
         if (mounted) {
-          _showError('验证超时，请重试');
+          _showError(S.current.cf_verifyTimeout);
           Future.delayed(const Duration(seconds: 2), () {
             if (mounted) _finish(false);
           });
@@ -574,7 +575,7 @@ class _CfChallengePageState extends State<CfChallengePage> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      _showInfo('自动验证超时，请手动完成验证');
+      _showInfo(S.current.cf_autoVerifyTimeout);
     });
   }
 
@@ -637,10 +638,10 @@ class _CfChallengePageState extends State<CfChallengePage> {
                       title: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('安全验证'),
+                          Text(context.l10n.cf_securityVerifyTitle),
                           if (_checkCount > 0)
                             Text(
-                              '验证中... ${_checkCount}s',
+                              context.l10n.cf_verifying(_checkCount),
                               style: theme.textTheme.bodySmall?.copyWith(
                                 color: theme.colorScheme.onSurfaceVariant,
                               ),
@@ -655,12 +656,12 @@ class _CfChallengePageState extends State<CfChallengePage> {
                         IconButton(
                           icon: const Icon(Icons.refresh),
                           onPressed: _refresh,
-                          tooltip: '刷新',
+                          tooltip: context.l10n.common_refresh,
                         ),
                         IconButton(
                           icon: const Icon(Icons.help_outline),
                           onPressed: _showHelp,
-                          tooltip: '帮助',
+                          tooltip: context.l10n.common_help,
                         ),
                       ],
                     )
@@ -718,7 +719,7 @@ class _CfChallengePageState extends State<CfChallengePage> {
                                 setState(() => _isLoading = false);
                               }
                               if (showUi) {
-                                _showError('加载失败: ${error.description}');
+                                _showError(context.l10n.cf_loadFailed(error.description));
                               }
                             },
                           ),
@@ -745,7 +746,7 @@ class _CfChallengePageState extends State<CfChallengePage> {
                                     const SizedBox(width: 8),
                                     Expanded(
                                       child: Text(
-                                        '验证时间较长，还剩 ${_activeMaxCheckCount - _checkCount} 秒',
+                                        context.l10n.cf_verifyLonger(_activeMaxCheckCount - _checkCount),
                                         style: TextStyle(
                                           color: theme.colorScheme.onErrorContainer,
                                         ),
@@ -779,17 +780,17 @@ class _CfChallengePageState extends State<CfChallengePage> {
                 ),
                 Center(
                   child: AlertDialog(
-                    title: const Text('放弃验证？'),
-                    content: const Text('退出验证将导致相关功能无法使用，确定要退出吗？'),
+                    title: Text(context.l10n.cf_abandonVerifyTitle),
+                    content: Text(context.l10n.cf_abandonVerifyMessage),
                     actions: [
                       TextButton(
                         onPressed: _dismissExitConfirmation,
-                        child: const Text('继续验证'),
+                        child: Text(context.l10n.cf_continueVerify),
                       ),
                       TextButton(
                         onPressed: _confirmExit,
                         child: Text(
-                          '退出',
+                          context.l10n.common_exit,
                           style: TextStyle(color: theme.colorScheme.error),
                         ),
                       ),
@@ -812,20 +813,12 @@ class _CfChallengePageState extends State<CfChallengePage> {
               ),
               Center(
                 child: AlertDialog(
-                  title: const Text('验证帮助'),
-                  content: const Text(
-                    '这是 Cloudflare 安全验证页面。\n\n'
-                    '请完成页面上的验证挑战（如勾选框或滑块）。\n\n'
-                    '验证成功后会自动关闭此页面。\n\n'
-                    '如果长时间无法完成，可以尝试：\n'
-                    '• 点击刷新按钮重新加载\n'
-                    '• 检查网络连接\n'
-                    '• 关闭后稍后再试',
-                  ),
+                  title: Text(context.l10n.cf_helpTitle),
+                  content: Text(context.l10n.cf_helpContent),
                   actions: [
                     TextButton(
                       onPressed: _dismissHelp,
-                      child: const Text('知道了'),
+                      child: Text(context.l10n.common_gotIt),
                     ),
                   ],
                 ),
@@ -838,7 +831,7 @@ class _CfChallengePageState extends State<CfChallengePage> {
           DraggableFloatingPill(
             initialTop: 100,
             onTap: _promoteToForeground,
-            child: const Text('后台验证中... (点击打开)'),
+            child: Text(S.current.cf_backgroundVerifying),
           ),
       ],
     );

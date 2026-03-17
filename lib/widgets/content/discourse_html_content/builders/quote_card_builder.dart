@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../common/smart_avatar.dart';
+import '../../../../l10n/s.dart';
 
 /// 构建回复引用卡片
 Widget buildQuoteCard({
@@ -8,7 +9,7 @@ Widget buildQuoteCard({
   required dynamic element,
   required Widget Function(String html, TextStyle? textStyle) htmlBuilder,
 }) {
-  final username = element.attributes['data-username'] ?? '引用';
+  final username = element.attributes['data-username'] ?? S.current.common_quote;
   final imgElement = element.querySelector('img.avatar');
   final avatarUrl = imgElement?.attributes['src'] ?? '';
     final titleElement = element.querySelector('.quote-title__text-content');

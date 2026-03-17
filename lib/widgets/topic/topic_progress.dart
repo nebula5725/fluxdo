@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../../../../l10n/s.dart';
 
 /// 话题进度指示器，类似 Discourse 的 topic-progress 组件
 /// 显示当前索引/总数（基于 stream 索引，不是 post_number）
@@ -287,7 +288,7 @@ class _TopicTimelineSheetState extends State<TopicTimelineSheet> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '当前楼层',
+                            S.current.topic_currentFloor,
                             style: theme.textTheme.labelMedium?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
                               letterSpacing: 1.2,
@@ -385,7 +386,7 @@ class _TopicTimelineSheetState extends State<TopicTimelineSheet> {
                                       padding: const EdgeInsets.symmetric(horizontal: 12),
                                       visualDensity: VisualDensity.compact,
                                     ),
-                                    child: const Text('取消'),
+                                    child: Text(S.current.common_cancel),
                                   ),
                                 ),
                                 const SizedBox(width: 8),
@@ -397,7 +398,7 @@ class _TopicTimelineSheetState extends State<TopicTimelineSheet> {
                                       padding: const EdgeInsets.symmetric(horizontal: 12),
                                       visualDensity: VisualDensity.compact,
                                     ),
-                                    child: const Text('确定'),
+                                    child: Text(S.current.common_confirm),
                                   ),
                                 ),
                               ],
@@ -410,7 +411,7 @@ class _TopicTimelineSheetState extends State<TopicTimelineSheet> {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
-                                _selectedIndex == widget.currentIndex ? '正位于此' : '准备跳转',
+                                _selectedIndex == widget.currentIndex ? S.current.topic_atCurrentPosition : S.current.topic_readyToJump,
                                 style: theme.textTheme.labelSmall?.copyWith(
                                   color: theme.colorScheme.onPrimaryContainer,
                                   fontWeight: FontWeight.bold,
@@ -507,7 +508,7 @@ class _TopicTimelineSheetState extends State<TopicTimelineSheet> {
                       style: TextButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
-                      child: const Text('取消'),
+                      child: Text(S.current.common_cancel),
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -518,7 +519,7 @@ class _TopicTimelineSheetState extends State<TopicTimelineSheet> {
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                       ),
-                      child: const Text('跳转', style: TextStyle(fontWeight: FontWeight.bold)),
+                      child: Text(S.current.topic_jump, style: const TextStyle(fontWeight: FontWeight.bold)),
                     ),
                   ),
                 ],

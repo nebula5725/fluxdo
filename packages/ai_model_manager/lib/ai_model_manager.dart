@@ -7,6 +7,7 @@ export 'services/ai_provider_service.dart';
 export 'services/ai_chat_service.dart';
 export 'services/ai_chat_storage_service.dart';
 export 'services/toast_delegate.dart';
+export 'l10n/ai_l10n.dart';
 export 'providers/ai_provider_providers.dart';
 export 'providers/ai_chat_providers.dart';
 export 'pages/ai_providers_page.dart';

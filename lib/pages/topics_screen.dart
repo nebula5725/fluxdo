@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
+import '../l10n/s.dart';
 import '../providers/selected_topic_provider.dart';
 import '../providers/discourse_providers.dart';
 import '../widgets/layout/master_detail_layout.dart';
@@ -286,7 +287,7 @@ class _TopicsFabState extends ConsumerState<_TopicsFab>
               children: [
                 _buildMiniAction(
                   icon: Icons.drafts_outlined,
-                  label: '我的草稿',
+                  label: context.l10n.topicsScreen_myDrafts,
                   onTap: () {
                     _close(immediately: true);
                     widget.onOpenDrafts();
@@ -296,7 +297,7 @@ class _TopicsFabState extends ConsumerState<_TopicsFab>
                 const SizedBox(height: 12),
                 _buildMiniAction(
                   icon: Icons.edit_outlined,
-                  label: '创建话题',
+                  label: context.l10n.topicsScreen_createTopic,
                   onTap: () {
                     _close(immediately: true);
                     widget.onCreateTopic();

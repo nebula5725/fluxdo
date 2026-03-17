@@ -4,6 +4,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../services/log/logger_utils.dart';
 import '../services/toast_service.dart';
+import '../l10n/s.dart';
 
 /// 日志筛选类型
 enum _LogFilter { all, error, request, lifecycle }
@@ -54,23 +55,23 @@ class _AppLogsPageState extends State<AppLogsPage> {
   Future<void> _copyDeviceInfo() async {
     final text = await LoggerUtils.getDeviceInfoText();
     await Clipboard.setData(ClipboardData(text: text));
-    ToastService.showSuccess('已复制到剪贴板');
+    ToastService.showSuccess(S.current.common_copiedToClipboard);
   }
 
   Future<void> _copyAll() async {
     final content = await LoggerUtils.readLogContent();
     if (content.trim().isEmpty) {
-      ToastService.showInfo('暂无日志');
+      ToastService.showInfo(S.current.appLogs_noLogs);
       return;
     }
     await Clipboard.setData(ClipboardData(text: content));
-    ToastService.showSuccess('已复制到剪贴板');
+    ToastService.showSuccess(S.current.common_copiedToClipboard);
   }
 
   Future<void> _shareLog() async {
     final path = await LoggerUtils.getShareFilePath();
     await SharePlus.instance.share(
-      ShareParams(files: [XFile(path)], subject: '应用日志'),
+      ShareParams(files: [XFile(path)], subject: S.current.appLogs_shareSubject),
     );
   }
 
@@ -78,16 +79,16 @@ class _AppLogsPageState extends State<AppLogsPage> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('清除日志'),
-        content: const Text('确定要清除所有日志吗？此操作不可撤销。'),
+        title: Text(context.l10n.appLogs_clearTitle),
+        content: Text(context.l10n.appLogs_clearContent),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('取消'),
+            child: Text(context.l10n.common_cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('清除'),
+            child: Text(context.l10n.common_delete),
           ),
         ],
       ),
@@ -95,7 +96,7 @@ class _AppLogsPageState extends State<AppLogsPage> {
     if (confirmed == true) {
       await LoggerUtils.clearLogs();
       await _loadLogs();
-      ToastService.showSuccess('日志已清除');
+      ToastService.showSuccess(S.current.appLogs_logsCleared);
     }
   }
 
@@ -144,12 +145,12 @@ class _AppLogsPageState extends State<AppLogsPage> {
     }
 
     if (type == 'lifecycle') {
-      return entry['message']?.toString() ?? '生命周期事件';
+      return entry['message']?.toString() ?? S.current.appLogs_lifecycleEvent;
     }
 
     final tag = entry['tag']?.toString();
     final errorType = entry['errorType']?.toString();
-    final message = entry['message']?.toString() ?? '未知';
+    final message = entry['message']?.toString() ?? S.current.error_unknown;
 
     if (tag != null && errorType != null) {
       return '[$tag] $errorType';
@@ -179,14 +180,14 @@ class _AppLogsPageState extends State<AppLogsPage> {
       final parts = <String>[];
       final username = entry['username']?.toString();
       final reason = entry['reason']?.toString();
-      if (username != null) parts.add('用户: $username');
+      if (username != null) parts.add('${S.current.appLogs_user}: $username');
       if (reason != null) parts.add(reason);
       return parts.join(' · ');
     }
 
     final level = entry['level']?.toString() ?? 'error';
     if (level == 'error') {
-      return entry['error']?.toString() ?? '未知错误';
+      return entry['error']?.toString() ?? S.current.error_unknown;
     }
     return entry['message']?.toString() ?? '';
   }
@@ -211,10 +212,10 @@ class _AppLogsPageState extends State<AppLogsPage> {
     final appVersion = entry['appVersion']?.toString();
 
     final eventLabel = switch (event) {
-      'app_start' => '应用启动',
-      'login' => '用户登录',
-      'logout_active' => '主动退出',
-      'logout_passive' => '被动退出',
+      'app_start' => S.current.appLogs_appStart,
+      'login' => S.current.appLogs_userLogin,
+      'logout_active' => S.current.appLogs_logoutActive,
+      'logout_passive' => S.current.appLogs_logoutPassive,
       _ => event,
     };
 
@@ -233,14 +234,14 @@ class _AppLogsPageState extends State<AppLogsPage> {
               icon: const Icon(Icons.copy, size: 20),
               onPressed: () {
                 final detail = StringBuffer()
-                  ..writeln('时间: $timestamp')
-                  ..writeln('事件: $eventLabel');
-                if (appVersion != null) detail.writeln('版本: $appVersion');
-                detail.writeln('消息: $message');
-                if (username != null) detail.writeln('用户: $username');
-                if (reason != null) detail.writeln('原因: $reason');
+                  ..writeln('${S.current.appLogs_time}: $timestamp')
+                  ..writeln('${S.current.appLogs_event}: $eventLabel');
+                if (appVersion != null) detail.writeln('${S.current.appLogs_version}: $appVersion');
+                detail.writeln('${S.current.appLogs_message}: $message');
+                if (username != null) detail.writeln('${S.current.appLogs_user}: $username');
+                if (reason != null) detail.writeln('${S.current.appLogs_reason}: $reason');
                 Clipboard.setData(ClipboardData(text: detail.toString()));
-                ToastService.showSuccess('已复制到剪贴板');
+                ToastService.showSuccess(S.current.common_copiedToClipboard);
               },
             ),
           ],
@@ -250,19 +251,19 @@ class _AppLogsPageState extends State<AppLogsPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              _buildDetailField('时间', timestamp),
-              if (appVersion != null) _buildDetailField('版本', appVersion),
-              _buildDetailField('事件', eventLabel),
-              _buildDetailField('消息', message),
-              if (username != null) _buildDetailField('用户', username),
-              if (reason != null) _buildDetailField('原因', reason),
+              _buildDetailField(context.l10n.appLogs_time, timestamp),
+              if (appVersion != null) _buildDetailField(context.l10n.appLogs_version, appVersion),
+              _buildDetailField(context.l10n.appLogs_event, eventLabel),
+              _buildDetailField(context.l10n.appLogs_message, message),
+              if (username != null) _buildDetailField(context.l10n.appLogs_user, username),
+              if (reason != null) _buildDetailField(context.l10n.appLogs_reason, reason),
             ],
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('关闭'),
+            child: Text(context.l10n.common_close),
           ),
         ],
       ),
@@ -297,23 +298,23 @@ class _AppLogsPageState extends State<AppLogsPage> {
               icon: const Icon(Icons.copy, size: 20),
               onPressed: () {
                 final detail = StringBuffer()
-                  ..writeln('时间: $timestamp')
-                  ..writeln('级别: $level');
-                if (appVersion != null) detail.writeln('版本: $appVersion');
-                if (tag != null) detail.writeln('标签: $tag');
-                detail.writeln('消息: $message');
+                  ..writeln('${S.current.appLogs_time}: $timestamp')
+                  ..writeln('${S.current.appLogs_level}: $level');
+                if (appVersion != null) detail.writeln('${S.current.appLogs_version}: $appVersion');
+                if (tag != null) detail.writeln('${S.current.appLogs_tag}: $tag');
+                detail.writeln('${S.current.appLogs_message}: $message');
                 if (error != null && error != message) {
-                  detail.writeln('错误: $error');
+                  detail.writeln('${S.current.appLogs_error}: $error');
                 }
-                if (errorType != null) detail.writeln('类型: $errorType');
+                if (errorType != null) detail.writeln('${S.current.appLogs_type}: $errorType');
                 if (stackTrace != null) {
                   detail
                     ..writeln()
-                    ..writeln('堆栈:')
+                    ..writeln('${S.current.appLogs_stack}:')
                     ..writeln(stackTrace);
                 }
                 Clipboard.setData(ClipboardData(text: detail.toString()));
-                ToastService.showSuccess('已复制到剪贴板');
+                ToastService.showSuccess(S.current.common_copiedToClipboard);
               },
             ),
           ],
@@ -323,16 +324,16 @@ class _AppLogsPageState extends State<AppLogsPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              _buildDetailField('时间', timestamp),
-              if (appVersion != null) _buildDetailField('版本', appVersion),
-              _buildDetailField('消息', message),
+              _buildDetailField(context.l10n.appLogs_time, timestamp),
+              if (appVersion != null) _buildDetailField(context.l10n.appLogs_version, appVersion),
+              _buildDetailField(context.l10n.appLogs_message, message),
               if (error != null && error != message)
-                _buildDetailField('错误', error),
-              if (errorType != null) _buildDetailField('错误类型', errorType),
+                _buildDetailField(context.l10n.appLogs_error, error),
+              if (errorType != null) _buildDetailField(context.l10n.appLogs_errorType, errorType),
               if (stackTrace != null) ...[
                 const SizedBox(height: 12),
                 Text(
-                  '堆栈跟踪',
+                  context.l10n.appLogs_stackTrace,
                   style: Theme.of(context).textTheme.labelMedium?.copyWith(
                     color: Theme.of(context).colorScheme.primary,
                   ),
@@ -362,7 +363,7 @@ class _AppLogsPageState extends State<AppLogsPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('关闭'),
+            child: Text(context.l10n.common_close),
           ),
         ],
       ),
@@ -384,7 +385,7 @@ class _AppLogsPageState extends State<AppLogsPage> {
           children: [
             Expanded(
               child: Text(
-                '$method 请求',
+                '$method ${context.l10n.appLogs_request}',
                 style: Theme.of(context).textTheme.titleMedium,
               ),
             ),
@@ -392,14 +393,14 @@ class _AppLogsPageState extends State<AppLogsPage> {
               icon: const Icon(Icons.copy, size: 20),
               onPressed: () {
                 final detail = StringBuffer()
-                  ..writeln('时间: $timestamp')
-                  ..writeln('方法: $method')
+                  ..writeln('${S.current.appLogs_time}: $timestamp')
+                  ..writeln('${S.current.appLogs_method}: $method')
                   ..writeln('URL: $url')
-                  ..writeln('状态码: $statusCode');
-                if (duration != null) detail.writeln('耗时: ${duration}ms');
-                detail.writeln('级别: $level');
+                  ..writeln('${S.current.appLogs_statusCode}: $statusCode');
+                if (duration != null) detail.writeln('${S.current.appLogs_duration}: ${duration}ms');
+                detail.writeln('${S.current.appLogs_level}: $level');
                 Clipboard.setData(ClipboardData(text: detail.toString()));
-                ToastService.showSuccess('已复制到剪贴板');
+                ToastService.showSuccess(S.current.common_copiedToClipboard);
               },
             ),
           ],
@@ -409,20 +410,20 @@ class _AppLogsPageState extends State<AppLogsPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              _buildDetailField('时间', timestamp),
-              _buildDetailField('方法', method),
+              _buildDetailField(context.l10n.appLogs_time, timestamp),
+              _buildDetailField(context.l10n.appLogs_method, method),
               _buildDetailField('URL', url),
-              _buildDetailField('状态码', statusCode),
+              _buildDetailField(context.l10n.appLogs_statusCode, statusCode),
               if (duration != null)
-                _buildDetailField('耗时', '${duration}ms'),
-              _buildDetailField('级别', level == 'warning' ? '失败' : '成功'),
+                _buildDetailField(context.l10n.appLogs_duration, '${duration}ms'),
+              _buildDetailField(context.l10n.appLogs_level, level == 'warning' ? context.l10n.common_loadFailed : context.l10n.common_done),
             ],
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('关闭'),
+            child: Text(context.l10n.common_close),
           ),
         ],
       ),
@@ -466,7 +467,7 @@ class _AppLogsPageState extends State<AppLogsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('应用日志'),
+        title: Text(context.l10n.appLogs_title),
         centerTitle: true,
         actions: [
           PopupMenuButton<String>(
@@ -483,38 +484,38 @@ class _AppLogsPageState extends State<AppLogsPage> {
               }
             },
             itemBuilder: (context) => [
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'deviceInfo',
                 child: ListTile(
-                  leading: Icon(Icons.smartphone),
-                  title: Text('复制设备信息'),
+                  leading: const Icon(Icons.smartphone),
+                  title: Text(context.l10n.appLogs_copyDeviceInfo),
                   dense: true,
                   contentPadding: EdgeInsets.zero,
                 ),
               ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'copy',
                 child: ListTile(
-                  leading: Icon(Icons.copy),
-                  title: Text('复制全部'),
+                  leading: const Icon(Icons.copy),
+                  title: Text(context.l10n.appLogs_copyAll),
                   dense: true,
                   contentPadding: EdgeInsets.zero,
                 ),
               ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'share',
                 child: ListTile(
-                  leading: Icon(Icons.share),
-                  title: Text('分享日志'),
+                  leading: const Icon(Icons.share),
+                  title: Text(context.l10n.appLogs_shareLogs),
                   dense: true,
                   contentPadding: EdgeInsets.zero,
                 ),
               ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'clear',
                 child: ListTile(
-                  leading: Icon(Icons.delete_outline),
-                  title: Text('清除日志'),
+                  leading: const Icon(Icons.delete_outline),
+                  title: Text(context.l10n.appLogs_clearLogs),
                   dense: true,
                   contentPadding: EdgeInsets.zero,
                 ),
@@ -544,7 +545,7 @@ class _AppLogsPageState extends State<AppLogsPage> {
             ),
             const SizedBox(height: 16),
             Text(
-              '暂无日志',
+              context.l10n.appLogs_noLogs,
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 color: Theme.of(context).colorScheme.outline,
               ),
@@ -563,13 +564,13 @@ class _AppLogsPageState extends State<AppLogsPage> {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Row(
             children: [
-              _buildFilterChip('全部', _LogFilter.all),
+              _buildFilterChip(context.l10n.common_all, _LogFilter.all),
               const SizedBox(width: 8),
-              _buildFilterChip('错误', _LogFilter.error),
+              _buildFilterChip(context.l10n.appLogs_error, _LogFilter.error),
               const SizedBox(width: 8),
-              _buildFilterChip('请求', _LogFilter.request),
+              _buildFilterChip(context.l10n.appLogs_request, _LogFilter.request),
               const SizedBox(width: 8),
-              _buildFilterChip('生命周期', _LogFilter.lifecycle),
+              _buildFilterChip(context.l10n.appLogs_lifecycle, _LogFilter.lifecycle),
             ],
           ),
         ),
@@ -578,7 +579,7 @@ class _AppLogsPageState extends State<AppLogsPage> {
           child: filtered.isEmpty
               ? Center(
                   child: Text(
-                    '无匹配日志',
+                    context.l10n.appLogs_noMatchingLogs,
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: Theme.of(context).colorScheme.outline,
                     ),

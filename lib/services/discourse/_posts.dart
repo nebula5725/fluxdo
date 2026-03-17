@@ -42,10 +42,10 @@ mixin _PostsMixin on _DiscourseServiceBase {
       }
 
       if (respData is Map && respData['success'] == false) {
-        throw Exception(respData['errors']?.toString() ?? '回复失败');
+        throw Exception(respData['errors']?.toString() ?? S.current.error_replyFailed);
       }
 
-      throw Exception('未知响应格式');
+      throw Exception(S.current.error_unknownResponseFormat);
     } on DioException catch (e) {
       if (e.response?.data != null && e.response!.data is Map) {
         final data = e.response!.data as Map;
@@ -162,7 +162,7 @@ mixin _PostsMixin on _DiscourseServiceBase {
       if (respData is Map && respData['post'] != null) {
         return Post.fromJson(respData['post'] as Map<String, dynamic>);
       }
-      throw Exception('更新帖子失败：响应格式异常');
+      throw Exception(S.current.error_updatePostFailed);
     } on DioException catch (e) {
       _throwApiError(e);
     }
@@ -195,7 +195,7 @@ mixin _PostsMixin on _DiscourseServiceBase {
       if (respData is Map && respData['id'] != null) {
         return respData['id'] as int;
       }
-      throw Exception('添加书签失败：响应格式异常');
+      throw Exception(S.current.error_unrecognizedDataFormat);
     } on DioException catch (e) {
       _throwApiError(e);
     }
@@ -228,7 +228,7 @@ mixin _PostsMixin on _DiscourseServiceBase {
       if (respData is Map && respData['id'] != null) {
         return respData['id'] as int;
       }
-      throw Exception('添加书签失败：响应格式异常');
+      throw Exception(S.current.error_unrecognizedDataFormat);
     } on DioException catch (e) {
       _throwApiError(e);
     }

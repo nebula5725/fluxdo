@@ -10,6 +10,7 @@ import '../widgets/topic/topic_item_builder.dart';
 import '../widgets/topic/topic_list_skeleton.dart';
 import '../providers/preferences_provider.dart';
 import '../widgets/common/error_view.dart';
+import '../l10n/s.dart';
 import 'topic_detail_page/topic_detail_page.dart';
 
 /// 浏览历史页面
@@ -78,7 +79,7 @@ class _BrowsingHistoryPageState extends ConsumerState<BrowsingHistoryPage> {
       },
       child: Scaffold(
         appBar: SearchableAppBar(
-          title: '浏览历史',
+          title: context.l10n.browsingHistory_title,
           isSearchMode: searchState.isSearchMode,
           onSearchPressed: () => ref
               .read(userContentSearchProvider(SearchInType.seen).notifier)
@@ -93,7 +94,7 @@ class _BrowsingHistoryPageState extends ConsumerState<BrowsingHistoryPage> {
           filterActive: searchState.filter.isNotEmpty,
           onFilterPressed: () =>
               showSearchFilterPanel(context, ref, SearchInType.seen),
-          searchHint: '在浏览历史中搜索...',
+          searchHint: context.l10n.browsingHistory_searchHint,
         ),
         body: Stack(
           children: [
@@ -103,9 +104,9 @@ class _BrowsingHistoryPageState extends ConsumerState<BrowsingHistoryPage> {
               child: _buildTopicList(historyAsync),
             ),
             if (searchState.isSearchMode)
-              const UserContentSearchView(
+              UserContentSearchView(
                 inType: SearchInType.seen,
-                emptySearchHint: '输入关键词搜索浏览历史',
+                emptySearchHint: context.l10n.browsingHistory_emptySearchHint,
               ),
           ],
         ),
@@ -119,13 +120,13 @@ class _BrowsingHistoryPageState extends ConsumerState<BrowsingHistoryPage> {
       child: historyAsync.when(
         data: (topics) {
           if (topics.isEmpty) {
-            return const Center(
+            return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.history, size: 64, color: Colors.grey),
-                  SizedBox(height: 16),
-                  Text('暂无浏览历史', style: TextStyle(color: Colors.grey)),
+                  const Icon(Icons.history, size: 64, color: Colors.grey),
+                  const SizedBox(height: 16),
+                  Text(context.l10n.browsingHistory_empty, style: const TextStyle(color: Colors.grey)),
                 ],
               ),
             );
@@ -139,12 +140,12 @@ class _BrowsingHistoryPageState extends ConsumerState<BrowsingHistoryPage> {
               if (index == topics.length) {
                 final notifier = ref.watch(browsingHistoryProvider.notifier);
                 if (!notifier.hasMore) {
-                  return const Padding(
-                    padding: EdgeInsets.all(16.0),
+                  return Padding(
+                    padding: const EdgeInsets.all(16.0),
                     child: Center(
                       child: Text(
-                        '没有更多了',
-                        style: TextStyle(color: Colors.grey),
+                        context.l10n.common_noMore,
+                        style: const TextStyle(color: Colors.grey),
                       ),
                     ),
                   );
@@ -161,7 +162,7 @@ class _BrowsingHistoryPageState extends ConsumerState<BrowsingHistoryPage> {
                             Icon(Icons.refresh, size: 16, color: Theme.of(context).colorScheme.primary),
                             const SizedBox(width: 6),
                             Text(
-                              '加载失败，点击重试',
+                              context.l10n.common_loadFailedTapRetry,
                               style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.primary),
                             ),
                           ],

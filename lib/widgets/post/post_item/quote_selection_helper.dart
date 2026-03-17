@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../../l10n/s.dart';
 import '../../../models/topic.dart';
 import '../../../services/toast_service.dart';
 import '../../../utils/code_selection_context.dart';
@@ -68,7 +69,7 @@ class QuoteSelectionHelper {
     );
 
     Clipboard.setData(ClipboardData(text: quote));
-    ToastService.showSuccess('已复制引用');
+    ToastService.showSuccess(S.current.common_quoteCopied);
   }
 
   static List<ContextMenuButtonItem> buildMenuItems({
@@ -91,7 +92,7 @@ class QuoteSelectionHelper {
     items.insert(
       0,
       ContextMenuButtonItem(
-        label: '引用',
+        label: S.current.common_quote,
         onPressed: () {
           final quoteText = buildQuoteSelectionText(
             plainText,
@@ -107,7 +108,7 @@ class QuoteSelectionHelper {
     items.insert(
       1,
       ContextMenuButtonItem(
-        label: '复制引用',
+        label: S.current.common_copyQuote,
         onPressed: () {
           copyQuoteToClipboard(
             selectedText: plainText,

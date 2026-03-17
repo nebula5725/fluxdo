@@ -4,6 +4,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../models/emoji.dart';
 import 'emoji_picker.dart';
 import 'sticker_picker.dart';
+import '../../../../../l10n/s.dart';
 
 /// 悬浮 Tab 的高度（含上下内边距），用于给内容区预留底部空间
 const double floatingTabHeight = 48;
@@ -183,7 +184,7 @@ class _EmojiStickerPanelState extends State<EmojiStickerPanel> {
                       icon: _currentPage == 0
                           ? PhosphorIcons.smileyBlank(PhosphorIconsStyle.fill)
                           : PhosphorIcons.smileyBlank(PhosphorIconsStyle.bold),
-                      label: '表情',
+                      label: S.current.emoji_tab,
                       selected: _currentPage == 0,
                       width: buttonWidth,
                       onTap: () => _pageController.animateToPage(
@@ -198,7 +199,7 @@ class _EmojiStickerPanelState extends State<EmojiStickerPanel> {
                       icon: _currentPage == 1
                           ? PhosphorIcons.smileyMelting(PhosphorIconsStyle.fill)
                           : PhosphorIcons.smileyMelting(PhosphorIconsStyle.bold),
-                      label: '表情包',
+                      label: S.current.sticker_tab,
                       selected: _currentPage == 1,
                       width: buttonWidth,
                       onTap: () => _pageController.animateToPage(

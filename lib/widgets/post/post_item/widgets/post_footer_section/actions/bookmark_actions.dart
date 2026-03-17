@@ -20,7 +20,7 @@ extension _PostFooterBookmarkActions on _PostFooterSectionState {
         _bookmarkName = null;
         _bookmarkReminderAt = null;
       });
-      ToastService.showSuccess('已添加书签');
+      ToastService.showSuccess(S.current.common_bookmarkAdded);
 
       // 弹出编辑 BottomSheet
       _showBookmarkSheet(bookmarkId);
@@ -51,7 +51,7 @@ extension _PostFooterBookmarkActions on _PostFooterSectionState {
             _bookmarkName = null;
             _bookmarkReminderAt = null;
           });
-          ToastService.showSuccess('已取消书签');
+          ToastService.showSuccess(S.current.common_bookmarkRemoved);
         }
       }
     } on DioException catch (_) {

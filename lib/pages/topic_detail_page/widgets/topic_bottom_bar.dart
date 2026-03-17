@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/s.dart';
 
 /// 话题详情页底部操作栏
 class TopicBottomBar extends StatelessWidget {
@@ -49,7 +50,7 @@ class TopicBottomBar extends StatelessWidget {
           IconButton(
             onPressed: onScrollToTop,
             icon: const Icon(Icons.vertical_align_top),
-            tooltip: '回到顶部',
+            tooltip: context.l10n.topicDetail_scrollToTop,
           ),
           // 热门回复切换
           if (hasSummary)
@@ -62,7 +63,7 @@ class TopicBottomBar extends StatelessWidget {
           IconButton(
             onPressed: onOpenInBrowser,
             icon: const Icon(Icons.language),
-            tooltip: '在浏览器打开',
+            tooltip: context.l10n.topicDetail_openInBrowser,
           ),
         ],
       ),
@@ -73,7 +74,7 @@ class TopicBottomBar extends StatelessWidget {
     return PopupMenuButton<String>(
       icon: const Icon(Icons.share_outlined),
       iconColor: theme.colorScheme.onSurfaceVariant,
-      tooltip: '分享',
+      tooltip: context.l10n.common_share,
       onSelected: (value) {
         switch (value) {
           case 'link':
@@ -98,7 +99,7 @@ class TopicBottomBar extends StatelessWidget {
                 color: theme.colorScheme.onSurface,
               ),
               const SizedBox(width: 12),
-              const Text('分享链接'),
+              Text(context.l10n.topicDetail_shareLink),
             ],
           ),
         ),
@@ -112,7 +113,7 @@ class TopicBottomBar extends StatelessWidget {
                 color: theme.colorScheme.onSurface,
               ),
               const SizedBox(width: 12),
-              const Text('生成分享图片'),
+              Text(context.l10n.topicDetail_generateShareImage),
             ],
           ),
         ),
@@ -126,7 +127,7 @@ class TopicBottomBar extends StatelessWidget {
                 color: theme.colorScheme.onSurface,
               ),
               const SizedBox(width: 12),
-              const Text('导出文章'),
+              Text(context.l10n.topicDetail_exportArticle),
             ],
           ),
         ),
@@ -148,7 +149,7 @@ class TopicBottomBar extends StatelessWidget {
       style: IconButton.styleFrom(
         backgroundColor: isSummaryMode ? theme.colorScheme.primaryContainer : null,
       ),
-      tooltip: isSummaryMode ? '查看全部' : '只看热门',
+      tooltip: isSummaryMode ? context.l10n.topicDetail_viewAll : context.l10n.topicDetail_hotOnly,
     );
   }
 
@@ -166,7 +167,7 @@ class TopicBottomBar extends StatelessWidget {
       style: IconButton.styleFrom(
         backgroundColor: isAuthorOnlyMode ? theme.colorScheme.primaryContainer : null,
       ),
-      tooltip: isAuthorOnlyMode ? '查看全部' : '只看题主',
+      tooltip: isAuthorOnlyMode ? context.l10n.topicDetail_viewAll : context.l10n.topicDetail_authorOnly,
     );
   }
 }

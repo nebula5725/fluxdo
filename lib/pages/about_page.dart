@@ -9,6 +9,7 @@ import '../services/apk_download_service.dart';
 import '../services/cf_challenge_logger.dart';
 import '../services/toast_service.dart';
 import '../services/update_service.dart';
+import '../l10n/s.dart';
 import '../widgets/download_progress_dialog.dart';
 import '../widgets/update_dialog.dart';
 import 'app_logs_page.dart';
@@ -55,7 +56,7 @@ class _AboutPageState extends State<AboutPage> {
     if (alreadyEnabled) {
       setState(() => _developerMode = true);
       if (!mounted) return;
-      ToastService.showInfo('开发者模式已启用');
+      ToastService.showInfo(S.current.about_developerModeAlreadyEnabled);
       return;
     }
     await _setDeveloperMode(true);
@@ -72,7 +73,7 @@ class _AboutPageState extends State<AboutPage> {
       setState(() => _developerMode = enabled);
     }
     if (!mounted) return;
-    ToastService.showSuccess(enabled ? '已启用开发者模式' : '已关闭开发者模式');
+    ToastService.showSuccess(enabled ? S.current.about_developerModeEnabled : S.current.about_developerModeClosed);
   }
 
   Future<void> _loadVersion() async {
@@ -183,12 +184,12 @@ class _AboutPageState extends State<AboutPage> {
       context: context,
       builder: (context) => AlertDialog(
         icon: const Icon(Icons.check_circle_outline, size: 48, color: Colors.green),
-        title: const Text('已是最新版本'),
-        content: Text('当前版本: $currentVersion\n您正在使用最新版本的 FluxDO，无需更新。'),
+        title: Text(context.l10n.about_latestVersion),
+        content: Text(context.l10n.about_noUpdateContent(currentVersion)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('好'),
+            child: Text(context.l10n.common_ok),
           ),
         ],
       ),
@@ -200,12 +201,12 @@ class _AboutPageState extends State<AboutPage> {
       context: context,
       builder: (context) => AlertDialog(
         icon: const Icon(Icons.error_outline, size: 48, color: Colors.red),
-        title: const Text('检查更新失败'),
-        content: Text('无法检查更新，请稍后重试。\n错误信息: $error'),
+        title: Text(context.l10n.about_checkUpdateFailed),
+        content: Text(context.l10n.about_checkUpdateError(error)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('确定'),
+            child: Text(context.l10n.common_confirm),
           ),
         ],
       ),
@@ -218,7 +219,7 @@ class _AboutPageState extends State<AboutPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('关于'),
+        title: Text(context.l10n.about_title),
         centerTitle: true,
       ),
       body: ListView(
@@ -265,32 +266,32 @@ class _AboutPageState extends State<AboutPage> {
           const SizedBox(height: 48),
 
           // Action List
-          _buildSectionTitle(context, '信息'),
+          _buildSectionTitle(context, context.l10n.about_info),
           _buildListTile(
             context,
             icon: Icons.update_rounded,
-            title: '检查更新',
+            title: context.l10n.about_checkUpdate,
             onTap: _checkForUpdate,
           ),
           _buildListTile(
             context,
             icon: Icons.description_outlined,
-            title: '开源许可',
+            title: context.l10n.about_openSourceLicense,
             onTap: () => showLicensePage(
               context: context,
               applicationName: 'FluxDO',
               applicationVersion: _version,
-              applicationLegalese: '非官方 Linux.do 客户端\n基于 Flutter & Material 3',
+              applicationLegalese: context.l10n.about_legalese,
             ),
           ),
 
           const Divider(height: 32, indent: 16, endIndent: 16),
 
-          _buildSectionTitle(context, '开发'),
+          _buildSectionTitle(context, context.l10n.about_develop),
           if (_developerMode)
             SwitchListTile(
-              title: const Text('开发者模式'),
-              subtitle: const Text('点击关闭开发者模式'),
+              title: Text(context.l10n.about_developerMode),
+              subtitle: Text(context.l10n.about_tapToDisableDeveloperMode),
               value: true,
               onChanged: (value) {
                 if (!value) {
@@ -301,7 +302,7 @@ class _AboutPageState extends State<AboutPage> {
           _buildListTile(
             context,
             icon: Icons.code,
-            title: '项目源码',
+            title: context.l10n.about_sourceCode,
             subtitle: 'GitHub',
             onTap: () => launchUrl(
               Uri.parse('https://github.com/Lingyan000/fluxdo'),
@@ -311,7 +312,7 @@ class _AboutPageState extends State<AboutPage> {
           _buildListTile(
             context,
             icon: Icons.article_outlined,
-            title: '应用日志',
+            title: context.l10n.about_appLogs,
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const AppLogsPage()),
@@ -320,7 +321,7 @@ class _AboutPageState extends State<AboutPage> {
           _buildListTile(
             context,
             icon: Icons.bug_report_outlined,
-            title: '反馈问题',
+            title: context.l10n.about_feedback,
             onTap: () => launchUrl(
               Uri.parse('https://github.com/Lingyan000/fluxdo/issues'),
               mode: LaunchMode.externalApplication,

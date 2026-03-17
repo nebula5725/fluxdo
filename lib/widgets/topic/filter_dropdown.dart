@@ -5,6 +5,7 @@ import '../../providers/topic_list/sort_provider.dart';
 import '../../providers/topic_list/tab_state_provider.dart';
 import '../../providers/message_bus/topic_tracking_providers.dart';
 import 'sort_and_tags_bar.dart';
+import '../../../../../l10n/s.dart';
 
 /// 下拉样式
 enum DropdownStyle {
@@ -61,7 +62,7 @@ class FilterDropdown extends ConsumerWidget {
       onSelected: onFilterChanged,
       offset: const Offset(0, 36),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      tooltip: '筛选: ${filterLabel(currentFilter)}',
+      tooltip: S.current.topic_filterTooltip(filterLabel(currentFilter)),
       itemBuilder: (context) {
         return filterOptions
             .where((option) => isLoggedIn || (option.$1 != TopicListFilter.newTopics && option.$1 != TopicListFilter.unread && option.$1 != TopicListFilter.unseen))
@@ -177,7 +178,7 @@ class OrderDropdown extends StatelessWidget {
       },
       offset: const Offset(0, 36),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      tooltip: '排序: ${currentOrder.label}',
+      tooltip: S.current.topic_sortTooltip(currentOrder.label),
       itemBuilder: (context) {
         return TopicSortOrder.values.map((order) {
           final isSelected = order == currentOrder;

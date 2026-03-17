@@ -1,5 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../l10n/s.dart';
 import '../../../services/toast_service.dart';
 
 /// AI 聊天首次引导
@@ -12,6 +13,6 @@ class AiChatGuide {
     if (shown) return;
 
     await prefs.setBool(_key, true);
-    ToastService.showInfo('向左滑动可打开 AI 助手');
+    ToastService.showInfo(S.current.ai_swipeHint);
   }
 }

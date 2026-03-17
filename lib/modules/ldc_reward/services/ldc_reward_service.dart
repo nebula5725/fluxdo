@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import '../../../services/network/discourse_dio.dart';
+import '../../../l10n/s.dart';
 import '../models/reward_request.dart';
 import '../models/reward_result.dart';
 
@@ -34,18 +35,18 @@ class LdcRewardService {
         return LdcRewardResult.fromResponse(response.data as Map<String, dynamic>);
       }
 
-      return LdcRewardResult.error('请求失败: HTTP ${response.statusCode}');
+      return LdcRewardResult.error(S.current.reward_httpError(response.statusCode ?? 0));
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
-        return LdcRewardResult.error('认证失败，请检查 Client ID 和 Client Secret');
+        return LdcRewardResult.error(S.current.reward_authFailed);
       }
       if (e.response?.data is Map<String, dynamic>) {
         final msg = (e.response!.data as Map<String, dynamic>)['msg'] as String?;
         if (msg != null) return LdcRewardResult.error(msg);
       }
-      return LdcRewardResult.error('网络错误: ${e.message}');
+      return LdcRewardResult.error(S.current.reward_networkError(e.message ?? ''));
     } catch (e) {
-      return LdcRewardResult.error('未知错误: $e');
+      return LdcRewardResult.error(S.current.reward_unknownError(e.toString()));
     }
   }
 }

@@ -1,6 +1,7 @@
 // ignore: depend_on_referenced_packages
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../l10n/s.dart';
 import '../theme_provider.dart';
 
 /// 话题排序字段
@@ -42,23 +43,23 @@ extension TopicSortOrderX on TopicSortOrder {
     }
   }
 
-  /// 中文显示名称
+  /// 显示名称
   String get label {
     switch (this) {
       case TopicSortOrder.defaultOrder:
-        return '默认';
+        return S.current.topicSort_default;
       case TopicSortOrder.activity:
-        return '活跃度';
+        return S.current.topicSort_activity;
       case TopicSortOrder.created:
-        return '创建时间';
+        return S.current.topicSort_created;
       case TopicSortOrder.likes:
-        return '点赞数';
+        return S.current.topicSort_likes;
       case TopicSortOrder.views:
-        return '浏览量';
+        return S.current.topicSort_views;
       case TopicSortOrder.posts:
-        return '回复数';
+        return S.current.topicSort_posts;
       case TopicSortOrder.posters:
-        return '参与者';
+        return S.current.topicSort_posters;
     }
   }
 }

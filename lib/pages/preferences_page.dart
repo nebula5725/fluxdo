@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../l10n/s.dart';
 import '../providers/preferences_provider.dart';
 import '../providers/sticker_provider.dart';
 import '../services/sticker_market_service.dart';
@@ -13,15 +14,16 @@ class PreferencesPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final preferences = ref.watch(preferencesProvider);
+    final l10n = context.l10n;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('功能设置'),
+        title: Text(l10n.preferences_title),
       ),
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         children: [
-          _buildSectionHeader(theme, '基础'),
+          _buildSectionHeader(theme, l10n.preferences_basic),
           const SizedBox(height: 12),
           Card(
             shape: RoundedRectangleBorder(
@@ -31,8 +33,8 @@ class PreferencesPage extends ConsumerWidget {
             child: Column(
               children: [
                 SwitchListTile(
-                  title: const Text('长按预览'),
-                  subtitle: const Text('长按话题卡片快速预览内容'),
+                  title: Text(l10n.preferences_longPressPreview),
+                  subtitle: Text(l10n.preferences_longPressPreviewDesc),
                   secondary: Icon(
                     Icons.touch_app_rounded,
                     color: preferences.longPressPreview
@@ -46,8 +48,8 @@ class PreferencesPage extends ConsumerWidget {
                 ),
                 Divider(height: 1, indent: 56, color: theme.colorScheme.outlineVariant.withValues(alpha:0.3)),
                 SwitchListTile(
-                  title: const Text('滚动收起导航栏'),
-                  subtitle: const Text('首页滚动时自动收起顶栏和底栏'),
+                  title: Text(l10n.preferences_hideBarOnScroll),
+                  subtitle: Text(l10n.preferences_hideBarOnScrollDesc),
                   secondary: Icon(
                     Icons.swap_vert_rounded,
                     color: preferences.hideBarOnScroll
@@ -61,8 +63,8 @@ class PreferencesPage extends ConsumerWidget {
                 ),
                 Divider(height: 1, indent: 56, color: theme.colorScheme.outlineVariant.withValues(alpha:0.3)),
                 SwitchListTile(
-                  title: const Text('外部链接使用内置浏览器'),
-                  subtitle: const Text('贴内外部链接优先在应用内打开'),
+                  title: Text(l10n.preferences_openLinksInApp),
+                  subtitle: Text(l10n.preferences_openLinksInAppDesc),
                   secondary: Icon(
                     Icons.open_in_browser_rounded,
                     color: preferences.openExternalLinksInAppBrowser
@@ -78,8 +80,8 @@ class PreferencesPage extends ConsumerWidget {
                 ),
                 Divider(height: 1, indent: 56, color: theme.colorScheme.outlineVariant.withValues(alpha:0.3)),
                 SwitchListTile(
-                  title: const Text('匿名分享'),
-                  subtitle: const Text('分享链接时不附带个人用户标识'),
+                  title: Text(l10n.preferences_anonymousShare),
+                  subtitle: Text(l10n.preferences_anonymousShareDesc),
                   secondary: Icon(
                     Icons.visibility_off_rounded,
                     color: preferences.anonymousShare
@@ -93,8 +95,8 @@ class PreferencesPage extends ConsumerWidget {
                 ),
                 Divider(height: 1, indent: 56, color: theme.colorScheme.outlineVariant.withValues(alpha:0.3)),
                 SwitchListTile(
-                  title: const Text('自动填充登录'),
-                  subtitle: const Text('记住账号密码，登录时自动填充'),
+                  title: Text(l10n.preferences_autoFillLogin),
+                  subtitle: Text(l10n.preferences_autoFillLoginDesc),
                   secondary: Icon(
                     Icons.password_rounded,
                     color: preferences.autoFillLogin
@@ -109,8 +111,8 @@ class PreferencesPage extends ConsumerWidget {
                 if (Platform.isIOS || Platform.isAndroid) ...[
                   Divider(height: 1, indent: 56, color: theme.colorScheme.outlineVariant.withValues(alpha:0.3)),
                   SwitchListTile(
-                    title: const Text('竖屏锁定'),
-                    subtitle: const Text('锁定屏幕方向为竖屏'),
+                    title: Text(l10n.preferences_portraitLock),
+                    subtitle: Text(l10n.preferences_portraitLockDesc),
                     secondary: Icon(
                       Icons.screen_lock_portrait_rounded,
                       color: preferences.portraitLock
@@ -127,7 +129,7 @@ class PreferencesPage extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 24),
-          _buildSectionHeader(theme, '编辑器'),
+          _buildSectionHeader(theme, l10n.preferences_editor),
           const SizedBox(height: 12),
           Card(
             shape: RoundedRectangleBorder(
@@ -137,8 +139,8 @@ class PreferencesPage extends ConsumerWidget {
             child: Column(
               children: [
                 SwitchListTile(
-                  title: const Text('自动混排优化'),
-                  subtitle: const Text('输入时自动插入中英文混排空格'),
+                  title: Text(l10n.preferences_autoPanguSpacing),
+                  subtitle: Text(l10n.preferences_autoPanguSpacingDesc),
                   secondary: Icon(
                     Icons.auto_fix_high_rounded,
                     color: preferences.autoPanguSpacing
@@ -156,7 +158,7 @@ class PreferencesPage extends ConsumerWidget {
                     Icons.sticky_note_2_outlined,
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
-                  title: const Text('表情包数据源'),
+                  title: Text(l10n.preferences_stickerSource),
                   subtitle: Text(
                     ref.watch(stickerMarketServiceProvider).baseUrl,
                     maxLines: 1,
@@ -174,7 +176,7 @@ class PreferencesPage extends ConsumerWidget {
           ),
           if (Platform.isAndroid) ...[
             const SizedBox(height: 24),
-            _buildSectionHeader(theme, '高级'),
+            _buildSectionHeader(theme, l10n.preferences_advanced),
             const SizedBox(height: 12),
             Card(
               shape: RoundedRectangleBorder(
@@ -182,8 +184,8 @@ class PreferencesPage extends ConsumerWidget {
               ),
               clipBehavior: Clip.antiAlias,
               child: SwitchListTile(
-                title: const Text('崩溃日志上报'),
-                subtitle: const Text('发生崩溃时自动上报日志，帮助开发者定位问题'),
+                title: Text(l10n.preferences_crashlytics),
+                subtitle: Text(l10n.preferences_crashlyticsDesc),
                 secondary: Icon(
                   Icons.bug_report_rounded,
                   color: preferences.crashlytics
@@ -196,20 +198,16 @@ class PreferencesPage extends ConsumerWidget {
                     final confirmed = await showDialog<bool>(
                       context: context,
                       builder: (context) => AlertDialog(
-                        title: const Text('开启崩溃日志上报'),
-                        content: const Text(
-                          '开启后，应用崩溃时会将崩溃日志上传到 Firebase Crashlytics 服务，'
-                          '用于帮助开发者定位和修复问题。\n\n'
-                          '上报内容仅包含崩溃堆栈信息，不包含个人数据。',
-                        ),
+                        title: Text(context.l10n.preferences_enableCrashlyticsTitle),
+                        content: Text(context.l10n.preferences_enableCrashlyticsContent),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(context, false),
-                            child: const Text('取消'),
+                            child: Text(context.l10n.common_cancel),
                           ),
                           FilledButton(
                             onPressed: () => Navigator.pop(context, true),
-                            child: const Text('开启'),
+                            child: Text(context.l10n.common_enable),
                           ),
                         ],
                       ),
@@ -237,14 +235,14 @@ class PreferencesPage extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('表情包数据源'),
+        title: Text(context.l10n.preferences_stickerSource),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: controller,
-              decoration: const InputDecoration(
-                hintText: '输入 URL',
+              decoration: InputDecoration(
+                hintText: context.l10n.preferences_enterUrl,
                 border: OutlineInputBorder(),
               ),
               keyboardType: TextInputType.url,
@@ -257,7 +255,7 @@ class PreferencesPage extends ConsumerWidget {
                 onPressed: () {
                   controller.text = StickerMarketService.defaultBaseUrl;
                 },
-                child: const Text('恢复默认'),
+                child: Text(context.l10n.common_restoreDefault),
               ),
             ),
           ],
@@ -265,7 +263,7 @@ class PreferencesPage extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('取消'),
+            child: Text(context.l10n.common_cancel),
           ),
           FilledButton(
             onPressed: () async {
@@ -276,7 +274,7 @@ class PreferencesPage extends ConsumerWidget {
               }
               if (dialogContext.mounted) Navigator.pop(dialogContext);
             },
-            child: const Text('确定'),
+            child: Text(context.l10n.common_confirm),
           ),
         ],
       ),

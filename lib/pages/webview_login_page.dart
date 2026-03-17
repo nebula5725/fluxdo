@@ -13,6 +13,7 @@ import '../services/network/cookie/cookie_sync_service.dart';
 import '../services/toast_service.dart';
 import '../services/webview_settings.dart';
 import '../services/log/log_writer.dart';
+import '../l10n/s.dart';
 
 /// WebView 登录页面（统一使用 flutter_inappwebview）
 class WebViewLoginPage extends ConsumerStatefulWidget {
@@ -57,34 +58,34 @@ class _WebViewLoginPageState extends ConsumerState<WebViewLoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('登录 Linux.do'),
+        title: Text(context.l10n.webviewLogin_title),
         actions: [
           if (_savedUsername != null)
             PopupMenuButton<String>(
               icon: const Icon(Icons.key_rounded),
-              tooltip: '已保存的密码',
+              tooltip: context.l10n.webviewLogin_savedPassword,
               onSelected: (value) {
                 if (value == 'clear') _clearCredentials();
               },
               itemBuilder: (context) => [
                 PopupMenuItem(
                   enabled: false,
-                  child: Text('上次登录: @$_savedUsername'),
+                  child: Text(context.l10n.webviewLogin_lastLogin(_savedUsername!)),
                 ),
                 const PopupMenuDivider(),
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'clear',
                   child: Row(
                     children: [
-                      Icon(Icons.delete_outline_rounded, size: 20),
-                      SizedBox(width: 8),
-                      Text('清除已保存的密码'),
+                      const Icon(Icons.delete_outline_rounded, size: 20),
+                      const SizedBox(width: 8),
+                      Text(context.l10n.webviewLogin_clearSaved),
                     ],
                   ),
                 ),
               ],
             ),
-          IconButton(icon: const Icon(Icons.refresh), onPressed: () => _controller?.reload(), tooltip: '刷新'),
+          IconButton(icon: const Icon(Icons.refresh), onPressed: () => _controller?.reload(), tooltip: context.l10n.common_refresh),
         ],
       ),
       body: Column(
@@ -145,11 +146,11 @@ class _WebViewLoginPageState extends ConsumerState<WebViewLoginPage> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('清除已保存的密码'),
-        content: const Text('确定要清除已保存的登录凭证吗？下次登录时需要手动输入。'),
+        title: Text(context.l10n.webviewLogin_clearSavedTitle),
+        content: Text(context.l10n.webviewLogin_clearSavedContent),
         actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('取消')),
-          FilledButton(onPressed: () => Navigator.of(context).pop(true), child: const Text('清除')),
+          TextButton(onPressed: () => Navigator.of(context).pop(false), child: Text(context.l10n.common_cancel)),
+          FilledButton(onPressed: () => Navigator.of(context).pop(true), child: Text(context.l10n.common_delete)),
         ],
       ),
     );
@@ -296,7 +297,7 @@ class _WebViewLoginPageState extends ConsumerState<WebViewLoginPage> {
     });
 
     if (mounted) {
-      ToastService.showSuccess('登录成功！${username != null ? '用户: $username' : ''}');
+      ToastService.showSuccess(S.current.webviewLogin_loginSuccess);
       Navigator.of(context).pop(true);
     }
   }

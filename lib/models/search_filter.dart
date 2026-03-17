@@ -1,33 +1,51 @@
+import '../l10n/s.dart';
+
 /// 搜索范围类型（用于用户内容页面）
 enum SearchInType {
   /// 书签
-  bookmarks('bookmarks', '书签'),
+  bookmarks('bookmarks'),
   /// 用户创建的话题
-  created('created', '我的话题'),
+  created('created'),
   /// 浏览过的
-  seen('seen', '浏览历史');
+  seen('seen');
 
   final String value;
-  final String label;
-  const SearchInType(this.value, this.label);
+  const SearchInType(this.value);
+
+  String get label {
+    switch (this) {
+      case SearchInType.bookmarks: return S.current.search_filterBookmarks;
+      case SearchInType.created: return S.current.search_filterCreated;
+      case SearchInType.seen: return S.current.search_filterSeen;
+    }
+  }
 }
 
 /// 话题状态过滤
 enum SearchStatus {
   /// 未关闭
-  open('open', '进行中'),
+  open('open'),
   /// 已关闭
-  closed('closed', '已关闭'),
+  closed('closed'),
   /// 已归档
-  archived('archived', '已归档'),
+  archived('archived'),
   /// 已解决
-  solved('solved', '已解决'),
+  solved('solved'),
   /// 未解决
-  unsolved('unsolved', '未解决');
+  unsolved('unsolved');
 
   final String value;
-  final String label;
-  const SearchStatus(this.value, this.label);
+  const SearchStatus(this.value);
+
+  String get label {
+    switch (this) {
+      case SearchStatus.open: return S.current.search_statusOpen;
+      case SearchStatus.closed: return S.current.search_statusClosed;
+      case SearchStatus.archived: return S.current.search_statusArchived;
+      case SearchStatus.solved: return S.current.search_statusSolved;
+      case SearchStatus.unsolved: return S.current.search_statusUnsolved;
+    }
+  }
 }
 
 /// 高级搜索过滤参数

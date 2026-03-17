@@ -6,6 +6,7 @@ import '../../providers/sticker_provider.dart';
 import '../../services/discourse_cache_manager.dart';
 import '../common/cached_image.dart';
 import '../common/loading_spinner.dart';
+import '../../../../../l10n/s.dart';
 
 /// 表情包市场浏览面板 (Bottom Sheet)
 ///
@@ -91,9 +92,9 @@ class _StickerMarketSheetState extends ConsumerState<StickerMarketSheet> {
                 ),
                 Row(
                   children: [
-                    const Expanded(
+                    Expanded(
                       child: Text(
-                        '表情包市场',
+                        S.current.sticker_marketTitle,
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
@@ -106,7 +107,7 @@ class _StickerMarketSheetState extends ConsumerState<StickerMarketSheet> {
                         visualDensity: VisualDensity.compact,
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                       ),
-                      child: const Text('完成'),
+                      child: Text(S.current.common_done),
                     ),
                   ],
                 ),
@@ -141,11 +142,11 @@ class _StickerMarketSheetState extends ConsumerState<StickerMarketSheet> {
         children: [
           Icon(Icons.error_outline, size: 48, color: theme.colorScheme.outline),
           const SizedBox(height: 12),
-          Text('加载市场失败', style: TextStyle(color: theme.colorScheme.error)),
+          Text(S.current.sticker_marketLoadFailed, style: TextStyle(color: theme.colorScheme.error)),
           const SizedBox(height: 8),
           TextButton(
             onPressed: () => ref.read(marketGroupsProvider.notifier).refresh(),
-            child: const Text('重试'),
+            child: Text(S.current.common_retry),
           ),
         ],
       ),
@@ -159,7 +160,7 @@ class _StickerMarketSheetState extends ConsumerState<StickerMarketSheet> {
     if (groups.isEmpty) {
       return Center(
         child: Text(
-          '暂无可用的表情包',
+          S.current.sticker_marketEmpty,
           style: TextStyle(
             color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
@@ -236,7 +237,7 @@ class _StickerGroupTile extends StatelessWidget {
         leading: _buildIcon(theme),
         title: Text(group.name, maxLines: 1, overflow: TextOverflow.ellipsis),
         subtitle: Text(
-          '${group.emojiCount} 个表情',
+          S.current.sticker_emojiCount(group.emojiCount),
           style: TextStyle(
             fontSize: 12,
             color: theme.colorScheme.onSurfaceVariant,
@@ -248,7 +249,7 @@ class _StickerGroupTile extends StatelessWidget {
             ? FilledButton.tonalIcon(
                 onPressed: onToggle,
                 icon: const Icon(Icons.check, size: 16),
-                label: const Text('已添加'),
+                label: Text(S.current.sticker_added),
                 style: FilledButton.styleFrom(
                   visualDensity: VisualDensity.compact,
                   padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -257,7 +258,7 @@ class _StickerGroupTile extends StatelessWidget {
             : OutlinedButton.icon(
                 onPressed: onToggle,
                 icon: const Icon(Icons.add, size: 16),
-                label: const Text('添加'),
+                label: Text(S.current.common_add),
                 style: OutlinedButton.styleFrom(
                   visualDensity: VisualDensity.compact,
                   padding: const EdgeInsets.symmetric(horizontal: 12),

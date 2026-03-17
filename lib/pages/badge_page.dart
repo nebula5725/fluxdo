@@ -13,6 +13,7 @@ import '../widgets/content/discourse_html_content/discourse_html_content_widget.
 import '../services/emoji_handler.dart';
 import 'topic_detail_page/topic_detail_page.dart';
 import 'user_profile_page.dart';
+import '../l10n/s.dart';
 
 /// 徽章详情页面
 class BadgePage extends ConsumerStatefulWidget {
@@ -94,11 +95,11 @@ class _BadgePageState extends ConsumerState<BadgePage> {
                     children: [
                       const Icon(Icons.error_outline, size: 64, color: Colors.grey),
                       const SizedBox(height: 16),
-                      Text('加载失败: $_error', style: const TextStyle(color: Colors.grey)),
+                      Text('${context.l10n.common_loadFailed}: $_error', style: const TextStyle(color: Colors.grey)),
                       const SizedBox(height: 16),
                       ElevatedButton(
                         onPressed: _onRefresh,
-                        child: const Text('重试'),
+                        child: Text(context.l10n.common_retry),
                       ),
                     ],
                   ),
@@ -131,7 +132,7 @@ class _BadgePageState extends ConsumerState<BadgePage> {
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                '获得者',
+                                context.l10n.badge_grantees,
                                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 18,
@@ -145,7 +146,7 @@ class _BadgePageState extends ConsumerState<BadgePage> {
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: Text(
-                                  '${_badgeDetail!.totalCount} 位',
+                                  context.l10n.badge_granteeCount(_badgeDetail!.totalCount),
                                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -171,7 +172,7 @@ class _BadgePageState extends ConsumerState<BadgePage> {
                                     ),
                                     const SizedBox(height: 12),
                                     Text(
-                                      '暂无用户获得该徽章',
+                                      context.l10n.badge_noGrantees,
                                       style: TextStyle(
                                         color: Theme.of(context).colorScheme.outline,
                                       ),
@@ -359,7 +360,7 @@ class _BadgeInfoCard extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                '已授予 ${badge.grantCount} 次',
+                context.l10n.badge_grantedCount(badge.grantCount),
                 style: TextStyle(
                   color: theme.colorScheme.secondary,
                   fontWeight: FontWeight.w600,
@@ -450,7 +451,7 @@ class _UserBadgeItem extends StatelessWidget {
                   RelativeTimeText(
                     dateTime: userBadge.grantedAt,
                     displayStyle: TimeDisplayStyle.suffixed,
-                    suffix: ' 获得',
+                    suffix: context.l10n.badge_grantedSuffix,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.outline,
                     ),

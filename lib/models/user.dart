@@ -1,3 +1,4 @@
+import '../l10n/s.dart';
 import '../utils/time_utils.dart';
 import '../utils/url_helper.dart';
 import 'badge.dart';
@@ -289,17 +290,17 @@ class User {
   String get trustLevelString {
     switch (trustLevel) {
       case 0:
-        return 'L0 新用户';
+        return S.current.user_trustLevel0;
       case 1:
-        return 'L1 基本用户';
+        return S.current.user_trustLevel1;
       case 2:
-        return 'L2 成员';
+        return S.current.user_trustLevel2;
       case 3:
-        return 'L3 活跃用户';
+        return S.current.user_trustLevel3;
       case 4:
-        return 'L4 领袖';
+        return S.current.user_trustLevel4;
       default:
-        return '等级 $trustLevel';
+        return S.current.user_trustLevelUnknown(trustLevel);
     }
   }
   

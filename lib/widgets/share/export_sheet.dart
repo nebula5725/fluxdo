@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../models/topic.dart';
+import '../../l10n/s.dart';
 import '../../services/toast_service.dart';
 import '../../utils/export_utils.dart';
 
@@ -70,7 +71,7 @@ class _ExportSheetState extends State<ExportSheet> {
       }
     } catch (e) {
       if (mounted) {
-        ToastService.showError('导出失败: $e');
+        ToastService.showError(S.current.export_failed('$e'));
       }
     } finally {
       if (mounted) {
@@ -111,7 +112,7 @@ class _ExportSheetState extends State<ExportSheet> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Text(
-                '导出文章',
+                context.l10n.export_title,
                 style: theme.textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
@@ -124,7 +125,7 @@ class _ExportSheetState extends State<ExportSheet> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Text(
-                '导出范围',
+                context.l10n.export_range,
                 style: theme.textTheme.titleSmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -134,16 +135,16 @@ class _ExportSheetState extends State<ExportSheet> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: SegmentedButton<ExportScope>(
-                segments: const [
+                segments: [
                   ButtonSegment(
                     value: ExportScope.firstPostOnly,
-                    label: Text('仅主帖'),
-                    icon: Icon(Icons.article_outlined),
+                    label: Text(context.l10n.export_firstPostOnly),
+                    icon: const Icon(Icons.article_outlined),
                   ),
                   ButtonSegment(
                     value: ExportScope.allPosts,
-                    label: Text('全部'),
-                    icon: Icon(Icons.forum_outlined),
+                    label: Text(context.l10n.common_all),
+                    icon: const Icon(Icons.forum_outlined),
                   ),
                 ],
                 selected: {_scope},
@@ -159,7 +160,7 @@ class _ExportSheetState extends State<ExportSheet> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Text(
-                '导出格式',
+                context.l10n.export_format,
                 style: theme.textTheme.titleSmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -203,7 +204,7 @@ class _ExportSheetState extends State<ExportSheet> {
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(
-                        'Markdown 格式最多导出前 ${ExportUtils.maxMarkdownPosts} 条帖子',
+                        context.l10n.export_markdownLimit(ExportUtils.maxMarkdownPosts),
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.primary,
                         ),
@@ -232,8 +233,8 @@ class _ExportSheetState extends State<ExportSheet> {
                       )
                     : const Icon(Icons.download),
                 label: Text(_isExporting
-                    ? (_total > 0 ? '导出中 ($_progress/$_total)' : '导出中...')
-                    : '导出'),
+                    ? (_total > 0 ? context.l10n.export_exporting(_progress, _total) : context.l10n.export_exportingNoProgress)
+                    : context.l10n.common_export),
                 style: FilledButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 14),
                 ),

@@ -10,6 +10,7 @@ import '../../services/discourse_cache_manager.dart';
 import '../common/cached_image.dart';
 import '../common/loading_spinner.dart';
 import 'sticker_market_sheet.dart';
+import '../../../../../l10n/s.dart';
 
 /// 表情包选择器
 ///
@@ -249,13 +250,13 @@ class _StickerPickerState extends ConsumerState<StickerPicker>
               size: 48,
               color: theme.colorScheme.outline.withValues(alpha: 0.5)),
           const SizedBox(height: 16),
-          Text('还没有表情包',
+          Text(S.current.sticker_noStickers,
               style: TextStyle(color: theme.colorScheme.onSurfaceVariant)),
           const SizedBox(height: 12),
           FilledButton.tonalIcon(
             onPressed: _openMarket,
             icon: const Icon(Icons.add, size: 18),
-            label: const Text('从市场添加'),
+            label: Text(S.current.sticker_addFromMarket),
           ),
         ],
       ),
@@ -270,12 +271,12 @@ class _StickerPickerState extends ConsumerState<StickerPicker>
         children: [
           Icon(Icons.error_outline, size: 48, color: theme.colorScheme.outline),
           const SizedBox(height: 12),
-          Text('加载表情包失败',
+          Text(S.current.sticker_loadFailed,
               style: TextStyle(color: theme.colorScheme.error)),
           const SizedBox(height: 8),
           TextButton(
             onPressed: () => ref.invalidate(stickerGroupsProvider),
-            child: const Text('重试'),
+            child: Text(S.current.common_retry),
           ),
         ],
       ),
@@ -399,7 +400,7 @@ class _StickerPickerState extends ConsumerState<StickerPicker>
           icon: Icon(Icons.add_circle_outline,
               size: 20, color: theme.colorScheme.primary),
           onPressed: _openMarket,
-          tooltip: '添加表情包',
+          tooltip: S.current.sticker_addTooltip,
         ),
       ],
     );
@@ -450,7 +451,7 @@ class _StickerPickerState extends ConsumerState<StickerPicker>
 
     if (hasRecent) {
       slivers.add(SliverToBoxAdapter(
-        child: _buildSectionHeader('最近使用', _groupKeys[keyIndex]),
+        child: _buildSectionHeader(S.current.common_recentlyUsed, _groupKeys[keyIndex]),
       ));
       slivers.add(_buildStickerSliverGrid(recentStickers));
       keyIndex++;
@@ -555,7 +556,7 @@ class _StickerGroupSliverContent extends ConsumerWidget {
             child: TextButton(
               onPressed: () =>
                   ref.invalidate(stickerGroupDetailProvider(groupId)),
-              child: Text('加载失败，点击重试',
+              child: Text(S.current.common_loadFailedTapRetry,
                   style: TextStyle(color: theme.colorScheme.error)),
             ),
           ),
@@ -566,8 +567,8 @@ class _StickerGroupSliverContent extends ConsumerWidget {
 
   Widget _buildGrid(StickerGroupDetail detail) {
     if (detail.emojis.isEmpty) {
-      return const SliverToBoxAdapter(
-        child: SizedBox(height: 80, child: Center(child: Text('该分组暂无表情包'))),
+      return SliverToBoxAdapter(
+        child: SizedBox(height: 80, child: Center(child: Text(S.current.sticker_groupEmpty))),
       );
     }
     return SliverPadding(

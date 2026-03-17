@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:paper_shaders/paper_shaders.dart';
 
+import '../l10n/s.dart';
 import '../services/apk_download_service.dart';
 import '../services/update_service.dart';
 
@@ -234,19 +235,20 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
   }
 
   String _getStatusText() {
+    final l10n = S.current;
     switch (_progress.status) {
       case ApkDownloadStatus.idle:
-        return '正在连接...';
+        return l10n.download_connecting;
       case ApkDownloadStatus.downloading:
-        return '正在下载 ${widget.asset.name}';
+        return l10n.download_downloading(widget.asset.name);
       case ApkDownloadStatus.verifying:
-        return '正在校验文件...';
+        return l10n.download_verifying;
       case ApkDownloadStatus.installing:
-        return '正在安装...';
+        return l10n.download_installing;
       case ApkDownloadStatus.completed:
-        return '已开始安装';
+        return l10n.download_installStarted;
       case ApkDownloadStatus.error:
-        return _progress.error ?? '发生错误';
+        return _progress.error ?? l10n.common_error;
     }
   }
 
@@ -262,13 +264,13 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
              TextButton(
               onPressed: () => Navigator.of(context).pop(),
               style: TextButton.styleFrom(foregroundColor: subColor),
-              child: const Text('关闭'),
+              child: Text(S.current.common_close),
             ),
             const SizedBox(width: 16),
              TextButton(
               onPressed: _isRetrying ? null : _retry,
                style: TextButton.styleFrom(foregroundColor: color),
-              child: const Text('重试'),
+              child: Text(S.current.common_retry),
             ),
           ],
         );
@@ -278,7 +280,7 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
          return TextButton(
             onPressed: () => Navigator.of(context).pop(),
             style: TextButton.styleFrom(foregroundColor: subColor),
-            child: const Text('关闭'),
+            child: Text(S.current.common_close),
         );
     }
 
@@ -288,7 +290,7 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
         style: TextButton.styleFrom(
             foregroundColor: subColor.withValues(alpha: 0.5), // 弱化取消
         ),
-        child: const Text('取消'),
+        child: Text(S.current.common_cancel),
     );
   }
 }

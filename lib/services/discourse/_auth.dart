@@ -7,7 +7,7 @@ mixin _AuthMixin on _DiscourseServiceBase {
     // 设置 PreloadedDataService 的登录失效回调
     PreloadedDataService().setAuthInvalidCallback(() {
       _handleAuthInvalid(
-        '登录已失效，请重新登录',
+        S.current.auth_loginExpiredRelogin,
         source: 'preloaded_data',
         triggerInfo: '有 token 但没有 currentUser，WebView 验证确认已登出',
       );
@@ -49,7 +49,7 @@ mixin _AuthMixin on _DiscourseServiceBase {
             },
           );
           await _handleAuthInvalid(
-            '登录已失效，请重新登录',
+            S.current.auth_loginExpiredRelogin,
             source: 'response_header',
             triggerInfo: '${response.requestOptions.method} ${response.requestOptions.uri} → ${response.statusCode}',
           );
@@ -114,7 +114,7 @@ mixin _AuthMixin on _DiscourseServiceBase {
             },
           );
           await _handleAuthInvalid(
-            '登录已失效，请重新登录',
+            S.current.auth_loginExpiredRelogin,
             source: 'error_response_header',
             triggerInfo: '${error.requestOptions.method} ${error.requestOptions.uri} → ${error.response?.statusCode}',
           );
@@ -138,7 +138,7 @@ mixin _AuthMixin on _DiscourseServiceBase {
               'memHasToken': _tToken != null && _tToken!.isNotEmpty,
             },
           );
-          final message = (data['errors'] as List?)?.first?.toString() ?? '登录已失效，请重新登录';
+          final message = (data['errors'] as List?)?.first?.toString() ?? S.current.auth_loginExpiredRelogin;
           await _handleAuthInvalid(
             message,
             source: 'error_response_body',

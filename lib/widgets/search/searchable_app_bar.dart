@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/s.dart';
 
 /// 可搜索的 AppBar
 /// 支持正常模式（显示标题）和搜索模式（显示输入框）之间的切换
@@ -51,7 +52,7 @@ class SearchableAppBar extends StatefulWidget implements PreferredSizeWidget {
     this.showFilterButton = false,
     this.filterActive = false,
     this.initialSearchText,
-    this.searchHint = '搜索...',
+    this.searchHint = '',
     this.onBackPressed,
   });
 
@@ -163,7 +164,7 @@ class _SearchableAppBarState extends State<SearchableAppBar>
               textAlignVertical: TextAlignVertical.center,
               style: theme.textTheme.bodyLarge,
               decoration: InputDecoration(
-                hintText: widget.searchHint,
+                hintText: widget.searchHint.isEmpty ? context.l10n.common_searchHint : widget.searchHint,
                 border: InputBorder.none,
                 isDense: true,
                 contentPadding: const EdgeInsets.symmetric(
@@ -186,7 +187,7 @@ class _SearchableAppBarState extends State<SearchableAppBar>
               IconButton(
                 icon: const Icon(Icons.search),
                 onPressed: () => _handleSubmit(_searchController.text),
-                tooltip: '搜索',
+                tooltip: context.l10n.common_search,
               ),
               if (widget.showFilterButton)
                 _buildFilterButton(theme),
@@ -195,7 +196,7 @@ class _SearchableAppBarState extends State<SearchableAppBar>
               IconButton(
                 icon: const Icon(Icons.search),
                 onPressed: widget.onSearchPressed,
-                tooltip: '搜索',
+                tooltip: context.l10n.common_search,
               ),
               if (widget.showFilterButton)
                 _buildFilterButton(theme),
@@ -209,7 +210,7 @@ class _SearchableAppBarState extends State<SearchableAppBar>
         IconButton(
           icon: const Icon(Icons.tune),
           onPressed: widget.onFilterPressed,
-          tooltip: '筛选',
+          tooltip: context.l10n.common_filter,
         ),
         if (widget.filterActive)
           Positioned(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../l10n/s.dart';
 import '../../../services/cf_challenge_service.dart';
 import '../../../services/toast_service.dart';
 
@@ -16,8 +17,8 @@ class CfVerifyCard extends StatelessWidget {
       ),
       child: ListTile(
         leading: const Icon(Icons.security),
-        title: const Text('Cloudflare 验证'),
-        subtitle: const Text('手动触发过盾验证'),
+        title: Text(context.l10n.cf_securityVerifyTitle),
+        subtitle: Text(context.l10n.error_securityChallenge),
         trailing: const Icon(Icons.chevron_right, size: 20),
         onTap: () => _showManualVerify(context),
       ),
@@ -30,12 +31,12 @@ class CfVerifyCard extends StatelessWidget {
     if (!context.mounted) return;
 
     if (result == true) {
-      ToastService.showSuccess('验证成功');
+      ToastService.showSuccess(S.current.common_success);
     } else if (result == false) {
-      ToastService.showError('验证未通过');
+      ToastService.showError(S.current.cf_failedRetry);
     } else {
       if (CfChallengeService().isInCooldown) {
-        ToastService.showInfo('验证太频繁，请稍后再试');
+        ToastService.showInfo(S.current.cf_cooldown);
       }
     }
   }

@@ -1,6 +1,7 @@
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import '../../../../../l10n/s.dart';
 
 abstract class ImageCompressionStrategy {
   const ImageCompressionStrategy();
@@ -16,7 +17,7 @@ abstract class ImageCompressionStrategy {
 }
 
 class GifImageCompressionStrategy extends ImageCompressionStrategy {
-  const GifImageCompressionStrategy();
+  GifImageCompressionStrategy();
 
   @override
   bool get canEdit => false;
@@ -25,7 +26,7 @@ class GifImageCompressionStrategy extends ImageCompressionStrategy {
   bool get supportsCompression => false;
 
   @override
-  String get displayName => 'GIF 动图';
+  String get displayName => S.current.imageFormat_gif;
 
   @override
   int estimateCompressedSize(int originalSize, int quality) => originalSize;
@@ -103,42 +104,31 @@ class StaticImageCompressionStrategy extends ImageCompressionStrategy {
 }
 
 class ImageCompressionStrategyFactory {
-  static const ImageCompressionStrategy _gifStrategy =
-      GifImageCompressionStrategy();
-  static const ImageCompressionStrategy _jpegStrategy =
-      StaticImageCompressionStrategy(
-        displayName: 'JPEG 图片',
-        format: CompressFormat.jpeg,
-        extension: 'jpg',
-      );
-  static const ImageCompressionStrategy _pngStrategy =
-      StaticImageCompressionStrategy(
-        displayName: 'PNG 图片',
-        format: CompressFormat.png,
-        extension: 'png',
-      );
-  static const ImageCompressionStrategy _webpStrategy =
-      StaticImageCompressionStrategy(
-        displayName: 'WebP 图片',
-        format: CompressFormat.webp,
-        extension: 'webp',
-      );
-  static const ImageCompressionStrategy _defaultStrategy =
-      PassthroughImageCompressionStrategy(displayName: '图片');
-
   static ImageCompressionStrategy fromPath(String path) {
     switch (p.extension(path).toLowerCase()) {
       case '.gif':
-        return _gifStrategy;
+        return GifImageCompressionStrategy();
       case '.png':
-        return _pngStrategy;
+        return StaticImageCompressionStrategy(
+          displayName: S.current.imageFormat_png,
+          format: CompressFormat.png,
+          extension: 'png',
+        );
       case '.webp':
-        return _webpStrategy;
+        return StaticImageCompressionStrategy(
+          displayName: S.current.imageFormat_webp,
+          format: CompressFormat.webp,
+          extension: 'webp',
+        );
       case '.jpg':
       case '.jpeg':
-        return _jpegStrategy;
+        return StaticImageCompressionStrategy(
+          displayName: S.current.imageFormat_jpeg,
+          format: CompressFormat.jpeg,
+          extension: 'jpg',
+        );
       default:
-        return _defaultStrategy;
+        return PassthroughImageCompressionStrategy(displayName: S.current.imageFormat_generic);
     }
   }
 }

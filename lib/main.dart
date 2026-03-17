@@ -6,6 +6,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
@@ -13,6 +14,7 @@ import 'pages/topics_page.dart';
 import 'pages/topics_screen.dart';
 import 'pages/profile_page.dart';
 import 'providers/discourse_providers.dart';
+import 'providers/locale_provider.dart';
 import 'providers/message_bus_providers.dart';
 import 'services/discourse/discourse_service.dart';
 import 'providers/app_state_refresher.dart';
@@ -25,6 +27,7 @@ import 'services/local_notification_service.dart';
 import 'services/data_management/cache_size_service.dart';
 import 'services/discourse_cache_manager.dart';
 import 'services/toast_service.dart';
+import 'l10n/s.dart';
 
 import 'services/preloaded_data_service.dart';
 import 'services/network/doh/network_settings_service.dart';
@@ -180,6 +183,13 @@ Future<void> main() async {
     }
   });
 
+  // 根据当前语言配置 AI 模型管理包的语言
+  final savedLocale = prefs.getString('pref_locale');
+  if (savedLocale != null && savedLocale != 'system') {
+    final parts = savedLocale.split('_');
+    AiL10n.configureLocale(Locale(parts[0], parts.length > 1 ? parts[1] : null));
+  }
+
   // 过滤 Flutter 框架已知 bug（https://github.com/flutter/flutter/issues/115787）
   // SelectionArea + CustomScrollView 拖选时触发的断言错误，仅 debug 模式出现
   bool filterKnownFrameworkBugs(Report report) {
@@ -268,17 +278,14 @@ class MainApp extends ConsumerWidget {
           navigatorKey: navigatorKey,
           navigatorObservers: [appRouteObserver],
           title: 'FluxDO',
-          // 配置中文本地化
-          locale: const Locale('zh', 'CN'),
-          localizationsDelegates: [
+          locale: ref.watch(localeProvider),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          supportedLocales: const [
-            Locale('zh', 'CN'), // 简体中文
-            Locale('en', 'US'), // 英文
-          ],
+          supportedLocales: AppLocalizations.supportedLocales,
           themeMode: themeState.mode,
           theme: ThemeData(
             colorScheme: lightScheme,
@@ -394,9 +401,9 @@ class _MainPageState extends ConsumerState<MainPage> with WidgetsBindingObserver
       final wasConnected = prev?.value ?? true;
       final isNow = next.value;
       if (isNow == false && wasConnected) {
-        ToastService.showError('网络连接已断开');
+        ToastService.showError(S.current.toast_networkDisconnected);
       } else if (isNow == true && prev?.value == false) {
-        ToastService.showSuccess('网络已恢复');
+        ToastService.showSuccess(S.current.toast_networkRestored);
       }
     });
 
@@ -535,12 +542,12 @@ class _MainPageState extends ConsumerState<MainPage> with WidgetsBindingObserver
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: const Text('登录失效'),
+        title: Text(S.current.auth_loginExpiredTitle),
         content: Text(message),
         actions: [
           FilledButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('确定'),
+            child: Text(S.current.common_confirm),
           ),
         ],
       ),
@@ -573,7 +580,7 @@ class _MainPageState extends ConsumerState<MainPage> with WidgetsBindingObserver
           SystemNavigator.pop();
         } else {
           _lastBackPressTime = now;
-          ToastService.showInfo('再按一次返回键退出');
+          ToastService.showInfo(S.current.toast_pressAgainToExit);
         }
       },
       child: AdaptiveScaffold(
@@ -603,15 +610,15 @@ class _MainPageState extends ConsumerState<MainPage> with WidgetsBindingObserver
         : null;
 
     return [
-      const AdaptiveDestination(
-        icon: Icon(Icons.home_outlined),
-        selectedIcon: Icon(Icons.home),
-        label: '首页',
+      AdaptiveDestination(
+        icon: const Icon(Icons.home_outlined),
+        selectedIcon: const Icon(Icons.home),
+        label: S.current.nav_home,
       ),
       AdaptiveDestination(
         icon: avatarWidget ?? const Icon(Icons.person_outline),
         selectedIcon: avatarWidget ?? const Icon(Icons.person),
-        label: '我的',
+        label: S.current.nav_mine,
       ),
     ];
   }

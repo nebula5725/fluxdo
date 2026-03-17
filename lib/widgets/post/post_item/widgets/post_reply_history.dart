@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../l10n/s.dart';
 import '../../../../models/topic.dart';
 import '../../../../services/discourse_cache_manager.dart';
 import '../../../content/discourse_html_content/discourse_html_content.dart';
@@ -44,7 +45,7 @@ class PostReplyHistory extends StatelessWidget {
                 Icon(Icons.format_quote_rounded, size: 16, color: theme.colorScheme.primary),
                 const SizedBox(width: 8),
                 Text(
-                  '回复给',
+                  context.l10n.post_replyTo,
                   style: theme.textTheme.labelMedium?.copyWith(
                     color: theme.colorScheme.primary,
                     fontWeight: FontWeight.bold,

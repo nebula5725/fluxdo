@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../common/skeleton.dart';
+import '../../../../../l10n/s.dart';
 
 /// 我的徽章页骨架屏
 class MyBadgesSkeleton extends StatelessWidget {
@@ -15,7 +16,7 @@ class MyBadgesSkeleton extends StatelessWidget {
         slivers: [
           // AppBar 骨架
           SliverAppBar.large(
-            title: const Text('我的徽章'),
+            title: Text(S.current.badge_myBadges),
             centerTitle: false,
             expandedHeight: 200,
             flexibleSpace: FlexibleSpaceBar(

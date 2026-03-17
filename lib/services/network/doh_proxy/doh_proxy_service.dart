@@ -7,6 +7,7 @@ import 'dart:typed_data';
 import 'package:path/path.dart' as p;
 
 import '../../network_logger.dart';
+import '../../../l10n/s.dart';
 import 'doh_proxy_ffi.dart';
 
 /// DOH (DNS over HTTPS) 代理服务
@@ -245,7 +246,7 @@ class DohProxyService {
     try {
       final executablePath = await _getExecutablePath();
       if (executablePath == null) {
-        _lastError = '找不到代理可执行文件';
+        _lastError = S.current.doh_executableNotFound;
         NetworkLogger.log('[DOH] $_lastError');
         return false;
       }
@@ -362,7 +363,7 @@ class DohProxyService {
       final result = await completer.future.timeout(
         const Duration(seconds: 5),
         onTimeout: () {
-          _lastError = '代理启动超时（5秒内未响应）';
+          _lastError = S.current.doh_startTimeout;
           NetworkLogger.log('[DOH] $_lastError');
           return false;
         },

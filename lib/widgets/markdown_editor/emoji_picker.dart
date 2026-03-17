@@ -8,6 +8,7 @@ import '../../services/emoji_handler.dart';
 import '../../services/discourse_cache_manager.dart';
 import '../common/cached_image.dart';
 import '../common/loading_spinner.dart';
+import '../../../../../l10n/s.dart';
 
 /// 常用表情的 Key
 const String _recentEmojisKey = 'recent_emojis';
@@ -204,13 +205,13 @@ class _EmojiPickerState extends ConsumerState<EmojiPicker>
                       size: 48,
                       color: Theme.of(context).colorScheme.outline),
                   const SizedBox(height: 12),
-                  Text('加载表情失败',
+                  Text(S.current.emoji_loadFailed,
                       style: TextStyle(
                           color: Theme.of(context).colorScheme.error)),
                   const SizedBox(height: 8),
                   TextButton(
                     onPressed: () => ref.invalidate(emojiGroupsProvider),
-                    child: const Text('重试'),
+                    child: Text(S.current.common_retry),
                   ),
                 ],
               ),
@@ -222,7 +223,7 @@ class _EmojiPickerState extends ConsumerState<EmojiPicker>
   }
 
   Widget _buildContent(Map<String, List<Emoji>> emojiGroups) {
-    if (emojiGroups.isEmpty) return const Center(child: Text('没有找到表情'));
+    if (emojiGroups.isEmpty) return Center(child: Text(S.current.emoji_notFound));
 
     // 构建最近使用的表情（使用快照）
     final recentEmojis = <Emoji>[];
@@ -283,7 +284,7 @@ class _EmojiPickerState extends ConsumerState<EmojiPicker>
           icon:
               Icon(Icons.search, size: 20, color: theme.colorScheme.primary),
           onPressed: () => _showSearchDialog(context, emojiGroups),
-          tooltip: '搜索表情',
+          tooltip: S.current.emoji_searchTooltip,
         ),
         Container(
             height: 20, width: 1, color: theme.colorScheme.outlineVariant),
@@ -377,7 +378,7 @@ class _EmojiPickerState extends ConsumerState<EmojiPicker>
 
     if (hasRecent) {
       slivers.add(SliverToBoxAdapter(
-        child: _buildSectionHeader('最近使用', _groupKeys[keyIndex]),
+        child: _buildSectionHeader(S.current.common_recentlyUsed, _groupKeys[keyIndex]),
       ));
       slivers.add(_buildEmojiSliverGrid(recentEmojis));
       keyIndex++;
@@ -455,15 +456,15 @@ class _EmojiPickerState extends ConsumerState<EmojiPicker>
   }
 
   String _formatGroupName(String name) {
-    if (name == 'smileys_&_emotion') return '表情';
-    if (name == 'people_&_body') return '人物';
-    if (name == 'animals_&_nature') return '动物';
-    if (name == 'food_&_drink') return '食物';
-    if (name == 'activities') return '活动';
-    if (name == 'travel_&_places') return '旅行';
-    if (name == 'objects') return '物体';
-    if (name == 'symbols') return '符号';
-    if (name == 'flags') return '旗帜';
+    if (name == 'smileys_&_emotion') return S.current.emoji_smileys;
+    if (name == 'people_&_body') return S.current.emoji_people;
+    if (name == 'animals_&_nature') return S.current.emoji_animals;
+    if (name == 'food_&_drink') return S.current.emoji_food;
+    if (name == 'activities') return S.current.emoji_activities;
+    if (name == 'travel_&_places') return S.current.emoji_travel;
+    if (name == 'objects') return S.current.emoji_objects;
+    if (name == 'symbols') return S.current.emoji_symbols;
+    if (name == 'flags') return S.current.emoji_flags;
     return name.replaceAll('_&_', ' & ').replaceAll('_', ' ').capitalize();
   }
 }
@@ -565,7 +566,7 @@ class _EmojiSearchSheetState extends State<_EmojiSearchSheet> {
                           textAlignVertical: TextAlignVertical.center,
                           style: const TextStyle(fontSize: 16),
                           decoration: InputDecoration(
-                            hintText: '搜索表情...',
+                            hintText: S.current.emoji_searchHint,
                             hintStyle: TextStyle(
                                 color: theme.colorScheme.onSurfaceVariant),
                             border: InputBorder.none,
@@ -599,7 +600,7 @@ class _EmojiSearchSheetState extends State<_EmojiSearchSheet> {
                         padding:
                             const EdgeInsets.symmetric(horizontal: 8),
                       ),
-                      child: const Text('取消'),
+                      child: Text(S.current.common_cancel),
                     ),
                   ],
                 ),
@@ -617,7 +618,7 @@ class _EmojiSearchSheetState extends State<_EmojiSearchSheet> {
                             color: theme.colorScheme.outline
                                 .withValues(alpha: 0.5)),
                         const SizedBox(height: 16),
-                        Text('输入关键词搜索表情',
+                        Text(S.current.emoji_searchPrompt,
                             style: TextStyle(
                                 color:
                                     theme.colorScheme.onSurfaceVariant)),
@@ -626,7 +627,7 @@ class _EmojiSearchSheetState extends State<_EmojiSearchSheet> {
                   )
                 : results.isEmpty
                     ? Center(
-                        child: Text('未找到相关表情',
+                        child: Text(S.current.emoji_searchNotFound,
                             style: TextStyle(
                                 color:
                                     theme.colorScheme.onSurfaceVariant)),

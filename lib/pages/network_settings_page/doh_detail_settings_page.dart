@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../l10n/s.dart';
 import '../../services/network/doh/doh_resolver.dart';
 import '../../services/network/doh/network_settings_service.dart';
 import '../../services/toast_service.dart';
@@ -30,7 +31,7 @@ class _DohDetailSettingsPageState extends State<DohDetailSettingsPage> {
         final settings = _service.current;
 
         return Scaffold(
-          appBar: AppBar(title: const Text('DOH 详细设置')),
+          appBar: AppBar(title: Text(context.l10n.dohDetail_title)),
           body: ListView(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             children: [
@@ -43,11 +44,11 @@ class _DohDetailSettingsPageState extends State<DohDetailSettingsPage> {
                 child: Column(
                   children: [
                     SwitchListTile(
-                      title: const Text('Gateway 模式'),
+                      title: Text(context.l10n.dohDetail_gatewayMode),
                       subtitle: Text(
                         settings.gatewayEnabled
-                            ? '单次 TLS，通过反向代理转发'
-                            : '已关闭，使用 MITM 双重 TLS',
+                            ? context.l10n.dohDetail_gatewayEnabledDesc
+                            : context.l10n.dohDetail_gatewayDisabledDesc,
                       ),
                       secondary: const Icon(Icons.swap_horiz),
                       value: settings.gatewayEnabled,
@@ -58,8 +59,8 @@ class _DohDetailSettingsPageState extends State<DohDetailSettingsPage> {
                       color: theme.colorScheme.outlineVariant.withValues(alpha: 0.2),
                     ),
                     SwitchListTile(
-                      title: const Text('IPv6 优先'),
-                      subtitle: const Text('优先尝试 IPv6，失败自动回落 IPv4'),
+                      title: Text(context.l10n.dohDetail_ipv6Prefer),
+                      subtitle: Text(context.l10n.dohDetail_ipv6PreferDesc),
                       secondary: const Icon(Icons.language),
                       value: settings.preferIPv6,
                       onChanged: (value) => _service.setPreferIPv6(value),
@@ -71,11 +72,11 @@ class _DohDetailSettingsPageState extends State<DohDetailSettingsPage> {
                     // Server IP
                     ListTile(
                       leading: const Icon(Icons.dns),
-                      title: const Text('服务端 IP'),
+                      title: Text(context.l10n.dohDetail_serverIp),
                       subtitle: Text(
                         settings.serverIp != null && settings.serverIp!.isNotEmpty
                             ? settings.serverIp!
-                            : '未设置',
+                            : context.l10n.common_notSet,
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
@@ -83,7 +84,7 @@ class _DohDetailSettingsPageState extends State<DohDetailSettingsPage> {
                       trailing: settings.serverIp != null && settings.serverIp!.isNotEmpty
                           ? IconButton(
                               icon: const Icon(Icons.clear, size: 20),
-                              tooltip: '清除',
+                              tooltip: context.l10n.common_clear,
                               onPressed: () => _service.setServerIp(null),
                             )
                           : null,
@@ -95,7 +96,7 @@ class _DohDetailSettingsPageState extends State<DohDetailSettingsPage> {
               const SizedBox(height: 24),
 
               // 服务器列表
-              _buildSectionHeader(theme, '服务器'),
+              _buildSectionHeader(theme, context.l10n.dohDetail_servers),
               const SizedBox(height: 12),
               Card(
                 clipBehavior: Clip.antiAlias,
@@ -119,7 +120,7 @@ class _DohDetailSettingsPageState extends State<DohDetailSettingsPage> {
                                     child: CircularProgressIndicator(strokeWidth: 2),
                                   )
                                 : const Icon(Icons.speed, size: 16),
-                            label: Text(_testingAll ? '测速中' : '全部测速'),
+                            label: Text(_testingAll ? context.l10n.dohDetail_testingSpeed : context.l10n.dohDetail_testAllSpeed),
                             style: TextButton.styleFrom(
                               padding: const EdgeInsets.symmetric(horizontal: 8),
                               visualDensity: VisualDensity.compact,
@@ -128,7 +129,7 @@ class _DohDetailSettingsPageState extends State<DohDetailSettingsPage> {
                           TextButton.icon(
                             onPressed: _showAddServerDialog,
                             icon: const Icon(Icons.add, size: 16),
-                            label: const Text('添加'),
+                            label: Text(context.l10n.common_add),
                             style: TextButton.styleFrom(
                               padding: const EdgeInsets.symmetric(horizontal: 8),
                               visualDensity: VisualDensity.compact,
@@ -156,7 +157,7 @@ class _DohDetailSettingsPageState extends State<DohDetailSettingsPage> {
               ),
               const SizedBox(height: 24),
 
-              _buildSectionHeader(theme, 'DNS 缓存'),
+              _buildSectionHeader(theme, context.l10n.dohDetail_dnsCacheSection),
               const SizedBox(height: 12),
               Card(
                 clipBehavior: Clip.antiAlias,
@@ -200,9 +201,9 @@ class _DohDetailSettingsPageState extends State<DohDetailSettingsPage> {
               ),
           ],
           if (servers.isEmpty)
-            const Padding(
-              padding: EdgeInsets.all(24),
-              child: Text('暂无服务器'),
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Text(S.current.dohDetail_noServers),
             ),
         ],
       ),
@@ -236,7 +237,7 @@ class _DohDetailSettingsPageState extends State<DohDetailSettingsPage> {
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Text(
-                '自定义',
+                S.current.common_custom,
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: theme.colorScheme.onTertiaryContainer,
                 ),
@@ -284,20 +285,20 @@ class _DohDetailSettingsPageState extends State<DohDetailSettingsPage> {
               width: 48,
               child: IconButton(
                 icon: const Icon(Icons.speed, size: 20),
-                tooltip: '测速',
+                tooltip: S.current.dohDetail_testSpeed,
                 onPressed: () => _testServer(server),
                 visualDensity: VisualDensity.compact,
               ),
             ),
           PopupMenuButton<String>(
             icon: Icon(Icons.more_vert, size: 20, color: theme.colorScheme.onSurfaceVariant),
-            tooltip: '更多',
+            tooltip: S.current.common_more,
             padding: EdgeInsets.zero,
             onSelected: (value) {
               switch (value) {
                 case 'copy':
                   Clipboard.setData(ClipboardData(text: server.url));
-                  ToastService.showInfo('已复制 DoH 地址');
+                  ToastService.showInfo(S.current.dohDetail_dohAddressCopied);
                 case 'edit':
                   _showEditServerDialog(server);
                 case 'delete':
@@ -305,21 +306,21 @@ class _DohDetailSettingsPageState extends State<DohDetailSettingsPage> {
               }
             },
             itemBuilder: (context) => [
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'copy',
                 child: ListTile(
-                  leading: Icon(Icons.copy, size: 20),
-                  title: Text('复制地址'),
+                  leading: const Icon(Icons.copy, size: 20),
+                  title: Text(S.current.dohDetail_copyAddress),
                   dense: true,
                   contentPadding: EdgeInsets.zero,
                 ),
               ),
               if (server.isCustom) ...[
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'edit',
                   child: ListTile(
-                    leading: Icon(Icons.edit, size: 20),
-                    title: Text('编辑'),
+                    leading: const Icon(Icons.edit, size: 20),
+                    title: Text(S.current.common_edit),
                     dense: true,
                     contentPadding: EdgeInsets.zero,
                   ),
@@ -328,7 +329,7 @@ class _DohDetailSettingsPageState extends State<DohDetailSettingsPage> {
                   value: 'delete',
                   child: ListTile(
                     leading: Icon(Icons.delete_outline, size: 20, color: theme.colorScheme.error),
-                    title: Text('删除', style: TextStyle(color: theme.colorScheme.error)),
+                    title: Text(S.current.common_delete, style: TextStyle(color: theme.colorScheme.error)),
                     dense: true,
                     contentPadding: EdgeInsets.zero,
                   ),
@@ -393,7 +394,7 @@ class _DohDetailSettingsPageState extends State<DohDetailSettingsPage> {
   Widget _buildEchServerSelector(ThemeData theme, NetworkSettings settings) {
     final servers = _service.servers;
     final currentEch = settings.echServerUrl;
-    String echLabel = '与 DNS 相同';
+    String echLabel = S.current.dohDetail_sameAsDns;
     if (currentEch != null) {
       for (final s in servers) {
         if (s.url == currentEch) {
@@ -405,7 +406,7 @@ class _DohDetailSettingsPageState extends State<DohDetailSettingsPage> {
 
     return ListTile(
       leading: const Icon(Icons.security),
-      title: const Text('ECH 服务器'),
+      title: Text(S.current.dohDetail_echServer),
       subtitle: Text(
         echLabel,
         style: theme.textTheme.bodySmall?.copyWith(
@@ -423,9 +424,9 @@ class _DohDetailSettingsPageState extends State<DohDetailSettingsPage> {
       children: [
         ListTile(
           leading: const Icon(Icons.storage),
-          title: const Text('共享本地 DNS 缓存'),
+          title: Text(S.current.dohDetail_localDnsCache),
           subtitle: Text(
-            '当前已缓存 $cacheCount 个域名。代理模式和查询模式共用缓存，TTL 临近到期会后台刷新。',
+            S.current.dohDetail_dnsCacheDesc(cacheCount),
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -449,7 +450,7 @@ class _DohDetailSettingsPageState extends State<DohDetailSettingsPage> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : const Icon(Icons.delete_outline),
-                  label: Text(_dnsCacheBusy ? '处理中' : '清空缓存'),
+                  label: Text(_dnsCacheBusy ? S.current.dohDetail_processing : S.current.dohDetail_clearCache),
                 ),
               ),
               const SizedBox(width: 12),
@@ -463,7 +464,7 @@ class _DohDetailSettingsPageState extends State<DohDetailSettingsPage> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : const Icon(Icons.refresh),
-                  label: Text(_dnsCacheBusy ? '处理中' : '强制刷新'),
+                  label: Text(_dnsCacheBusy ? S.current.dohDetail_processing : S.current.dohDetail_forceRefresh),
                 ),
               ),
             ],
@@ -478,12 +479,12 @@ class _DohDetailSettingsPageState extends State<DohDetailSettingsPage> {
       context: context,
       builder: (context) {
         return SimpleDialog(
-          title: const Text('选择 ECH 服务器'),
+          title: Text(context.l10n.dohDetail_selectEchServer),
           children: [
             RadioListTile<String?>(
-              title: const Text('与 DNS 相同'),
+              title: Text(context.l10n.dohDetail_sameAsDns),
               subtitle: Text(
-                '使用 DNS 解析服务器查询 ECH 配置',
+                context.l10n.dohDetail_echSameAsDnsDesc,
                 style: Theme.of(context).textTheme.bodySmall,
               ),
               value: null,
@@ -523,11 +524,11 @@ class _DohDetailSettingsPageState extends State<DohDetailSettingsPage> {
     try {
       await _service.clearDnsCache();
       if (mounted) {
-        ToastService.showSuccess('DNS 缓存已清空');
+        ToastService.showSuccess(S.current.dohDetail_dnsCacheCleared);
       }
     } catch (e) {
       if (mounted) {
-        ToastService.showError('清空 DNS 缓存失败: $e');
+        ToastService.showError(S.current.dohDetail_clearDnsCacheFailed('$e'));
       }
     } finally {
       if (mounted) {
@@ -543,12 +544,12 @@ class _DohDetailSettingsPageState extends State<DohDetailSettingsPage> {
       final count = await _service.forceRefreshDnsCache();
       if (mounted) {
         ToastService.showSuccess(
-          count > 0 ? 'DNS 缓存已强制刷新（$count 个域名）' : 'DNS 缓存已强制刷新',
+          count > 0 ? S.current.dohDetail_dnsCacheRefreshed(count) : S.current.dohDetail_dnsCacheRefreshedSimple,
         );
       }
     } catch (e) {
       if (mounted) {
-        ToastService.showError('强制刷新 DNS 缓存失败: $e');
+        ToastService.showError(S.current.dohDetail_refreshDnsCacheFailed('$e'));
       }
     } finally {
       if (mounted) {
@@ -566,23 +567,23 @@ class _DohDetailSettingsPageState extends State<DohDetailSettingsPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('添加服务器'),
+          title: Text(context.l10n.dohDetail_addServer),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: nameController,
-                decoration: const InputDecoration(
-                  labelText: '名称',
-                  hintText: '例如：My DNS',
+                decoration: InputDecoration(
+                  labelText: context.l10n.common_name,
+                  hintText: context.l10n.dohDetail_exampleDns,
                 ),
                 textInputAction: TextInputAction.next,
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: urlController,
-                decoration: const InputDecoration(
-                  labelText: 'DoH 地址',
+                decoration: InputDecoration(
+                  labelText: context.l10n.dohDetail_dohAddress,
                   hintText: 'https://dns.example.com/dns-query',
                 ),
                 keyboardType: TextInputType.url,
@@ -591,10 +592,10 @@ class _DohDetailSettingsPageState extends State<DohDetailSettingsPage> {
               const SizedBox(height: 12),
               TextField(
                 controller: bootstrapIpsController,
-                decoration: const InputDecoration(
-                  labelText: 'Bootstrap IP（可选）',
-                  hintText: '用逗号分隔，如 1.1.1.1, 1.0.0.1',
-                  helperText: '直接用 IP 连接 DoH 服务器，绕过 DNS 解析',
+                decoration: InputDecoration(
+                  labelText: context.l10n.dohDetail_bootstrapIpOptional,
+                  hintText: context.l10n.dohDetail_bootstrapIpHint,
+                  helperText: context.l10n.dohDetail_bootstrapIpHelper,
                   helperMaxLines: 2,
                 ),
                 keyboardType: TextInputType.text,
@@ -605,18 +606,18 @@ class _DohDetailSettingsPageState extends State<DohDetailSettingsPage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('取消'),
+              child: Text(context.l10n.common_cancel),
             ),
             FilledButton(
               onPressed: () {
                 final name = nameController.text.trim();
                 final url = urlController.text.trim();
                 if (name.isEmpty || url.isEmpty) {
-                  ToastService.showInfo('请填写完整信息');
+                  ToastService.showInfo(S.current.common_fillComplete);
                   return;
                 }
                 if (!url.startsWith('https://')) {
-                  ToastService.showError('地址必须以 https:// 开头');
+                  ToastService.showError(S.current.dohDetail_urlMustHttps);
                   return;
                 }
                 final bootstrapIps = _parseBootstrapIps(bootstrapIpsController.text);
@@ -630,7 +631,7 @@ class _DohDetailSettingsPageState extends State<DohDetailSettingsPage> {
                   ),
                 );
               },
-              child: const Text('添加'),
+              child: Text(context.l10n.common_add),
             ),
           ],
         );
@@ -653,23 +654,23 @@ class _DohDetailSettingsPageState extends State<DohDetailSettingsPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('编辑服务器'),
+          title: Text(context.l10n.dohDetail_editServer),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: nameController,
-                decoration: const InputDecoration(
-                  labelText: '名称',
-                  hintText: '例如：My DNS',
+                decoration: InputDecoration(
+                  labelText: context.l10n.common_name,
+                  hintText: context.l10n.dohDetail_exampleDns,
                 ),
                 textInputAction: TextInputAction.next,
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: urlController,
-                decoration: const InputDecoration(
-                  labelText: 'DoH 地址',
+                decoration: InputDecoration(
+                  labelText: context.l10n.dohDetail_dohAddress,
                   hintText: 'https://dns.example.com/dns-query',
                 ),
                 keyboardType: TextInputType.url,
@@ -678,10 +679,10 @@ class _DohDetailSettingsPageState extends State<DohDetailSettingsPage> {
               const SizedBox(height: 12),
               TextField(
                 controller: bootstrapIpsController,
-                decoration: const InputDecoration(
-                  labelText: 'Bootstrap IP（可选）',
-                  hintText: '用逗号分隔，如 1.1.1.1, 1.0.0.1',
-                  helperText: '直接用 IP 连接 DoH 服务器，绕过 DNS 解析',
+                decoration: InputDecoration(
+                  labelText: context.l10n.dohDetail_bootstrapIpOptional,
+                  hintText: context.l10n.dohDetail_bootstrapIpHint,
+                  helperText: context.l10n.dohDetail_bootstrapIpHelper,
                   helperMaxLines: 2,
                 ),
                 keyboardType: TextInputType.text,
@@ -692,18 +693,18 @@ class _DohDetailSettingsPageState extends State<DohDetailSettingsPage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('取消'),
+              child: Text(context.l10n.common_cancel),
             ),
             FilledButton(
               onPressed: () {
                 final name = nameController.text.trim();
                 final url = urlController.text.trim();
                 if (name.isEmpty || url.isEmpty) {
-                  ToastService.showInfo('请填写完整信息');
+                  ToastService.showInfo(S.current.common_fillComplete);
                   return;
                 }
                 if (!url.startsWith('https://')) {
-                  ToastService.showError('地址必须以 https:// 开头');
+                  ToastService.showError(S.current.dohDetail_urlMustHttps);
                   return;
                 }
                 final bootstrapIps = _parseBootstrapIps(bootstrapIpsController.text);
@@ -717,7 +718,7 @@ class _DohDetailSettingsPageState extends State<DohDetailSettingsPage> {
                   ),
                 );
               },
-              child: const Text('保存'),
+              child: Text(context.l10n.common_save),
             ),
           ],
         );
@@ -739,12 +740,12 @@ class _DohDetailSettingsPageState extends State<DohDetailSettingsPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('服务端 IP'),
+          title: Text(context.l10n.dohDetail_serverIp),
           content: TextField(
             controller: controller,
-            decoration: const InputDecoration(
-              hintText: '指定连接 IP，跳过 DNS 解析',
-              labelText: 'IP 地址',
+            decoration: InputDecoration(
+              hintText: context.l10n.dohDetail_serverIpHint,
+              labelText: context.l10n.dohDetail_ipAddress,
             ),
             keyboardType: TextInputType.text,
             autofocus: true,
@@ -752,16 +753,16 @@ class _DohDetailSettingsPageState extends State<DohDetailSettingsPage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('取消'),
+              child: Text(context.l10n.common_cancel),
             ),
             if (settings.serverIp != null && settings.serverIp!.isNotEmpty)
               TextButton(
                 onPressed: () => Navigator.pop(context, ''),
-                child: const Text('清除'),
+                child: Text(context.l10n.common_clear),
               ),
             FilledButton(
               onPressed: () => Navigator.pop(context, controller.text),
-              child: const Text('确认'),
+              child: Text(context.l10n.common_confirm),
             ),
           ],
         );
@@ -777,19 +778,19 @@ class _DohDetailSettingsPageState extends State<DohDetailSettingsPage> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('删除服务器'),
-        content: Text('确定要删除 "${server.name}" 吗？'),
+        title: Text(context.l10n.dohDetail_deleteServer),
+        content: Text(context.l10n.dohDetail_deleteServerConfirm(server.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('取消'),
+            child: Text(context.l10n.common_cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
             style: FilledButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.error,
             ),
-            child: const Text('删除'),
+            child: Text(context.l10n.common_delete),
           ),
         ],
       ),

@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import '../../models/mention_user.dart';
 import '../../constants.dart';
 import '../common/smart_avatar.dart';
+import '../../../../../l10n/s.dart';
 
 /// 搜索用户的数据源类型
 typedef MentionDataSource = Future<MentionSearchResult> Function(String term);
@@ -379,7 +380,7 @@ class _MentionAutocompleteState extends State<MentionAutocomplete> {
           Padding(
             padding: const EdgeInsets.all(16),
             child: Text(
-              _currentSearchTerm.isEmpty ? '输入用户名搜索' : '未找到匹配用户',
+              _currentSearchTerm.isEmpty ? S.current.mention_searchHint : S.current.mention_noUserFound,
               style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
             ),
           )
@@ -524,7 +525,7 @@ class _MentionItemTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
-        '群组',
+        S.current.mention_group,
         style: TextStyle(
           fontSize: 10,
           color: theme.colorScheme.onSecondaryContainer,

@@ -7,6 +7,7 @@ import '../../cf_challenge_service.dart';
 import '../../cf_challenge_logger.dart';
 import '../../cf_clearance_refresh_service.dart';
 import '../cookie/cookie_jar_service.dart';
+import '../../../l10n/s.dart';
 import '../exceptions/api_exception.dart';
 
 /// Cloudflare 验证拦截器
@@ -87,7 +88,7 @@ class CfChallengeInterceptor extends Interceptor {
       if (cfService.isInCooldown) {
         debugPrint('[Dio] CF Challenge in cooldown, rejecting request');
         CfChallengeLogger.log('[INTERCEPTOR] Skipped: in cooldown');
-        CfChallengeService.showGlobalMessage('安全验证失败，已进入冷却期，请稍后再试');
+        CfChallengeService.showGlobalMessage(S.current.cf_challengeFailedCooldown);
         return handler.reject(DioException(
           requestOptions: err.requestOptions,
           error: CfChallengeException(inCooldown: true),
@@ -108,7 +109,7 @@ class CfChallengeInterceptor extends Interceptor {
         if (!syncOk) {
           debugPrint('[Dio] cf_clearance not found after sync, entering cooldown');
           cfService.startCooldown();
-          CfChallengeService.showGlobalMessage('验证未生效，请稍后重试');
+          CfChallengeService.showGlobalMessage(S.current.cf_challengeNotEffective);
           return handler.reject(DioException(
             requestOptions: err.requestOptions,
             error: CfChallengeException(cause: 'cf_clearance cookie 同步失败'),
@@ -168,7 +169,7 @@ class CfChallengeInterceptor extends Interceptor {
       } else if (result == null) {
         // null 可能是冷却期内，也可能是无 context
         if (cfService.isInCooldown) {
-          CfChallengeService.showGlobalMessage('安全验证失败，已进入冷却期，请稍后再试');
+          CfChallengeService.showGlobalMessage(S.current.cf_challengeFailedCooldown);
           return handler.reject(DioException(
             requestOptions: err.requestOptions,
             error: CfChallengeException(inCooldown: true),
@@ -179,7 +180,7 @@ class CfChallengeInterceptor extends Interceptor {
         debugPrint(
             '[Dio] CF Challenge: no context available, cannot show verify page');
         CfChallengeLogger.log('[INTERCEPTOR] No context available');
-        CfChallengeService.showGlobalMessage('无法打开验证页面，请稍后重试');
+        CfChallengeService.showGlobalMessage(S.current.cf_cannotOpenVerifyPage);
         return handler.reject(DioException(
           requestOptions: err.requestOptions,
           error: CfChallengeException(cause: '无法获取 context，验证页面未展示'),
@@ -188,7 +189,7 @@ class CfChallengeInterceptor extends Interceptor {
       } else {
         // result == false：用户取消或验证失败
         CfChallengeLogger.log('[INTERCEPTOR] User cancelled or verify failed');
-        CfChallengeService.showGlobalMessage('验证未完成，请重试');
+        CfChallengeService.showGlobalMessage(S.current.cf_verifyIncomplete);
         return handler.reject(DioException(
           requestOptions: err.requestOptions,
           error: CfChallengeException(userCancelled: true),

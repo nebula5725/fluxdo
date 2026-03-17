@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../l10n/s.dart';
 import '../../services/message_bus_service.dart';
 import '../../services/local_notification_service.dart';
 import '../../models/notification.dart';
@@ -262,7 +263,7 @@ class NotificationAlertChannelNotifier extends Notifier<void> {
   
   /// 获取通知类型标签
   String _getNotificationTypeLabel(int? type) {
-    if (type == null) return '新通知';
+    if (type == null) return S.current.notification_newNotification;
     final notificationType = NotificationType.fromId(type);
     return notificationType.label;
   }

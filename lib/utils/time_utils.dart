@@ -1,4 +1,5 @@
 import 'package:intl/intl.dart';
+import '../l10n/s.dart';
 
 /// 时间工具类 - 统一处理时间格式化和时区转换
 class TimeUtils {
@@ -27,13 +28,13 @@ class TimeUtils {
     final now = DateTime.now();
     final diff = now.difference(time);
 
-    if (diff.inSeconds < 60) return '刚刚';
-    if (diff.inMinutes < 60) return '${diff.inMinutes}分钟前';
-    if (diff.inHours < 24) return '${diff.inHours}小时前';
-    if (diff.inDays < 7) return '${diff.inDays}天前';
-    if (diff.inDays < 30) return '${(diff.inDays / 7).floor()}周前';
-    if (diff.inDays < 365) return '${(diff.inDays / 30).floor()}个月前';
-    return '${(diff.inDays / 365).floor()}年前';
+    if (diff.inSeconds < 60) return S.current.time_justNow;
+    if (diff.inMinutes < 60) return S.current.time_minutesAgo(diff.inMinutes);
+    if (diff.inHours < 24) return S.current.time_hoursAgo(diff.inHours);
+    if (diff.inDays < 7) return S.current.time_daysAgo(diff.inDays);
+    if (diff.inDays < 30) return S.current.time_weeksAgo((diff.inDays / 7).floor());
+    if (diff.inDays < 365) return S.current.time_monthsAgo((diff.inDays / 30).floor());
+    return S.current.time_yearsAgo((diff.inDays / 365).floor());
   }
 
   /// 格式化时间为详细时间字符串
@@ -51,7 +52,7 @@ class TimeUtils {
   static String formatShortDate(DateTime? time) {
     if (time == null) return '';
 
-    return '${time.month}月${time.day}日';
+    return S.current.time_shortDate(time.month, time.day);
   }
 
   /// 格式化时间为完整日期
@@ -59,7 +60,7 @@ class TimeUtils {
   static String formatFullDate(DateTime? time) {
     if (time == null) return '';
 
-    return '${time.year}年${time.month}月${time.day}日';
+    return S.current.time_fullDate(time.year, time.month, time.day);
   }
 
   /// 格式化时间为 Tooltip 精确时间
@@ -68,7 +69,10 @@ class TimeUtils {
   static String formatTooltipTime(DateTime? time) {
     if (time == null) return '';
 
-    return '${time.year}年${time.month}月${time.day}日 ${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}:${time.second.toString().padLeft(2, '0')}';
+    final hh = time.hour.toString().padLeft(2, '0');
+    final mm = time.minute.toString().padLeft(2, '0');
+    final ss = time.second.toString().padLeft(2, '0');
+    return S.current.time_tooltipTime(time.year, time.month, time.day, hh, mm, ss);
   }
 
   /// 格式化时间为智能日期标签
@@ -80,10 +84,10 @@ class TimeUtils {
     final today = DateTime(now.year, now.month, now.day);
     final date = DateTime(time.year, time.month, time.day);
 
-    if (date == today) return '今天';
-    if (date == today.subtract(const Duration(days: 1))) return '昨天';
-    if (time.year == now.year) return '${time.month}月${time.day}日';
-    return '${time.year}年${time.month}月${time.day}日';
+    if (date == today) return S.current.time_today;
+    if (date == today.subtract(const Duration(days: 1))) return S.current.time_yesterday;
+    if (time.year == now.year) return S.current.time_shortDate(time.month, time.day);
+    return S.current.time_fullDate(time.year, time.month, time.day);
   }
 
   /// 格式化时间为紧凑格式

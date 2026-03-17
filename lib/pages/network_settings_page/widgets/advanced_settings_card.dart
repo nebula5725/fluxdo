@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
+import '../../../l10n/s.dart';
 import '../../network_adapter_settings_page.dart';
 
 /// 高级设置卡片（仅保留网络适配器入口）
@@ -19,8 +20,8 @@ class AdvancedSettingsCard extends StatelessWidget {
       ),
       child: ListTile(
         leading: const Icon(Icons.settings_ethernet),
-        title: const Text('网络适配器'),
-        subtitle: const Text('管理 Cronet 和备用适配器设置'),
+        title: Text(context.l10n.networkAdapter_title),
+        subtitle: Text(context.l10n.networkAdapter_controlOptions),
         trailing: const Icon(Icons.chevron_right, size: 20),
         onTap: () {
           Navigator.push(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../l10n/s.dart';
 import '../../../models/topic.dart';
 import '../../../providers/discourse_providers.dart';
 import '../../../utils/font_awesome_helper.dart';
@@ -157,13 +158,13 @@ class TopicDetailHeader extends ConsumerWidget {
                       context,
                       Icons.chat_bubble_outline_rounded,
                       '${detail.postsCount - 1}',
-                      label: '回复'
+                      label: context.l10n.topicDetail_replyLabel
                     ),
                     _buildMetadataItem(
                       context,
                       Icons.visibility_outlined,
                       NumberUtils.formatCount(detail.views),
-                      label: '浏览'
+                      label: context.l10n.topicDetail_viewsLabel
                     ),
                     Tooltip(
                       message: TimeUtils.formatTooltipTime(detail.createdAt),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/s.dart';
 
 /// 悄悄话（Whisper）指示器组件
 /// 用于标识仅管理员/版主可见的帖子
@@ -29,7 +30,7 @@ class WhisperIndicator extends StatelessWidget {
           ),
           const SizedBox(width: 4),
           Text(
-            '仅管理员可见',
+            context.l10n.post_whisperIndicator,
             style: theme.textTheme.labelSmall?.copyWith(
               color: theme.colorScheme.tertiary,
               fontWeight: FontWeight.w500,

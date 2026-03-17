@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../l10n/s.dart';
 import '../../services/network/doh/network_settings_service.dart';
 import '../../services/network/proxy/proxy_settings_service.dart';
 import '../../services/network/rhttp/rhttp_settings_service.dart';
@@ -65,7 +66,7 @@ class _NetworkSettingsPageState extends State<NetworkSettingsPage> {
 
         return Scaffold(
           appBar: AppBar(
-            title: const Text('网络设置'),
+            title: Text(context.l10n.networkSettings_title),
             actions: [
               if (isApplying)
                 const Padding(
@@ -82,13 +83,13 @@ class _NetworkSettingsPageState extends State<NetworkSettingsPage> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             children: [
               // 网络引擎
-              _buildSectionHeader(theme, '网络引擎'),
+              _buildSectionHeader(theme, context.l10n.networkSettings_engine),
               const SizedBox(height: 12),
               const RhttpEngineCard(),
               const SizedBox(height: 24),
 
               // 网络代理
-              _buildSectionHeader(theme, '网络代理'),
+              _buildSectionHeader(theme, context.l10n.networkSettings_proxy),
               const SizedBox(height: 12),
               DohSettingsCard(
                 settings: settings,
@@ -104,7 +105,7 @@ class _NetworkSettingsPageState extends State<NetworkSettingsPage> {
               const SizedBox(height: 24),
 
               // 辅助功能
-              _buildSectionHeader(theme, '辅助功能'),
+              _buildSectionHeader(theme, context.l10n.networkSettings_auxiliary),
               const SizedBox(height: 12),
               const VpnAutoToggleCard(),
               const SizedBox(height: 12),
@@ -112,13 +113,13 @@ class _NetworkSettingsPageState extends State<NetworkSettingsPage> {
               const SizedBox(height: 24),
 
               // 高级
-              _buildSectionHeader(theme, '高级'),
+              _buildSectionHeader(theme, context.l10n.networkSettings_advanced),
               const SizedBox(height: 12),
               const AdvancedSettingsCard(),
               const SizedBox(height: 24),
 
               // 调试
-              _buildSectionHeader(theme, '调试'),
+              _buildSectionHeader(theme, context.l10n.networkSettings_debug),
               const SizedBox(height: 12),
               DebugToolsCard(isDeveloperMode: _isDeveloperMode),
               const SizedBox(height: 32),

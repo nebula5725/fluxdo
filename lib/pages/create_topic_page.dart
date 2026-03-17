@@ -14,6 +14,7 @@ import 'package:fluxdo/widgets/markdown_editor/markdown_renderer.dart';
 import 'package:fluxdo/services/draft_controller.dart';
 import 'package:fluxdo/services/preloaded_data_service.dart';
 import 'package:fluxdo/widgets/topic/topic_editor_helpers.dart';
+import '../l10n/s.dart';
 
 class CreateTopicPage extends ConsumerStatefulWidget {
   final int? initialCategoryId;
@@ -100,16 +101,16 @@ class _CreateTopicPageState extends ConsumerState<CreateTopicPage> {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: const Text('恢复草稿'),
-        content: const Text('检测到未发送的草稿，是否恢复？'),
+        title: Text(context.l10n.createTopic_restoreDraft),
+        content: Text(context.l10n.createTopic_restoreDraftContent),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('丢弃'),
+            child: Text(context.l10n.common_discard),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('恢复'),
+            child: Text(context.l10n.common_restore),
           ),
         ],
       ),
@@ -168,16 +169,16 @@ class _CreateTopicPageState extends ConsumerState<CreateTopicPage> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('放弃帖子'),
-        content: const Text('你想放弃你的帖子吗？'),
+        title: Text(context.l10n.createTopic_discardPost),
+        content: Text(context.l10n.createTopic_discardPostContent),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('取消'),
+            child: Text(context.l10n.common_cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('舍弃'),
+            child: Text(context.l10n.common_discard),
           ),
         ],
       ),
@@ -289,7 +290,7 @@ class _CreateTopicPageState extends ConsumerState<CreateTopicPage> {
       // 预览模式下验证错误不可见，切回编辑模式并提示
       if (_showPreview) {
         _togglePreview();
-        ToastService.showInfo('请检查输入');
+        ToastService.showInfo(S.current.common_checkInput);
       }
       return;
     }
@@ -299,25 +300,25 @@ class _CreateTopicPageState extends ConsumerState<CreateTopicPage> {
     final contentText = _contentController.text.trim();
     if (contentText.isEmpty) {
       if (_showPreview) _togglePreview();
-      ToastService.showInfo('请输入内容');
+      ToastService.showInfo(S.current.createTopic_enterContent);
       return;
     }
     if (contentText.length < minContentLength) {
       if (_showPreview) _togglePreview();
-      ToastService.showInfo('内容至少需要 $minContentLength 个字符');
+      ToastService.showInfo(S.current.createTopic_minContentLength(minContentLength));
       return;
     }
 
     if (_selectedCategory == null) {
       if (_showPreview) _togglePreview();
-      ToastService.showInfo('请选择分类');
+      ToastService.showInfo(S.current.createTopic_selectCategory);
       return;
     }
 
     if (_selectedCategory!.minimumRequiredTags > 0 &&
         _selectedTags.length < _selectedCategory!.minimumRequiredTags) {
       if (_showPreview) _togglePreview();
-      ToastService.showInfo('此分类至少需要 ${_selectedCategory!.minimumRequiredTags} 个标签');
+      ToastService.showInfo(S.current.createTopic_minTags(_selectedCategory!.minimumRequiredTags));
       return;
     }
 
@@ -326,16 +327,16 @@ class _CreateTopicPageState extends ConsumerState<CreateTopicPage> {
       final confirm = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('提示'),
-          content: const Text('您尚未修改分类模板内容，确定要发布吗？'),
+          title: Text(context.l10n.common_hint),
+          content: Text(context.l10n.createTopic_templateNotModified),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('继续编辑'),
+              child: Text(context.l10n.createTopic_continueEditing),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('确定发布'),
+              child: Text(context.l10n.createTopic_confirmPublish),
             ),
           ],
         ),
@@ -365,7 +366,7 @@ class _CreateTopicPageState extends ConsumerState<CreateTopicPage> {
       await _draftController.deleteDraft();
       _submitted = true;
       if (!mounted) return;
-      ToastService.showInfo('你的帖子已提交，正在等待审核');
+      ToastService.showInfo(S.current.createTopic_pendingReview);
       Navigator.of(context).pop();
     } on DioException catch (_) {
       // 网络错误已由 ErrorInterceptor 处理
@@ -425,7 +426,7 @@ class _CreateTopicPageState extends ConsumerState<CreateTopicPage> {
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
-          title: const Text('创建话题'),
+          title: Text(context.l10n.createTopic_title),
           scrolledUnderElevation: 0,
           actions: [
             // 草稿保存状态指示器
@@ -438,7 +439,7 @@ class _CreateTopicPageState extends ConsumerState<CreateTopicPage> {
             // 舍弃按钮
             TextButton(
               onPressed: _isSubmitting ? null : _discardDraft,
-              child: const Text('舍弃'),
+              child: Text(context.l10n.common_discard),
             ),
             const SizedBox(width: 8),
             Padding(
@@ -455,7 +456,7 @@ class _CreateTopicPageState extends ConsumerState<CreateTopicPage> {
                         height: 16,
                         child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                       )
-                    : const Text('发布'),
+                    : Text(context.l10n.common_publish),
               ),
             ),
           ],
@@ -495,7 +496,7 @@ class _CreateTopicPageState extends ConsumerState<CreateTopicPage> {
                                   TextFormField(
                                     controller: _titleController,
                                     decoration: InputDecoration(
-                                      hintText: '键入一个吸引人的标题...',
+                                      hintText: context.l10n.createTopic_titleHint,
                                       hintStyle: TextStyle(
                                         color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
                                         fontWeight: FontWeight.normal,
@@ -512,8 +513,8 @@ class _CreateTopicPageState extends ConsumerState<CreateTopicPage> {
                                     maxLength: 200,
                                     buildCounter: (context, {required currentLength, required isFocused, maxLength}) => null,
                                     validator: (value) {
-                                      if (value == null || value.trim().isEmpty) return '请输入标题';
-                                      if (value.trim().length < minTitleLength) return '标题至少需要 $minTitleLength 个字符';
+                                      if (value == null || value.trim().isEmpty) return context.l10n.createTopic_enterTitle;
+                                      if (value.trim().length < minTitleLength) return context.l10n.createTopic_minTitleLength(minTitleLength);
                                       return null;
                                     },
                                     onTap: () {
@@ -561,7 +562,7 @@ class _CreateTopicPageState extends ConsumerState<CreateTopicPage> {
                             child: Align(
                               alignment: Alignment.centerRight,
                               child: Text(
-                                '$_contentLength 字符',
+                                context.l10n.createTopic_charCount(_contentLength),
                                 style: theme.textTheme.labelSmall?.copyWith(
                                   color: theme.colorScheme.onSurfaceVariant,
                                 ),
@@ -575,7 +576,7 @@ class _CreateTopicPageState extends ConsumerState<CreateTopicPage> {
                               key: _editorKey,
                               controller: _contentController,
                               focusNode: _contentFocusNode,
-                              hintText: '正文内容 (支持 Markdown)...',
+                              hintText: context.l10n.createTopic_contentHint,
                               expands: true,
                               emojiPanelHeight: 350,
                               onTogglePreview: _togglePreview,
@@ -600,7 +601,7 @@ class _CreateTopicPageState extends ConsumerState<CreateTopicPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              _titleController.text.isEmpty ? '（无标题）' : _titleController.text,
+                              _titleController.text.isEmpty ? context.l10n.createTopic_noTitle : _titleController.text,
                               style: theme.textTheme.headlineSmall?.copyWith(
                                 fontWeight: FontWeight.w900,
                                 letterSpacing: -0.5,
@@ -626,7 +627,7 @@ class _CreateTopicPageState extends ConsumerState<CreateTopicPage> {
                             ),
                             if (_contentController.text.isEmpty)
                               Text(
-                                '（无内容）',
+                                context.l10n.createTopic_noContent,
                                 style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
                               )
                             else
@@ -646,7 +647,7 @@ class _CreateTopicPageState extends ConsumerState<CreateTopicPage> {
                 bottom: MediaQuery.paddingOf(context).bottom + 16,
                 child: FloatingActionButton.small(
                   onPressed: _togglePreview,
-                  tooltip: '退出预览',
+                  tooltip: context.l10n.common_exitPreview,
                   child: const Icon(Icons.edit_outlined),
                 ),
               ),
@@ -661,7 +662,7 @@ class _CreateTopicPageState extends ConsumerState<CreateTopicPage> {
           ]);
           },
           loading: () => const Center(child: LoadingSpinner()),
-          error: (err, stack) => Center(child: Text('加载分类失败: $err')),
+          error: (err, stack) => Center(child: Text(context.l10n.createTopic_loadCategoryFailed(err.toString()))),
         ),
       ),
     );

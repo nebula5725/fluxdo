@@ -3,15 +3,16 @@ import '../../providers/topic_list/filter_provider.dart';
 import '../../providers/topic_list/sort_provider.dart';
 import '../common/topic_badges.dart';
 import 'filter_dropdown.dart';
+import '../../../../../l10n/s.dart';
 
 /// 筛选选项定义
-const filterOptions = [
-  (TopicListFilter.latest, '最新'),
-  (TopicListFilter.newTopics, '新话题'),
-  (TopicListFilter.unread, '未读完'),
-  (TopicListFilter.unseen, '未浏览'),
-  (TopicListFilter.top, '排行榜'),
-  (TopicListFilter.hot, '热门'),
+List<(TopicListFilter, String)> get filterOptions => [
+  (TopicListFilter.latest, S.current.topic_filterLatest),
+  (TopicListFilter.newTopics, S.current.topic_filterNew),
+  (TopicListFilter.unread, S.current.topic_filterUnread),
+  (TopicListFilter.unseen, S.current.topic_filterUnseen),
+  (TopicListFilter.top, S.current.topic_filterTop),
+  (TopicListFilter.hot, S.current.topic_filterHot),
 ];
 
 /// 获取筛选模式的显示名称
@@ -19,7 +20,7 @@ String filterLabel(TopicListFilter filter) {
   for (final option in filterOptions) {
     if (option.$1 == filter) return option.$2;
   }
-  return '最新';
+  return S.current.topic_filterLatest;
 }
 
 /// 筛选下拉 + 排序下拉 + 标签 chips（固定在 Tab 和列表之间）

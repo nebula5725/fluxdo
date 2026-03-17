@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../../l10n/s.dart';
 
 /// 链接插入对话框
 /// 返回 {text: '链接文本', url: 'https://...'}
@@ -47,7 +48,7 @@ class _LinkInsertDialogState extends State<LinkInsertDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('插入链接'),
+      title: Text(S.current.link_insertTitle),
       content: Form(
         key: _formKey,
         child: Column(
@@ -55,16 +56,16 @@ class _LinkInsertDialogState extends State<LinkInsertDialog> {
           children: [
             TextFormField(
               controller: _textController,
-              decoration: const InputDecoration(
-                labelText: '链接文本',
-                hintText: '显示的文字',
+              decoration: InputDecoration(
+                labelText: S.current.link_textLabel,
+                hintText: S.current.link_textHint,
                 border: OutlineInputBorder(),
               ),
               autofocus: true,
               textInputAction: TextInputAction.next,
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                  return '请输入链接文本';
+                  return S.current.link_textRequired;
                 }
                 return null;
               },
@@ -72,7 +73,7 @@ class _LinkInsertDialogState extends State<LinkInsertDialog> {
             const SizedBox(height: 16),
             TextFormField(
               controller: _urlController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'URL',
                 hintText: 'https://example.com',
                 border: OutlineInputBorder(),
@@ -82,7 +83,7 @@ class _LinkInsertDialogState extends State<LinkInsertDialog> {
               onFieldSubmitted: (_) => _submit(),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                  return '请输入 URL';
+                  return S.current.link_urlRequired;
                 }
                 return null;
               },
@@ -93,11 +94,11 @@ class _LinkInsertDialogState extends State<LinkInsertDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('取消'),
+          child: Text(S.current.common_cancel),
         ),
         FilledButton(
           onPressed: _submit,
-          child: const Text('确定'),
+          child: Text(S.current.common_confirm),
         ),
       ],
     );

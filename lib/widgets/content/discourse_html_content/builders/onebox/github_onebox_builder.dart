@@ -4,6 +4,7 @@ import '../../../../../services/highlighter_service.dart';
 import '../../../../../services/toast_service.dart';
 import '../../../../../utils/link_launcher.dart';
 import 'onebox_base.dart';
+import '../../../../../l10n/s.dart';
 
 /// GitHub Onebox 构建器
 class GithubOneboxBuilder {
@@ -255,7 +256,7 @@ class GithubOneboxBuilder {
                       InkWell(
                         onTap: () {
                           Clipboard.setData(ClipboardData(text: codeText));
-                          ToastService.showSuccess('已复制代码');
+                          ToastService.showSuccess(S.current.common_codeCopied);
                         },
                         borderRadius: BorderRadius.circular(4),
                         child: Padding(
@@ -302,7 +303,7 @@ class GithubOneboxBuilder {
                         ),
                         const SizedBox(width: 6),
                         Text(
-                          '点击查看完整代码',
+                          S.current.github_viewFullCode,
                           style: theme.textTheme.labelSmall?.copyWith(
                             color: theme.colorScheme.primary,
                           ),
@@ -806,7 +807,7 @@ class GithubOneboxBuilder {
                         ),
                       ),
                       TextSpan(
-                        text: ' 评论于',
+                        text: S.current.github_commentedOn,
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
@@ -1188,7 +1189,7 @@ class GithubOneboxBuilder {
               Padding(
                 padding: const EdgeInsets.only(top: 4),
                 child: Text(
-                  '... 还有 ${files.length - 5} 个文件',
+                  S.current.github_moreFiles(files.length - 5),
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                     fontStyle: FontStyle.italic,

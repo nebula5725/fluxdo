@@ -8,6 +8,7 @@ import '../../utils/font_awesome_helper.dart';
 import '../../services/discourse_cache_manager.dart';
 import '../../utils/url_helper.dart';
 import '../../pages/category_topics_page.dart';
+import '../../../../../l10n/s.dart';
 
 // ============================================================
 // 工具函数
@@ -101,7 +102,7 @@ Future<void> _showSubcategoryMenu({
           children: [
             _buildCategoryIcon(parent, parentColor, 20),
             const SizedBox(width: 10),
-            Text('全部', style: const TextStyle(fontWeight: FontWeight.w600)),
+            Text(S.current.common_all, style: const TextStyle(fontWeight: FontWeight.w600)),
           ],
         ),
       ),
@@ -171,7 +172,7 @@ class CategoryTabManagerSheet extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
             child: Text(
-              '浏览分类',
+              S.current.category_browse,
               style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
           ),
@@ -187,7 +188,7 @@ class CategoryTabManagerSheet extends ConsumerWidget {
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(child: Text('加载分类失败: $e')),
+              error: (e, _) => Center(child: Text(S.current.category_loadFailed(e.toString()))),
             ),
           ),
         ],
@@ -238,7 +239,7 @@ class _BrowseContent extends ConsumerWidget {
         Row(
           children: [
             Text(
-              '我的分类',
+              S.current.category_myCategories,
               style: theme.textTheme.labelMedium?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: colorScheme.outline,
@@ -254,7 +255,7 @@ class _BrowseContent extends ConsumerWidget {
                 );
               },
               icon: const Icon(Icons.edit_outlined, size: 14),
-              label: const Text('编辑'),
+              label: Text(S.current.common_edit),
               style: TextButton.styleFrom(
                 visualDensity: VisualDensity.compact,
                 padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -268,7 +269,7 @@ class _BrowseContent extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.only(bottom: 16),
             child: Text(
-              '点击"编辑"添加常用分类到标签栏',
+              S.current.category_editHint,
               style: TextStyle(color: colorScheme.outline, fontSize: 13),
             ),
           )
@@ -289,7 +290,7 @@ class _BrowseContent extends ConsumerWidget {
 
         // ---- 全部分类（网格） ----
         Text(
-          '全部分类',
+          S.current.category_allCategories,
           style: theme.textTheme.labelMedium?.copyWith(
             fontWeight: FontWeight.w600,
             color: colorScheme.outline,
@@ -472,7 +473,7 @@ class _PinnedCategoryEditPage extends ConsumerWidget {
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('编辑我的分类'), centerTitle: false),
+      appBar: AppBar(title: Text(S.current.category_editMyCategories), centerTitle: false),
       body: categoriesAsync.when(
         data: (categories) {
           final categoryMap = categoryMapAsync.value ?? {};
@@ -485,7 +486,7 @@ class _PinnedCategoryEditPage extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('加载分类失败: $e')),
+        error: (e, _) => Center(child: Text(S.current.category_loadFailed(e.toString()))),
       ),
     );
   }
@@ -532,7 +533,7 @@ class _EditContent extends ConsumerWidget {
       children: [
         // ---- 已添加 ----
         Text(
-          '已添加',
+          S.current.common_added,
           style: theme.textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.w600,
             color: colorScheme.onSurfaceVariant,
@@ -540,7 +541,7 @@ class _EditContent extends ConsumerWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          '拖拽排序，点击移除',
+          S.current.category_dragHint,
           style: TextStyle(color: colorScheme.outline, fontSize: 12),
         ),
         const SizedBox(height: 8),
@@ -549,7 +550,7 @@ class _EditContent extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(vertical: 16),
             child: Center(
               child: Text(
-                '点击下方分类添加到标签栏',
+                S.current.category_addHint,
                 style: TextStyle(color: colorScheme.outline, fontSize: 13),
               ),
             ),
@@ -592,7 +593,7 @@ class _EditContent extends ConsumerWidget {
 
         // ---- 可添加（网格） ----
         Text(
-          '可添加',
+          S.current.category_available,
           style: theme.textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.w600,
             color: colorScheme.onSurfaceVariant,
@@ -675,7 +676,7 @@ class _EditContent extends ConsumerWidget {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  isParent ? '${cat.name}（全部）' : cat.name,
+                  isParent ? S.current.category_parentAll(cat.name) : cat.name,
                   style: TextStyle(
                     fontWeight: isParent ? FontWeight.w600 : FontWeight.normal,
                   ),

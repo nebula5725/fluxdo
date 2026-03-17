@@ -5,6 +5,7 @@ import '../../services/toast_service.dart';
 import '../../services/app_error_handler.dart';
 import '../../utils/time_utils.dart';
 import 'package:dio/dio.dart';
+import '../../../../../l10n/s.dart';
 
 /// 书签编辑结果
 class BookmarkEditResult {
@@ -99,7 +100,7 @@ class _BookmarkEditSheetState extends State<BookmarkEditSheet> {
           name: name.isNotEmpty ? name : null,
           reminderAt: reminderAt,
         ));
-        ToastService.showSuccess('书签已更新');
+        ToastService.showSuccess(S.current.common_bookmarkUpdated);
       }
     } on DioException catch (_) {
       // 网络错误已由 ErrorInterceptor 处理
@@ -116,19 +117,19 @@ class _BookmarkEditSheetState extends State<BookmarkEditSheet> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('删除书签'),
-        content: const Text('确定要删除这个书签吗？'),
+        title: Text(S.current.common_deleteBookmark),
+        content: Text(S.current.bookmark_deleteConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('取消'),
+            child: Text(S.current.common_cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: FilledButton.styleFrom(
               backgroundColor: Theme.of(ctx).colorScheme.error,
             ),
-            child: const Text('删除'),
+            child: Text(S.current.common_delete),
           ),
         ],
       ),
@@ -141,7 +142,7 @@ class _BookmarkEditSheetState extends State<BookmarkEditSheet> {
       await _service.deleteBookmark(widget.bookmarkId);
       if (mounted) {
         Navigator.pop(context, const BookmarkEditResult(deleted: true));
-        ToastService.showSuccess('已取消书签');
+        ToastService.showSuccess(S.current.bookmark_removed);
       }
     } on DioException catch (_) {
       // 网络错误已由 ErrorInterceptor 处理
@@ -217,7 +218,7 @@ class _BookmarkEditSheetState extends State<BookmarkEditSheet> {
                   Icon(Icons.bookmark, color: theme.colorScheme.primary),
                   const SizedBox(width: 8),
                   Text(
-                    '编辑书签',
+                    S.current.bookmark_editBookmark,
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -238,8 +239,8 @@ class _BookmarkEditSheetState extends State<BookmarkEditSheet> {
                 controller: _nameController,
                 maxLength: 100,
                 decoration: InputDecoration(
-                  labelText: '书签名称（可选）',
-                  hintText: '为书签添加备注...',
+                  labelText: S.current.bookmark_nameLabel,
+                  hintText: S.current.bookmark_nameHint,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -251,7 +252,7 @@ class _BookmarkEditSheetState extends State<BookmarkEditSheet> {
 
               // 提醒时间
               Text(
-                '设置提醒',
+                S.current.bookmark_setReminder,
                 style: theme.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
@@ -281,8 +282,8 @@ class _BookmarkEditSheetState extends State<BookmarkEditSheet> {
                       const SizedBox(width: 8),
                       Text(
                         _currentReminderAt!.isAfter(DateTime.now())
-                            ? '提醒时间：${TimeUtils.formatDetailTime(_currentReminderAt!)}'
-                            : '提醒已过期',
+                            ? S.current.bookmark_reminderTime(TimeUtils.formatDetailTime(_currentReminderAt!))
+                            : S.current.bookmark_reminderExpired,
                         style: TextStyle(
                           fontSize: 13,
                           color: _currentReminderAt!.isAfter(DateTime.now())
@@ -373,7 +374,7 @@ class _BookmarkEditSheetState extends State<BookmarkEditSheet> {
                           )
                         : Icon(Icons.delete_outline, color: theme.colorScheme.error),
                     label: Text(
-                      '删除',
+                      S.current.common_delete,
                       style: TextStyle(color: theme.colorScheme.error),
                     ),
                   ),
@@ -381,7 +382,7 @@ class _BookmarkEditSheetState extends State<BookmarkEditSheet> {
                   // 取消按钮
                   TextButton(
                     onPressed: () => Navigator.pop(context),
-                    child: const Text('取消'),
+                    child: Text(S.current.common_cancel),
                   ),
                   const SizedBox(width: 8),
                   // 保存按钮
@@ -392,7 +393,7 @@ class _BookmarkEditSheetState extends State<BookmarkEditSheet> {
                             width: 16, height: 16,
                             child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                           )
-                        : const Text('保存'),
+                        : Text(S.current.common_save),
                   ),
                 ],
               ),
