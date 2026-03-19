@@ -40,6 +40,7 @@ import '../services/toast_service.dart';
 import '../utils/number_utils.dart';
 import '../services/emoji_handler.dart';
 import '../services/log/log_writer.dart';
+import '../providers/theme_provider.dart';
 
 /// 个人页面
 class ProfilePage extends ConsumerStatefulWidget {
@@ -334,13 +335,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
             Consumer(
               builder: (context, ref, _) {
-                final ldcState = ref.watch(ldcUserInfoProvider);
-                final cdkState = ref.watch(cdkUserInfoProvider);
+                final prefs = ref.watch(sharedPreferencesProvider);
+                final ldcEnabled = prefs.getBool('ldc_enabled') ?? false;
+                final cdkEnabled = prefs.getBool('cdk_enabled') ?? false;
 
-                final showLdc = ldcState.isLoading || ldcState.hasError || ldcState.value != null;
-                final showCdk = cdkState.isLoading || cdkState.hasError || cdkState.value != null;
-
-                if (!showLdc && !showCdk) return const SizedBox.shrink();
+                if (!ldcEnabled && !cdkEnabled) return const SizedBox.shrink();
 
                 return Column(
                   children: [
@@ -351,13 +350,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       clipBehavior: Clip.antiAlias,
                       child: Column(
                         children: [
-                          if (showLdc)
+                          if (ldcEnabled)
                             LdcBalanceCard(
                               inline: true,
                               onReauthorize: () => _reauthorizeLdc(),
-                              showDivider: showCdk,
+                              showDivider: cdkEnabled,
                             ),
-                          if (showCdk)
+                          if (cdkEnabled)
                             CdkBalanceCard(
                               inline: true,
                               onReauthorize: () => _reauthorizeCdk(),
@@ -372,13 +371,16 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             ),
 
             if (isLoggedIn) ...[
-              _buildOptionsCard(
+              _buildContentCard(theme),
+              const SizedBox(height: 20),
+              _buildCommunityCard(
                 theme,
                 canAccessInviteLinks: (user?.trustLevel ?? 0) >= 3,
               ),
               const SizedBox(height: 20),
             ],
-            _buildAboutCard(theme),
+            
+            _buildSystemAndToolsCard(theme),
             const SizedBox(height: 32),
             _buildAuthButton(theme, isLoggedIn),
             const SizedBox(height: 48),
@@ -468,7 +470,56 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     );
   }
 
-  Widget _buildOptionsCard(ThemeData theme, {required bool canAccessInviteLinks}) {
+  Widget _buildContentCard(ThemeData theme) {
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _buildCompactActionItem(theme, Icons.article_rounded, Colors.blue, context.l10n.profile_myTopics, () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MyTopicsPage()))),
+            _buildCompactActionItem(theme, Icons.bookmark_rounded, Colors.orange, context.l10n.profile_myBookmarks, () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BookmarksPage()))),
+            _buildCompactActionItem(theme, Icons.drafts_rounded, Colors.teal, context.l10n.profile_myDrafts, () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DraftsPage()))),
+            _buildCompactActionItem(theme, Icons.history_rounded, Colors.purple, context.l10n.profile_browsingHistory, () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BrowsingHistoryPage()))),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCompactActionItem(ThemeData theme, IconData icon, Color iconColor, String title, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: iconColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, color: iconColor, size: 22),
+            ),
+            const SizedBox(height: 6),
+            Text(title, style: theme.textTheme.labelMedium?.copyWith(
+              fontWeight: FontWeight.w500,
+              fontSize: 12,
+            )),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCommunityCard(ThemeData theme, {required bool canAccessInviteLinks}) {
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
@@ -476,30 +527,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       clipBehavior: Clip.antiAlias,
       child: Column(
         children: [
-          _buildOptionTile(
-            icon: Icons.bookmark_rounded,
-            iconColor: Colors.orange,
-            title: context.l10n.profile_myBookmarks,
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BookmarksPage()))
-          ),
-          _buildOptionTile(
-            icon: Icons.language_rounded,
-            iconColor: Colors.blue,
-            title: context.l10n.profile_myBrowser,
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MyBrowserPage()))
-          ),
-          _buildOptionTile(
-            icon: Icons.drafts_rounded,
-            iconColor: Colors.teal,
-            title: context.l10n.profile_myDrafts,
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DraftsPage()))
-          ),
-          _buildOptionTile(
-            icon: Icons.article_rounded, 
-            iconColor: Colors.blue,
-            title: context.l10n.profile_myTopics,
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MyTopicsPage()))
-          ),
           _buildOptionTile(
             icon: Icons.military_tech_rounded, 
             iconColor: Colors.amber[700]!,
@@ -523,12 +550,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               ),
             ),
           _buildOptionTile(
-            icon: Icons.history_rounded,
-            iconColor: Colors.purple,
-            title: context.l10n.profile_browsingHistory,
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BrowsingHistoryPage()))
-          ),
-          _buildOptionTile(
             icon: Icons.explore_rounded,
             iconColor: Colors.deepOrange,
             title: context.l10n.profile_metaverse,
@@ -539,8 +560,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       ),
     );
   }
-  
-  Widget _buildAboutCard(ThemeData theme) {
+
+  Widget _buildSystemAndToolsCard(ThemeData theme) {
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
@@ -548,6 +569,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       clipBehavior: Clip.antiAlias,
       child: Column(
         children: [
+          _buildOptionTile(
+            icon: Icons.language_rounded,
+            iconColor: Colors.blue,
+            title: context.l10n.profile_myBrowser,
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MyBrowserPage()))
+          ),
           _buildOptionTile(
             icon: Icons.smart_toy_rounded,
             iconColor: Colors.cyan,

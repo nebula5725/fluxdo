@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../providers/theme_provider.dart';
 import '../services/ldc_oauth_service.dart';
 import '../services/cdk_oauth_service.dart';
 import '../l10n/s.dart';
@@ -23,31 +24,23 @@ class _MetaversePageState extends ConsumerState<MetaversePage> {
   static const String _cdkEnabledKey = 'cdk_enabled';
   bool _ldcEnabled = false;
   bool _cdkEnabled = false;
-  bool _isLoading = true;
   bool _ldcProcessing = false;
   bool _cdkProcessing = false;
 
   @override
   void initState() {
     super.initState();
-    _loadSettings();
-  }
-
-  Future<void> _loadSettings() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _ldcEnabled = prefs.getBool(_ldcEnabledKey) ?? false;
-      _cdkEnabled = prefs.getBool(_cdkEnabledKey) ?? false;
-      _isLoading = false;
-    });
+    final prefs = ref.read(sharedPreferencesProvider);
+    _ldcEnabled = prefs.getBool(_ldcEnabledKey) ?? false;
+    _cdkEnabled = prefs.getBool(_cdkEnabledKey) ?? false;
+    
     // 每次进入页面时刷新已启用服务的数据
-    // 先等 build() 完成，再调 refresh()，避免并发导致 build() 结果覆盖 refresh() 的错误状态
     if (_ldcEnabled) {
-      await ref.read(ldcUserInfoProvider.future).catchError((_) => null);
+      ref.read(ldcUserInfoProvider.future).catchError((_) => null);
       ref.read(ldcUserInfoProvider.notifier).refresh();
     }
     if (_cdkEnabled) {
-      await ref.read(cdkUserInfoProvider.future).catchError((_) => null);
+      ref.read(cdkUserInfoProvider.future).catchError((_) => null);
       ref.read(cdkUserInfoProvider.notifier).refresh();
     }
   }
@@ -158,9 +151,7 @@ class _MetaversePageState extends ConsumerState<MetaversePage> {
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : CustomScrollView(
+      body: CustomScrollView(
               slivers: [
                 SliverAppBar.large(
                   title: Text(context.l10n.metaverse_title),
