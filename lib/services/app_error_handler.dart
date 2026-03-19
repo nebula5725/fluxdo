@@ -15,7 +15,19 @@ class AppErrorHandler {
   /// 显示通用 toast 并写入本地日志。
   static void handleUnexpected(Object error, StackTrace stackTrace) {
     debugPrint('[AppErrorHandler] 意外异常: $error\n$stackTrace');
-    ToastService.showError(S.current.toast_operationFailedRetry);
+
+    // 尝试提取有意义的错误信息，避免总是显示通用提示
+    String? errorMessage;
+    if (error is Exception) {
+      final str = error.toString();
+      // Exception.toString() 格式为 "Exception: 具体信息"
+      const prefix = 'Exception: ';
+      if (str.startsWith(prefix) && str.length > prefix.length) {
+        errorMessage = str.substring(prefix.length);
+      }
+    }
+
+    ToastService.showError(errorMessage ?? S.current.toast_operationFailedRetry);
     LogWriter.instance.write({
       'timestamp': DateTime.now().toIso8601String(),
       'level': 'error',

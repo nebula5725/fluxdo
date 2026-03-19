@@ -208,6 +208,15 @@ class PreloadedDataService {
     return 2; // Discourse 默认值
   }
 
+  /// 获取回复内容最小长度
+  Future<int> getMinPostLength() async {
+    await _ensureLoaded();
+    final value = _siteSettings?['min_post_length'];
+    if (value is int) return value;
+    if (value is String) return int.tryParse(value) ?? 8;
+    return 8; // Discourse 默认值
+  }
+
   /// 获取首贴内容最小长度
   Future<int> getMinFirstPostLength() async {
     await _ensureLoaded();

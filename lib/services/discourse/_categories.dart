@@ -72,6 +72,11 @@ mixin _CategoriesMixin on _DiscourseServiceBase {
     return PreloadedDataService().getMinPmTitleLength();
   }
 
+  /// 获取回复内容最小长度
+  Future<int> getMinPostLength() async {
+    return PreloadedDataService().getMinPostLength();
+  }
+
   /// 获取首贴内容最小长度
   Future<int> getMinFirstPostLength() async {
     return PreloadedDataService().getMinFirstPostLength();

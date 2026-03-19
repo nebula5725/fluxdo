@@ -12,6 +12,7 @@ import 'package:dio/dio.dart';
 import '../../services/app_error_handler.dart';
 import '../../services/network/exceptions/api_exception.dart';
 import '../../services/toast_service.dart';
+import '../../services/preloaded_data_service.dart';
 import '../common/smart_avatar.dart';
 import '../../l10n/s.dart';
 import '../common/loading_spinner.dart';
@@ -355,6 +356,16 @@ class _ReplySheetState extends ConsumerState<ReplySheet> {
     final content = _contentController.text.trim();
     if (content.isEmpty) {
       _showError(S.current.post_contentRequired);
+      return;
+    }
+
+    // 最小字数校验
+    final preloaded = PreloadedDataService();
+    final minLength = _isPrivateMessage
+        ? await preloaded.getMinPmPostLength()
+        : await preloaded.getMinPostLength();
+    if (content.length < minLength) {
+      ToastService.showInfo(S.current.createTopic_minContentLength(minLength));
       return;
     }
 

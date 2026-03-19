@@ -39,51 +39,43 @@ mixin _UtilsMixin on _DiscourseServiceBase {
     required String title,
     required String raw,
   }) async {
-    try {
-      final data = <String, dynamic>{
-        'title': title,
-        'raw': raw,
-        'archetype': 'private_message',
-        'target_recipients': targetUsernames.join(','),
-      };
+    final data = <String, dynamic>{
+      'title': title,
+      'raw': raw,
+      'archetype': 'private_message',
+      'target_recipients': targetUsernames.join(','),
+    };
 
-      final response = await _dio.post(
-        '/posts.json',
-        data: data,
-        options: Options(contentType: Headers.formUrlEncodedContentType),
+    final response = await _dio.post(
+      '/posts.json',
+      data: data,
+      options: Options(contentType: Headers.formUrlEncodedContentType),
+    );
+
+    final respData = response.data;
+
+    // 帖子进入审核队列
+    if (respData is Map && respData['action'] == 'enqueued') {
+      throw PostEnqueuedException(
+        pendingCount: respData['pending_count'] as int? ?? 0,
       );
-
-      final respData = response.data;
-
-      // 帖子进入审核队列
-      if (respData is Map && respData['action'] == 'enqueued') {
-        throw PostEnqueuedException(
-          pendingCount: respData['pending_count'] as int? ?? 0,
-        );
-      }
-
-      if (respData is Map && respData.containsKey('post') && respData['post']['topic_id'] != null) {
-        return respData['post']['topic_id'] as int;
-      }
-
-      if (respData is Map && respData['topic_id'] != null) {
-        return respData['topic_id'] as int;
-      }
-
-      if (respData is Map && respData['success'] == false) {
-        throw Exception(respData['errors']?.toString() ?? S.current.error_sendPMFailed);
-      }
-
-      throw Exception(S.current.error_unknownResponseFormat);
-    } on DioException catch (e) {
-      if (e.response?.data != null && e.response!.data is Map) {
-        final data = e.response!.data as Map;
-        if (data['errors'] != null) {
-          throw Exception((data['errors'] as List).join('\n'));
-        }
-      }
-      rethrow;
     }
+
+    if (respData is Map && respData.containsKey('post') && respData['post']['topic_id'] != null) {
+      return respData['post']['topic_id'] as int;
+    }
+
+    if (respData is Map && respData['topic_id'] != null) {
+      return respData['topic_id'] as int;
+    }
+
+    if (respData is Map && respData['success'] == false) {
+      final errors = respData['errors'];
+      final msg = errors is List ? errors.join('\n') : errors?.toString();
+      throw Exception(msg ?? S.current.error_sendPMFailed);
+    }
+
+    throw Exception(S.current.error_unknownResponseFormat);
   }
 
 }

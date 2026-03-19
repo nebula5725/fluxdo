@@ -81,6 +81,12 @@ final minPmTitleLengthProvider = FutureProvider<int>((ref) async {
   return service.getMinPmTitleLength();
 });
 
+/// 回复内容最小长度
+final minPostLengthProvider = FutureProvider<int>((ref) async {
+  final service = ref.watch(discourseServiceProvider);
+  return service.getMinPostLength();
+});
+
 /// 首贴内容最小长度
 final minFirstPostLengthProvider = FutureProvider<int>((ref) async {
   final service = ref.watch(discourseServiceProvider);
