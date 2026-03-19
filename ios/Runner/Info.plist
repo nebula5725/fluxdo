@@ -2,12 +2,102 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.fluxdo.notificationPoll</string>
+	</array>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
 	<string>FluxDO</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIcons</key>
+	<dict>
+		<key>CFBundleAlternateIcons</key>
+		<dict>
+			<key>DefaultDarkIcon</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>DefaultDarkIcon</string>
+				</array>
+				<key>UIPrerenderedIcon</key>
+				<false/>
+			</dict>
+			<key>ModernIcon</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>ModernIcon</string>
+				</array>
+				<key>UIPrerenderedIcon</key>
+				<false/>
+			</dict>
+			<key>ModernLightIcon</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>ModernLightIcon</string>
+				</array>
+				<key>UIPrerenderedIcon</key>
+				<false/>
+			</dict>
+		</dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>AppIcon</string>
+			</array>
+			<key>UIPrerenderedIcon</key>
+			<false/>
+		</dict>
+	</dict>
+	<key>CFBundleIcons~ipad</key>
+	<dict>
+		<key>CFBundleAlternateIcons</key>
+		<dict>
+			<key>DefaultDarkIcon</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>DefaultDarkIcon</string>
+				</array>
+				<key>UIPrerenderedIcon</key>
+				<false/>
+			</dict>
+			<key>ModernIcon</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>ModernIcon</string>
+				</array>
+				<key>UIPrerenderedIcon</key>
+				<false/>
+			</dict>
+			<key>ModernLightIcon</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>ModernLightIcon</string>
+				</array>
+				<key>UIPrerenderedIcon</key>
+				<false/>
+			</dict>
+		</dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>AppIcon</string>
+			</array>
+			<key>UIPrerenderedIcon</key>
+			<false/>
+		</dict>
+	</dict>
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
@@ -20,10 +110,35 @@
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.fluxdo.app</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fluxdo</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>FlutterDeepLinkingEnabled</key>
+	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>需要访问相册以保存图片</string>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>processing</string>
+		<string>remote-notification</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
@@ -40,126 +155,6 @@
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
-	<key>CADisableMinimumFrameDurationOnPhone</key>
-	<true/>
-	<key>UIApplicationSupportsIndirectInputEvents</key>
-	<true/>
-	<!-- 备选应用图标 -->
-	<key>CFBundleIcons</key>
-	<dict>
-		<key>CFBundlePrimaryIcon</key>
-		<dict>
-			<key>CFBundleIconFiles</key>
-			<array>
-				<string>AppIcon</string>
-			</array>
-			<key>UIPrerenderedIcon</key>
-			<false/>
-		</dict>
-		<key>CFBundleAlternateIcons</key>
-		<dict>
-			<key>DefaultDarkIcon</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>DefaultDarkIcon</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
-			<key>ModernIcon</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>ModernIcon</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
-			<key>ModernLightIcon</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>ModernLightIcon</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
-		</dict>
-	</dict>
-	<key>CFBundleIcons~ipad</key>
-	<dict>
-		<key>CFBundlePrimaryIcon</key>
-		<dict>
-			<key>CFBundleIconFiles</key>
-			<array>
-				<string>AppIcon</string>
-			</array>
-			<key>UIPrerenderedIcon</key>
-			<false/>
-		</dict>
-		<key>CFBundleAlternateIcons</key>
-		<dict>
-			<key>DefaultDarkIcon</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>DefaultDarkIcon</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
-			<key>ModernIcon</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>ModernIcon</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
-			<key>ModernLightIcon</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>ModernLightIcon</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
-		</dict>
-	</dict>
-	<!-- Custom URL Scheme -->
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>CFBundleURLName</key>
-			<string>com.fluxdo.app</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>fluxdo</string>
-			</array>
-		</dict>
-	</array>
-	<!-- 启用 UIScene lifecycle（app_links 需要） -->
-	<key>FlutterDeepLinkingEnabled</key>
-	<false/>
-	<!-- 相册写入权限 -->
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>需要访问相册以保存图片</string>
-	<!-- 后台任务标识符 -->
-	<key>BGTaskSchedulerPermittedIdentifiers</key>
-	<array>
-		<string>com.fluxdo.notificationPoll</string>
-	</array>
-	<!-- 后台模式 -->
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>fetch</string>
-		<string>processing</string>
 	</array>
 </dict>
 </plist>

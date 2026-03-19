@@ -48,6 +48,7 @@ import 'services/connectivity_service.dart';
 import 'services/log/json_file_handler.dart';
 import 'services/log/log_writer.dart';
 import 'services/log/logger_utils.dart';
+import 'services/download_service.dart';
 import 'services/navigation/app_route_observer.dart';
 import 'services/window_state_service.dart';
 import 'models/user.dart';
@@ -152,6 +153,9 @@ Future<void> main() async {
   } catch (e) {
     debugPrint('[Main] 初始 VPN 状态同步失败: $e');
   }
+
+  // 初始化下载服务（依赖网络栈已就绪）
+  DownloadService().initialize();
 
   // 冷启动自动清除图片缓存（如果用户开启了该选项）
   if (prefs.getBool('pref_clear_cache_on_exit') == true) {

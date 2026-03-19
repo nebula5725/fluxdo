@@ -4548,6 +4548,127 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get webview_addBookmark => '收藏此页';
+
+  @override
+  String get webview_removeBookmark => '取消收藏';
+
+  @override
+  String get webview_bookmarkAdded => '已收藏';
+
+  @override
+  String get webview_bookmarkRemoved => '已取消收藏';
+
+  @override
+  String get myBrowser_title => '网页浏览';
+
+  @override
+  String get myBrowser_bookmarks => '收藏';
+
+  @override
+  String myBrowser_bookmarkCount(int count) {
+    return '$count 个收藏';
+  }
+
+  @override
+  String get myBrowser_history => '浏览历史';
+
+  @override
+  String get myBrowser_historyDesc => '查看浏览过的网页';
+
+  @override
+  String get myBrowser_historyEmpty => '还没有浏览记录';
+
+  @override
+  String get myBrowser_clearHistory => '清空历史';
+
+  @override
+  String get myBrowser_clearHistoryConfirm => '确定要清空所有浏览历史吗？';
+
+  @override
+  String get myBrowser_historyCleared => '浏览历史已清空';
+
+  @override
+  String get myBrowser_empty => '还没有收藏的网页';
+
+  @override
+  String get myBrowser_deleted => '已删除收藏';
+
+  @override
+  String get myBrowser_undo => '撤销';
+
+  @override
+  String get myBrowser_addManually => '添加收藏';
+
+  @override
+  String get myBrowser_editTitle => '编辑标题';
+
+  @override
+  String get myBrowser_inputUrl => '输入网址';
+
+  @override
+  String get myBrowser_inputTitle => '标题（选填）';
+
+  @override
+  String get myBrowser_edit => '编辑';
+
+  @override
+  String get myBrowser_delete => '删除';
+
+  @override
+  String get myBrowser_confirmDelete => '确定要删除这条收藏吗？';
+
+  @override
+  String get myBrowser_downloads => '下载管理';
+
+  @override
+  String get myBrowser_downloadsDesc => '查看下载的文件';
+
+  @override
+  String get myBrowser_downloadStarted => '开始下载';
+
+  @override
+  String get myBrowser_downloadComplete => '下载完成';
+
+  @override
+  String get myBrowser_downloadFailed => '下载失败';
+
+  @override
+  String get myBrowser_downloadEmpty => '还没有下载记录';
+
+  @override
+  String get myBrowser_clearCompleted => '清除已完成';
+
+  @override
+  String get myBrowser_clearCompletedConfirm => '确定要清除所有已完成的下载记录吗？';
+
+  @override
+  String get myBrowser_open => '打开';
+
+  @override
+  String get myBrowser_fileNotFound => '文件不存在';
+
+  @override
+  String get myBrowser_downloading => '下载中';
+
+  @override
+  String get myBrowser_viewDownload => '查看';
+
+  @override
+  String myBrowser_downloadSize(String size) {
+    return '$size MB';
+  }
+
+  @override
+  String get webview_inputUrl => '输入或编辑网址';
+
+  @override
+  String get webview_go => '前往';
+
+  @override
+  String get profile_myBrowser => '网页浏览';
+
+  @override
   String get networkSettings_title => '网络设置';
 
   @override

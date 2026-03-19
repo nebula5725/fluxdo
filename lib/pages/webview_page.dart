@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../utils/link_launcher.dart';
 import '../services/toast_service.dart';
 import '../services/app_link_service.dart';
@@ -8,10 +9,13 @@ import '../constants.dart';
 import '../services/network/cookie/cookie_jar_service.dart';
 import '../services/webview_settings.dart';
 import '../widgets/common/app_link_confirm_dialog.dart';
+import '../providers/web_bookmark_provider.dart';
+import '../providers/web_history_provider.dart';
+import '../providers/download_provider.dart';
 import '../l10n/s.dart';
 
 /// 通用内置浏览器页面
-class WebViewPage extends StatefulWidget {
+class WebViewPage extends ConsumerStatefulWidget {
   final String url;
   final String? title;
   final String? injectCss;
@@ -23,6 +27,7 @@ class WebViewPage extends StatefulWidget {
     this.injectCss,
   });
 
+  /// 打开浏览器，url 为空字符串时显示空白页
   static Future<T?> open<T extends Object?>(BuildContext context, String url, {String? title, String? injectCss}) {
     return Navigator.push<T>(
       context,
@@ -33,10 +38,10 @@ class WebViewPage extends StatefulWidget {
   }
 
   @override
-  State<WebViewPage> createState() => _WebViewPageState();
+  ConsumerState<WebViewPage> createState() => _WebViewPageState();
 }
 
-class _WebViewPageState extends State<WebViewPage> {
+class _WebViewPageState extends ConsumerState<WebViewPage> {
   InAppWebViewController? _controller;
   bool _isLoading = true;
   String _currentUrl = '';
@@ -63,6 +68,9 @@ class _WebViewPageState extends State<WebViewPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isBookmarked = ref.watch(
+      webBookmarkProvider.select((list) => list.any((e) => e.url == _currentUrl)),
+    );
 
     return PopScope(
       canPop: false,
@@ -72,12 +80,54 @@ class _WebViewPageState extends State<WebViewPage> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text(_currentTitle.isEmpty ? context.l10n.webview_browser : _currentTitle),
-          leading: IconButton(
-            icon: const Icon(Icons.close_rounded),
-            onPressed: () => Navigator.of(context).pop(),
-            tooltip: context.l10n.common_close,
+          title: GestureDetector(
+            onTap: _showUrlInput,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.lock_outline, size: 14, color: theme.colorScheme.onSurfaceVariant),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      _currentTitle.isNotEmpty ? _currentTitle : (_currentUrl.isNotEmpty ? _currentUrl : context.l10n.webview_inputUrl),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: _currentTitle.isNotEmpty || _currentUrl.isNotEmpty
+                            ? theme.colorScheme.onSurface
+                            : theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
+          leading: Center(
+            child: GestureDetector(
+              onTap: () => Navigator.of(context).pop(),
+              behavior: HitTestBehavior.opaque,
+              child: Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surfaceContainerHighest,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.close_rounded,
+                  size: 18,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+          ),
+          leadingWidth: 48,
           actions: [
             IconButton(
               icon: Icon(
@@ -103,6 +153,18 @@ class _WebViewPageState extends State<WebViewPage> {
             PopupMenuButton<String>(
               onSelected: _handleMenuAction,
               itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: 'toggle_bookmark',
+                  child: Row(
+                    children: [
+                      Icon(isBookmarked ? Icons.star_rounded : Icons.star_outline_rounded),
+                      const SizedBox(width: 8),
+                      Text(isBookmarked
+                          ? context.l10n.webview_removeBookmark
+                          : context.l10n.webview_addBookmark),
+                    ],
+                  ),
+                ),
                 PopupMenuItem(
                   value: 'copy_url',
                   child: Row(
@@ -142,7 +204,9 @@ class _WebViewPageState extends State<WebViewPage> {
                 ),
               Expanded(
                 child: InAppWebView(
-                  initialUrlRequest: URLRequest(url: WebUri(widget.url)),
+                  initialUrlRequest: widget.url.isNotEmpty
+                      ? URLRequest(url: WebUri(widget.url))
+                      : null,
                   initialSettings: WebViewSettings.visible
                     ..useShouldOverrideUrlLoading = true,
                   shouldOverrideUrlLoading: _shouldOverrideUrlLoading,
@@ -176,6 +240,13 @@ class _WebViewPageState extends State<WebViewPage> {
                     if (widget.injectCss != null) {
                       await controller.injectCSSCode(source: widget.injectCss!);
                     }
+                    // 记录浏览历史
+                    if (urlString != null && urlString.isNotEmpty) {
+                      ref.read(webHistoryProvider.notifier).record(
+                            urlString,
+                            _currentTitle,
+                          );
+                    }
                   },
                   onUpdateVisitedHistory: (controller, url, isReload) async {
                     final canGoBack = await controller.canGoBack();
@@ -194,6 +265,15 @@ class _WebViewPageState extends State<WebViewPage> {
                     if (title != null && title.isNotEmpty) {
                       setState(() => _currentTitle = title);
                     }
+                  },
+                  onDownloadStartRequest: (controller, request) {
+                    final url = request.url.toString();
+                    ref.read(downloadProvider.notifier).startDownload(
+                          url: url,
+                          suggestedFilename: request.suggestedFilename,
+                          mimeType: request.mimeType,
+                          contentLength: request.contentLength,
+                        );
                   },
                 ),
               ),
@@ -271,6 +351,9 @@ class _WebViewPageState extends State<WebViewPage> {
 
   void _handleMenuAction(String action) {
     switch (action) {
+      case 'toggle_bookmark':
+        _toggleBookmark();
+        break;
       case 'copy_url':
         _copyUrl();
         break;
@@ -278,6 +361,66 @@ class _WebViewPageState extends State<WebViewPage> {
         _openInExternalBrowser();
         break;
     }
+  }
+
+  void _showUrlInput() {
+    final controller = TextEditingController(text: _currentUrl);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(S.current.webview_inputUrl),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          keyboardType: TextInputType.url,
+          decoration: InputDecoration(
+            hintText: 'https://',
+            suffixIcon: IconButton(
+              icon: const Icon(Icons.clear, size: 18),
+              onPressed: () => controller.clear(),
+            ),
+          ),
+          onSubmitted: (value) {
+            Navigator.pop(ctx);
+            _navigateToUrl(value);
+          },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(S.current.common_cancel),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              _navigateToUrl(controller.text);
+            },
+            child: Text(S.current.webview_go),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _navigateToUrl(String input) {
+    var url = input.trim();
+    if (url.isEmpty) return;
+    // 自动补全 scheme
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = 'https://$url';
+    }
+    _controller?.loadUrl(urlRequest: URLRequest(url: WebUri(url)));
+  }
+
+  void _toggleBookmark() {
+    if (_currentUrl.isEmpty) return;
+    final added = ref.read(webBookmarkProvider.notifier).toggle(
+      _currentUrl,
+      _currentTitle,
+    );
+    ToastService.showSuccess(
+      added ? S.current.webview_bookmarkAdded : S.current.webview_bookmarkRemoved,
+    );
   }
 
   Future<void> _handleBackNavigation() async {

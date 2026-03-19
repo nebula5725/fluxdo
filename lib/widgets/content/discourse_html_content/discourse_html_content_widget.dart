@@ -9,6 +9,7 @@ import '../../../models/topic.dart';
 import '../../../providers/preferences_provider.dart';
 import '../../../services/discourse/discourse_service.dart';
 import '../../../services/emoji_handler.dart';
+import '../../../providers/download_provider.dart';
 import '../../../utils/discourse_url_parser.dart';
 import '../../../utils/link_launcher.dart';
 import '../../../utils/url_helper.dart';
@@ -509,6 +510,9 @@ class _DiscourseHtmlContentState extends ConsumerState<DiscourseHtmlContent> {
           context,
           url,
           onInternalLinkTap: widget.onInternalLinkTap,
+          onDownloadAttachment: (downloadUrl) {
+            ref.read(downloadProvider.notifier).startDownload(url: downloadUrl);
+          },
         );
         return true;
       },

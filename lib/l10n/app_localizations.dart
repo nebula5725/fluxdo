@@ -8453,6 +8453,240 @@ abstract class AppLocalizations {
   /// **'打开失败: {error}'**
   String webview_openFailed(String error);
 
+  /// No description provided for @webview_addBookmark.
+  ///
+  /// In zh, this message translates to:
+  /// **'收藏此页'**
+  String get webview_addBookmark;
+
+  /// No description provided for @webview_removeBookmark.
+  ///
+  /// In zh, this message translates to:
+  /// **'取消收藏'**
+  String get webview_removeBookmark;
+
+  /// No description provided for @webview_bookmarkAdded.
+  ///
+  /// In zh, this message translates to:
+  /// **'已收藏'**
+  String get webview_bookmarkAdded;
+
+  /// No description provided for @webview_bookmarkRemoved.
+  ///
+  /// In zh, this message translates to:
+  /// **'已取消收藏'**
+  String get webview_bookmarkRemoved;
+
+  /// No description provided for @myBrowser_title.
+  ///
+  /// In zh, this message translates to:
+  /// **'网页浏览'**
+  String get myBrowser_title;
+
+  /// No description provided for @myBrowser_bookmarks.
+  ///
+  /// In zh, this message translates to:
+  /// **'收藏'**
+  String get myBrowser_bookmarks;
+
+  /// No description provided for @myBrowser_bookmarkCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count} 个收藏'**
+  String myBrowser_bookmarkCount(int count);
+
+  /// No description provided for @myBrowser_history.
+  ///
+  /// In zh, this message translates to:
+  /// **'浏览历史'**
+  String get myBrowser_history;
+
+  /// No description provided for @myBrowser_historyDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'查看浏览过的网页'**
+  String get myBrowser_historyDesc;
+
+  /// No description provided for @myBrowser_historyEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'还没有浏览记录'**
+  String get myBrowser_historyEmpty;
+
+  /// No description provided for @myBrowser_clearHistory.
+  ///
+  /// In zh, this message translates to:
+  /// **'清空历史'**
+  String get myBrowser_clearHistory;
+
+  /// No description provided for @myBrowser_clearHistoryConfirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'确定要清空所有浏览历史吗？'**
+  String get myBrowser_clearHistoryConfirm;
+
+  /// No description provided for @myBrowser_historyCleared.
+  ///
+  /// In zh, this message translates to:
+  /// **'浏览历史已清空'**
+  String get myBrowser_historyCleared;
+
+  /// No description provided for @myBrowser_empty.
+  ///
+  /// In zh, this message translates to:
+  /// **'还没有收藏的网页'**
+  String get myBrowser_empty;
+
+  /// No description provided for @myBrowser_deleted.
+  ///
+  /// In zh, this message translates to:
+  /// **'已删除收藏'**
+  String get myBrowser_deleted;
+
+  /// No description provided for @myBrowser_undo.
+  ///
+  /// In zh, this message translates to:
+  /// **'撤销'**
+  String get myBrowser_undo;
+
+  /// No description provided for @myBrowser_addManually.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加收藏'**
+  String get myBrowser_addManually;
+
+  /// No description provided for @myBrowser_editTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑标题'**
+  String get myBrowser_editTitle;
+
+  /// No description provided for @myBrowser_inputUrl.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入网址'**
+  String get myBrowser_inputUrl;
+
+  /// No description provided for @myBrowser_inputTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'标题（选填）'**
+  String get myBrowser_inputTitle;
+
+  /// No description provided for @myBrowser_edit.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑'**
+  String get myBrowser_edit;
+
+  /// No description provided for @myBrowser_delete.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除'**
+  String get myBrowser_delete;
+
+  /// No description provided for @myBrowser_confirmDelete.
+  ///
+  /// In zh, this message translates to:
+  /// **'确定要删除这条收藏吗？'**
+  String get myBrowser_confirmDelete;
+
+  /// No description provided for @myBrowser_downloads.
+  ///
+  /// In zh, this message translates to:
+  /// **'下载管理'**
+  String get myBrowser_downloads;
+
+  /// No description provided for @myBrowser_downloadsDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'查看下载的文件'**
+  String get myBrowser_downloadsDesc;
+
+  /// No description provided for @myBrowser_downloadStarted.
+  ///
+  /// In zh, this message translates to:
+  /// **'开始下载'**
+  String get myBrowser_downloadStarted;
+
+  /// No description provided for @myBrowser_downloadComplete.
+  ///
+  /// In zh, this message translates to:
+  /// **'下载完成'**
+  String get myBrowser_downloadComplete;
+
+  /// No description provided for @myBrowser_downloadFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'下载失败'**
+  String get myBrowser_downloadFailed;
+
+  /// No description provided for @myBrowser_downloadEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'还没有下载记录'**
+  String get myBrowser_downloadEmpty;
+
+  /// No description provided for @myBrowser_clearCompleted.
+  ///
+  /// In zh, this message translates to:
+  /// **'清除已完成'**
+  String get myBrowser_clearCompleted;
+
+  /// No description provided for @myBrowser_clearCompletedConfirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'确定要清除所有已完成的下载记录吗？'**
+  String get myBrowser_clearCompletedConfirm;
+
+  /// No description provided for @myBrowser_open.
+  ///
+  /// In zh, this message translates to:
+  /// **'打开'**
+  String get myBrowser_open;
+
+  /// No description provided for @myBrowser_fileNotFound.
+  ///
+  /// In zh, this message translates to:
+  /// **'文件不存在'**
+  String get myBrowser_fileNotFound;
+
+  /// No description provided for @myBrowser_downloading.
+  ///
+  /// In zh, this message translates to:
+  /// **'下载中'**
+  String get myBrowser_downloading;
+
+  /// No description provided for @myBrowser_viewDownload.
+  ///
+  /// In zh, this message translates to:
+  /// **'查看'**
+  String get myBrowser_viewDownload;
+
+  /// No description provided for @myBrowser_downloadSize.
+  ///
+  /// In zh, this message translates to:
+  /// **'{size} MB'**
+  String myBrowser_downloadSize(String size);
+
+  /// No description provided for @webview_inputUrl.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入或编辑网址'**
+  String get webview_inputUrl;
+
+  /// No description provided for @webview_go.
+  ///
+  /// In zh, this message translates to:
+  /// **'前往'**
+  String get webview_go;
+
+  /// No description provided for @profile_myBrowser.
+  ///
+  /// In zh, this message translates to:
+  /// **'网页浏览'**
+  String get profile_myBrowser;
+
   /// No description provided for @networkSettings_title.
   ///
   /// In zh, this message translates to:

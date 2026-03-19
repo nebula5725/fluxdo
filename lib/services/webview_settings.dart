@@ -56,6 +56,9 @@ class WebViewSettings {
     // 保持默认回调（可能需要）
     useShouldOverrideUrlLoading: false,
 
+    // 启用下载拦截
+    useOnDownloadStart: true,
+
     // 安全相关
     thirdPartyCookiesEnabled: true,
   );

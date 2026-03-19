@@ -7,11 +7,48 @@ import 'local_notification_service.dart';
 /// Toast 类型
 enum ToastType { success, error, info }
 
+/// 下载进度 Toast 句柄
+class DownloadToastHandle {
+  OverlayEntry? _entry;
+  AnimationController? _controller;
+  final progress = ValueNotifier<double>(-1.0); // -1 = 不确定进度
+  bool _disposed = false;
+
+  bool get isActive => !_disposed && _entry != null;
+
+  /// 更新下载进度（0.0~1.0，-1 为不确定进度）
+  void updateProgress(double value) {
+    if (!_disposed) progress.value = value;
+  }
+
+  /// 关闭 Toast
+  void dismiss() {
+    if (_disposed) return;
+    _disposed = true;
+    ToastService._downloadHandle = null;
+    final c = _controller;
+    final e = _entry;
+    _entry = null;
+    _controller = null;
+    if (c != null && e != null) {
+      c.reverse().then((_) {
+        e.remove();
+        c.dispose();
+        progress.dispose();
+      });
+    } else {
+      e?.remove();
+      progress.dispose();
+    }
+  }
+}
+
 /// 全局 Toast 服务（基于 Overlay，显示在屏幕顶部）
 class ToastService {
   static OverlayEntry? _currentEntry;
   static Timer? _dismissTimer;
   static AnimationController? _currentController;
+  static DownloadToastHandle? _downloadHandle;
 
   /// 显示 Toast
   static void show(
@@ -21,6 +58,9 @@ class ToastService {
     String? actionLabel,
     VoidCallback? onAction,
   }) {
+    // 下载进度 Toast 活跃时不显示普通 Toast
+    if (_downloadHandle?.isActive == true) return;
+
     final overlay = navigatorKey.currentState?.overlay;
     if (overlay == null) return;
 
@@ -53,6 +93,41 @@ class ToastService {
 
     // 自动消失
     _dismissTimer = Timer(duration, () => _dismiss(animate: true));
+  }
+
+  /// 显示下载进度 Toast（持久，不自动消失）
+  static DownloadToastHandle showDownload(String fileName) {
+    // 关闭旧的下载 Toast
+    _downloadHandle?.dismiss();
+    // 关闭普通 Toast
+    _dismiss(animate: false);
+
+    final overlay = navigatorKey.currentState?.overlay;
+    if (overlay == null) {
+      final h = DownloadToastHandle();
+      h._disposed = true;
+      return h;
+    }
+
+    final handle = DownloadToastHandle();
+
+    final entry = OverlayEntry(
+      builder: (context) => _DownloadToastWidget(
+        fileName: fileName,
+        progress: handle.progress,
+        onControllerCreated: (c) {
+          handle._controller = c;
+          c.forward();
+        },
+        onDismiss: () => handle.dismiss(),
+      ),
+    );
+
+    handle._entry = entry;
+    _downloadHandle = handle;
+    overlay.insert(entry);
+
+    return handle;
   }
 
   /// 显示成功提示
@@ -284,6 +359,182 @@ class _ToastWidgetState extends State<_ToastWidget>
                             ),
                           ],
                         ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// 下载进度 Toast 组件
+class _DownloadToastWidget extends StatefulWidget {
+  final String fileName;
+  final ValueNotifier<double> progress;
+  final void Function(AnimationController) onControllerCreated;
+  final VoidCallback onDismiss;
+
+  const _DownloadToastWidget({
+    required this.fileName,
+    required this.progress,
+    required this.onControllerCreated,
+    required this.onDismiss,
+  });
+
+  @override
+  State<_DownloadToastWidget> createState() => _DownloadToastWidgetState();
+}
+
+class _DownloadToastWidgetState extends State<_DownloadToastWidget>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<Offset> _slideAnimation;
+  late final Animation<double> _fadeAnimation;
+  double _dragOffset = 0;
+  bool _dismissing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 350),
+    );
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, -1),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
+    _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+    );
+    widget.onControllerCreated(_controller);
+  }
+
+  void _onVerticalDragUpdate(DragUpdateDetails details) {
+    if (_dismissing) return;
+    setState(() {
+      _dragOffset = (_dragOffset + details.delta.dy).clamp(-double.infinity, 0);
+    });
+  }
+
+  void _onVerticalDragEnd(DragEndDetails details) {
+    if (_dismissing) return;
+    if (_dragOffset < -40 || details.velocity.pixelsPerSecond.dy < -200) {
+      _dismissing = true;
+      widget.onDismiss();
+    } else {
+      setState(() => _dragOffset = 0);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final mediaQuery = MediaQuery.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    const progressColor = Colors.blue;
+
+    return Positioned(
+      top: mediaQuery.padding.top + 16,
+      left: 16,
+      right: 16,
+      child: SafeArea(
+        top: false,
+        bottom: false,
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: SlideTransition(
+            position: _slideAnimation,
+            child: FadeTransition(
+              opacity: _fadeAnimation,
+              child: Transform.translate(
+                offset: Offset(0, _dragOffset),
+                child: Opacity(
+                  opacity: (_dragOffset < 0)
+                      ? (1.0 + _dragOffset / 120).clamp(0.0, 1.0)
+                      : 1.0,
+                  child: GestureDetector(
+                    onVerticalDragUpdate: _onVerticalDragUpdate,
+                    onVerticalDragEnd: _onVerticalDragEnd,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: colorScheme.inverseSurface,
+                        borderRadius: BorderRadius.circular(100),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
+                            blurRadius: 20,
+                            offset: const Offset(0, 8),
+                          ),
+                          BoxShadow(
+                            color: progressColor.withValues(alpha: isDark ? 0.25 : 0.15),
+                            blurRadius: 24,
+                            spreadRadius: -2,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      padding: const EdgeInsets.fromLTRB(10, 10, 20, 10),
+                      child: ValueListenableBuilder<double>(
+                        valueListenable: widget.progress,
+                        builder: (context, progress, _) {
+                          final hasProgress = progress >= 0;
+                          final percentage = hasProgress
+                              ? '${(progress * 100).toInt()}%'
+                              : '';
+
+                          return Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: const BoxDecoration(
+                                  color: Color(0x26448AFF), // progressColor 15%
+                                  shape: BoxShape.circle,
+                                ),
+                                child: SizedBox(
+                                  width: 22,
+                                  height: 22,
+                                  child: CircularProgressIndicator(
+                                    value: hasProgress ? progress : null,
+                                    strokeWidth: 2.5,
+                                    color: progressColor,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Flexible(
+                                child: Text(
+                                  widget.fileName,
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: colorScheme.onInverseSurface,
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: 0.2,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              if (percentage.isNotEmpty) ...[
+                                const SizedBox(width: 8),
+                                Text(
+                                  percentage,
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: colorScheme.onInverseSurface
+                                        .withValues(alpha: 0.7),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          );
+                        },
                       ),
                     ),
                   ),

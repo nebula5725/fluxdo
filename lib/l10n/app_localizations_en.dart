@@ -4628,6 +4628,130 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get webview_addBookmark => 'Bookmark this page';
+
+  @override
+  String get webview_removeBookmark => 'Remove bookmark';
+
+  @override
+  String get webview_bookmarkAdded => 'Bookmarked';
+
+  @override
+  String get webview_bookmarkRemoved => 'Bookmark removed';
+
+  @override
+  String get myBrowser_title => 'Web Browse';
+
+  @override
+  String get myBrowser_bookmarks => 'Bookmarks';
+
+  @override
+  String myBrowser_bookmarkCount(int count) {
+    return '$count bookmarks';
+  }
+
+  @override
+  String get myBrowser_history => 'Browsing History';
+
+  @override
+  String get myBrowser_historyDesc => 'View browsed pages';
+
+  @override
+  String get myBrowser_historyEmpty => 'No browsing history yet';
+
+  @override
+  String get myBrowser_clearHistory => 'Clear history';
+
+  @override
+  String get myBrowser_clearHistoryConfirm =>
+      'Are you sure you want to clear all browsing history?';
+
+  @override
+  String get myBrowser_historyCleared => 'Browsing history cleared';
+
+  @override
+  String get myBrowser_empty => 'No bookmarked pages yet';
+
+  @override
+  String get myBrowser_deleted => 'Bookmark deleted';
+
+  @override
+  String get myBrowser_undo => 'Undo';
+
+  @override
+  String get myBrowser_addManually => 'Add bookmark';
+
+  @override
+  String get myBrowser_editTitle => 'Edit title';
+
+  @override
+  String get myBrowser_inputUrl => 'Enter URL';
+
+  @override
+  String get myBrowser_inputTitle => 'Title (optional)';
+
+  @override
+  String get myBrowser_edit => 'Edit';
+
+  @override
+  String get myBrowser_delete => 'Delete';
+
+  @override
+  String get myBrowser_confirmDelete =>
+      'Are you sure you want to delete this bookmark?';
+
+  @override
+  String get myBrowser_downloads => 'Downloads';
+
+  @override
+  String get myBrowser_downloadsDesc => 'View downloaded files';
+
+  @override
+  String get myBrowser_downloadStarted => 'Download started';
+
+  @override
+  String get myBrowser_downloadComplete => 'Download complete';
+
+  @override
+  String get myBrowser_downloadFailed => 'Download failed';
+
+  @override
+  String get myBrowser_downloadEmpty => 'No downloads yet';
+
+  @override
+  String get myBrowser_clearCompleted => 'Clear completed';
+
+  @override
+  String get myBrowser_clearCompletedConfirm =>
+      'Are you sure you want to clear all completed downloads?';
+
+  @override
+  String get myBrowser_open => 'Open';
+
+  @override
+  String get myBrowser_fileNotFound => 'File not found';
+
+  @override
+  String get myBrowser_downloading => 'Downloading';
+
+  @override
+  String get myBrowser_viewDownload => 'View';
+
+  @override
+  String myBrowser_downloadSize(String size) {
+    return '$size MB';
+  }
+
+  @override
+  String get webview_inputUrl => 'Enter or edit URL';
+
+  @override
+  String get webview_go => 'Go';
+
+  @override
+  String get profile_myBrowser => 'Web Browse';
+
+  @override
   String get networkSettings_title => 'Network Settings';
 
   @override

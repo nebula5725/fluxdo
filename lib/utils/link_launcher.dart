@@ -114,6 +114,7 @@ Future<void> launchContentLink(
   BuildContext context,
   String url, {
   void Function(int topicId, String? topicSlug, int? postNumber)? onInternalLinkTap,
+  void Function(String url)? onDownloadAttachment,
 }) async {
   if (url.isEmpty) return;
   if (url.startsWith('upload://')) {
@@ -142,12 +143,16 @@ Future<void> launchContentLink(
     return;
   }
 
-  // 3. 下载附件链接：/uploads/ 路径用外部浏览器
+  // 3. 附件链接：优先使用内置下载，回退外部浏览器
   if (_isUploadLink(url) && isInternalUrlString(url)) {
     final fullUrl = UrlHelper.resolveUrl(url);
-    final uri = Uri.tryParse(fullUrl);
-    if (uri != null && await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (onDownloadAttachment != null) {
+      onDownloadAttachment(fullUrl);
+    } else {
+      final uri = Uri.tryParse(fullUrl);
+      if (uri != null && await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      }
     }
     return;
   }
