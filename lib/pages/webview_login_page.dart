@@ -182,11 +182,19 @@ class _WebViewLoginPageState extends ConsumerState<WebViewLoginPage> {
                   _isLoading = false;
                   _url = url?.toString() ?? '';
                 });
+                _recheckCount = 0;
                 await WebViewSettings.injectScrollFix(controller);
                 // 自动填充登录表单
                 await _autoFillLoginForm(controller, url);
                 // 自动检测登录状态
                 await _checkLoginStatus(controller);
+              },
+              onUpdateVisitedHistory: (controller, url, isReload) {
+                if (!_loginHandled && isReload != true) {
+                  // SPA 路由变化时也尝试检测登录状态
+                  _recheckCount = 0;
+                  _checkLoginStatus(controller);
+                }
               },
             ), getController: () => _controller),
           ),
@@ -473,8 +481,17 @@ class _WebViewLoginPageState extends ConsumerState<WebViewLoginPage> {
     );
   }
 
+  int _recheckCount = 0;
+  static const _maxRechecks = 15;
+  static const _recheckInterval = Duration(milliseconds: 500);
+
   void _scheduleLoginRecheck(InAppWebViewController controller) {
-    Future.delayed(const Duration(milliseconds: 400), () {
+    if (_recheckCount >= _maxRechecks) {
+      debugPrint('[Login] 已达最大重试次数($_maxRechecks)，停止重试');
+      return;
+    }
+    _recheckCount++;
+    Future.delayed(_recheckInterval, () {
       if (!mounted || _loginHandled || _controller != controller) {
         return;
       }
