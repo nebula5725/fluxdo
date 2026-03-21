@@ -9,6 +9,7 @@ class NotificationListSkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Skeleton(
       child: ListView.builder(
+        padding: EdgeInsets.zero,
         itemCount: 10,
         itemBuilder: (context, index) => const _NotificationItemSkeleton(),
       ),
