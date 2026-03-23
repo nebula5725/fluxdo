@@ -450,6 +450,21 @@ class _DiscourseHtmlContentState extends ConsumerState<DiscourseHtmlContent> {
         }
         // 优化链接样式
         if (element.localName == 'a') {
+          // 含有 emoji 图片的链接使用 inline-block 渲染，
+          // 绕过 flutter_widget_from_html 的 Flattener._getInlineRecognizer bug：
+          // 当链接内有 <img>（WidgetBit）时，isIdenticalWith 会错误地将链接的
+          // recognizer 判定为与根 resolvers 相同，导致 recognizer 丢失。
+          // inline-block 让链接走 onRenderBlock 路径，由 TagA.onRenderBlock
+          // 正确地用 GestureDetector 包裹整个链接。
+          final hasEmojiImg = element.getElementsByTagName('img')
+              .any((img) => img.classes.contains('emoji'));
+          if (hasEmojiImg) {
+            return {
+              'color': '#$linkColor',
+              'text-decoration': 'none',
+              'display': 'inline-block',
+            };
+          }
           return {
             'color': '#$linkColor',
             'text-decoration': 'none',
