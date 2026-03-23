@@ -13,6 +13,7 @@ import '../services/preloaded_data_service.dart';
 import '../services/network/cookie/cookie_jar_service.dart';
 import '../services/network/cookie/cookie_sync_service.dart';
 import '../services/toast_service.dart';
+import '../services/hcaptcha_accessibility_service.dart';
 import '../services/webview_settings.dart';
 import '../services/windows_webview_environment_service.dart';
 import '../services/log/log_writer.dart';
@@ -49,6 +50,7 @@ class _WebViewLoginPageState extends ConsumerState<WebViewLoginPage> {
   void initState() {
     super.initState();
     _cookieJar.syncToWebView();
+    HCaptchaAccessibilityService().syncToWebView();
     _loadSavedUsername();
   }
 

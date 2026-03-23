@@ -36,6 +36,7 @@ import 'services/network/proxy/proxy_settings_service.dart';
 import 'services/network/rhttp/rhttp_settings_service.dart';
 import 'package:rhttp/rhttp.dart' as rhttp;
 import 'services/network/vpn_auto_toggle_service.dart';
+import 'services/hcaptcha_accessibility_service.dart';
 import 'services/network/doh_proxy/proxy_certificate.dart';
 import 'services/cf_challenge_logger.dart';
 import 'services/cf_clearance_refresh_service.dart';
@@ -163,6 +164,7 @@ Future<void> main() async {
 
   await NetworkSettingsService.instance.initialize(prefs);
   VpnAutoToggleService.instance.initialize(prefs);
+  HCaptchaAccessibilityService().initialize(prefs);
   try {
     final initialConnectivity = await ConnectivityService.safeCheckConnectivity();
     await VpnAutoToggleService.instance.syncInitialState(initialConnectivity);

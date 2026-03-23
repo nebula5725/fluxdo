@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -11,6 +13,7 @@ import 'widgets/http_proxy_card.dart';
 import 'widgets/doh_settings_card.dart';
 import 'widgets/vpn_auto_toggle_card.dart';
 import 'widgets/cf_verify_card.dart';
+import 'widgets/hcaptcha_accessibility_card.dart';
 import 'widgets/advanced_settings_card.dart';
 import 'widgets/rate_limit_card.dart';
 import 'widgets/debug_tools_card.dart';
@@ -111,6 +114,12 @@ class _NetworkSettingsPageState extends State<NetworkSettingsPage> {
               const VpnAutoToggleCard(),
               const SizedBox(height: 12),
               const CfVerifyCard(),
+              // hCaptcha 无障碍仅在 Android/Windows 可用
+              // Apple 平台 WKWebView 阻止跨域 iframe 的第三方 Cookie
+              if (Platform.isAndroid || Platform.isWindows) ...[
+                const SizedBox(height: 12),
+                const HCaptchaAccessibilityCard(),
+              ],
               const SizedBox(height: 24),
 
               // 高级

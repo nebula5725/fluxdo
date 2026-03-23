@@ -1799,5 +1799,24 @@
   "template_searchHint": "Search templates...",
   "template_empty": "No templates available",
   "template_loadError": "Failed to load templates",
-  "template_tooltip": "Template"
+  "template_tooltip": "Template",
+
+  "hcaptcha_title": "hCaptcha Accessibility",
+  "hcaptcha_subtitle": "Skip hCaptcha verification for visually impaired users",
+  "hcaptcha_cookieSet": "Cookie set ✓",
+  "hcaptcha_cookieNotSet": "Cookie not set",
+  "hcaptcha_webviewGet": "WebView",
+  "hcaptcha_pasteCookie": "Paste Cookie",
+  "hcaptcha_clear": "Clear",
+  "hcaptcha_clearConfirm": "Are you sure you want to clear the hCaptcha accessibility cookie?",
+  "hcaptcha_pasteDialogTitle": "Paste hCaptcha Cookie",
+  "hcaptcha_pasteDialogDesc": "After registering on the hCaptcha accessibility page in your browser, copy the hc_accessibility cookie value from browser DevTools and paste it below.",
+  "hcaptcha_pasteDialogHint": "Enter hc_accessibility cookie value",
+  "hcaptcha_cookieSaved": "hCaptcha accessibility cookie saved",
+  "hcaptcha_cookieCleared": "hCaptcha accessibility cookie cleared",
+  "hcaptcha_cookieNotFound": "hCaptcha accessibility cookie not found, please complete registration first",
+  "hcaptcha_webviewTitle": "hCaptcha Accessibility",
+  "hcaptcha_done": "Done",
+  "hcaptcha_pasteLink": "Paste login link",
+  "hcaptcha_pasteLinkInvalid": "No valid hCaptcha link found in clipboard"
 }

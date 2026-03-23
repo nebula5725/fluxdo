@@ -9826,6 +9826,114 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'模板'**
   String get template_tooltip;
+
+  /// No description provided for @hcaptcha_title.
+  ///
+  /// In zh, this message translates to:
+  /// **'hCaptcha 无障碍'**
+  String get hcaptcha_title;
+
+  /// No description provided for @hcaptcha_subtitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'视障用户可跳过 hCaptcha 验证'**
+  String get hcaptcha_subtitle;
+
+  /// No description provided for @hcaptcha_cookieSet.
+  ///
+  /// In zh, this message translates to:
+  /// **'Cookie 已设置 ✓'**
+  String get hcaptcha_cookieSet;
+
+  /// No description provided for @hcaptcha_cookieNotSet.
+  ///
+  /// In zh, this message translates to:
+  /// **'Cookie 未设置'**
+  String get hcaptcha_cookieNotSet;
+
+  /// No description provided for @hcaptcha_webviewGet.
+  ///
+  /// In zh, this message translates to:
+  /// **'WebView 获取'**
+  String get hcaptcha_webviewGet;
+
+  /// No description provided for @hcaptcha_pasteCookie.
+  ///
+  /// In zh, this message translates to:
+  /// **'粘贴 Cookie'**
+  String get hcaptcha_pasteCookie;
+
+  /// No description provided for @hcaptcha_clear.
+  ///
+  /// In zh, this message translates to:
+  /// **'清除'**
+  String get hcaptcha_clear;
+
+  /// No description provided for @hcaptcha_clearConfirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'确定要清除 hCaptcha 无障碍 Cookie 吗？'**
+  String get hcaptcha_clearConfirm;
+
+  /// No description provided for @hcaptcha_pasteDialogTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'粘贴 hCaptcha Cookie'**
+  String get hcaptcha_pasteDialogTitle;
+
+  /// No description provided for @hcaptcha_pasteDialogDesc.
+  ///
+  /// In zh, this message translates to:
+  /// **'在浏览器中访问 hCaptcha 无障碍页面注册后，从浏览器开发者工具中复制名为 hc_accessibility 的 Cookie 值粘贴到下方。'**
+  String get hcaptcha_pasteDialogDesc;
+
+  /// No description provided for @hcaptcha_pasteDialogHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入 hc_accessibility Cookie 值'**
+  String get hcaptcha_pasteDialogHint;
+
+  /// No description provided for @hcaptcha_cookieSaved.
+  ///
+  /// In zh, this message translates to:
+  /// **'hCaptcha 无障碍 Cookie 已保存'**
+  String get hcaptcha_cookieSaved;
+
+  /// No description provided for @hcaptcha_cookieCleared.
+  ///
+  /// In zh, this message translates to:
+  /// **'hCaptcha 无障碍 Cookie 已清除'**
+  String get hcaptcha_cookieCleared;
+
+  /// No description provided for @hcaptcha_cookieNotFound.
+  ///
+  /// In zh, this message translates to:
+  /// **'未找到 hCaptcha 无障碍 Cookie，请先完成注册'**
+  String get hcaptcha_cookieNotFound;
+
+  /// No description provided for @hcaptcha_webviewTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'hCaptcha 无障碍'**
+  String get hcaptcha_webviewTitle;
+
+  /// No description provided for @hcaptcha_done.
+  ///
+  /// In zh, this message translates to:
+  /// **'完成'**
+  String get hcaptcha_done;
+
+  /// No description provided for @hcaptcha_pasteLink.
+  ///
+  /// In zh, this message translates to:
+  /// **'粘贴登录链接'**
+  String get hcaptcha_pasteLink;
+
+  /// No description provided for @hcaptcha_pasteLinkInvalid.
+  ///
+  /// In zh, this message translates to:
+  /// **'剪贴板中没有有效的 hCaptcha 链接'**
+  String get hcaptcha_pasteLinkInvalid;
 }
 
 class _AppLocalizationsDelegate

@@ -5388,4 +5388,63 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get template_tooltip => 'Template';
+
+  @override
+  String get hcaptcha_title => 'hCaptcha Accessibility';
+
+  @override
+  String get hcaptcha_subtitle =>
+      'Skip hCaptcha verification for visually impaired users';
+
+  @override
+  String get hcaptcha_cookieSet => 'Cookie set ✓';
+
+  @override
+  String get hcaptcha_cookieNotSet => 'Cookie not set';
+
+  @override
+  String get hcaptcha_webviewGet => 'WebView';
+
+  @override
+  String get hcaptcha_pasteCookie => 'Paste Cookie';
+
+  @override
+  String get hcaptcha_clear => 'Clear';
+
+  @override
+  String get hcaptcha_clearConfirm =>
+      'Are you sure you want to clear the hCaptcha accessibility cookie?';
+
+  @override
+  String get hcaptcha_pasteDialogTitle => 'Paste hCaptcha Cookie';
+
+  @override
+  String get hcaptcha_pasteDialogDesc =>
+      'After registering on the hCaptcha accessibility page in your browser, copy the hc_accessibility cookie value from browser DevTools and paste it below.';
+
+  @override
+  String get hcaptcha_pasteDialogHint => 'Enter hc_accessibility cookie value';
+
+  @override
+  String get hcaptcha_cookieSaved => 'hCaptcha accessibility cookie saved';
+
+  @override
+  String get hcaptcha_cookieCleared => 'hCaptcha accessibility cookie cleared';
+
+  @override
+  String get hcaptcha_cookieNotFound =>
+      'hCaptcha accessibility cookie not found, please complete registration first';
+
+  @override
+  String get hcaptcha_webviewTitle => 'hCaptcha Accessibility';
+
+  @override
+  String get hcaptcha_done => 'Done';
+
+  @override
+  String get hcaptcha_pasteLink => 'Paste login link';
+
+  @override
+  String get hcaptcha_pasteLinkInvalid =>
+      'No valid hCaptcha link found in clipboard';
 }

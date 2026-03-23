@@ -5275,6 +5275,61 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get template_tooltip => '模板';
+
+  @override
+  String get hcaptcha_title => 'hCaptcha 无障碍';
+
+  @override
+  String get hcaptcha_subtitle => '视障用户可跳过 hCaptcha 验证';
+
+  @override
+  String get hcaptcha_cookieSet => 'Cookie 已设置 ✓';
+
+  @override
+  String get hcaptcha_cookieNotSet => 'Cookie 未设置';
+
+  @override
+  String get hcaptcha_webviewGet => 'WebView 获取';
+
+  @override
+  String get hcaptcha_pasteCookie => '粘贴 Cookie';
+
+  @override
+  String get hcaptcha_clear => '清除';
+
+  @override
+  String get hcaptcha_clearConfirm => '确定要清除 hCaptcha 无障碍 Cookie 吗？';
+
+  @override
+  String get hcaptcha_pasteDialogTitle => '粘贴 hCaptcha Cookie';
+
+  @override
+  String get hcaptcha_pasteDialogDesc =>
+      '在浏览器中访问 hCaptcha 无障碍页面注册后，从浏览器开发者工具中复制名为 hc_accessibility 的 Cookie 值粘贴到下方。';
+
+  @override
+  String get hcaptcha_pasteDialogHint => '请输入 hc_accessibility Cookie 值';
+
+  @override
+  String get hcaptcha_cookieSaved => 'hCaptcha 无障碍 Cookie 已保存';
+
+  @override
+  String get hcaptcha_cookieCleared => 'hCaptcha 无障碍 Cookie 已清除';
+
+  @override
+  String get hcaptcha_cookieNotFound => '未找到 hCaptcha 无障碍 Cookie，请先完成注册';
+
+  @override
+  String get hcaptcha_webviewTitle => 'hCaptcha 无障碍';
+
+  @override
+  String get hcaptcha_done => '完成';
+
+  @override
+  String get hcaptcha_pasteLink => '粘贴登录链接';
+
+  @override
+  String get hcaptcha_pasteLinkInvalid => '剪贴板中没有有效的 hCaptcha 链接';
 }
 
 /// The translations for Chinese, as used in Hong Kong (`zh_HK`).
@@ -10427,6 +10482,61 @@ class AppLocalizationsZhHk extends AppLocalizationsZh {
 
   @override
   String get template_tooltip => '模板';
+
+  @override
+  String get hcaptcha_title => 'hCaptcha 無障礙';
+
+  @override
+  String get hcaptcha_subtitle => '視障用戶可跳過 hCaptcha 驗證';
+
+  @override
+  String get hcaptcha_cookieSet => 'Cookie 已設置 ✓';
+
+  @override
+  String get hcaptcha_cookieNotSet => 'Cookie 未設置';
+
+  @override
+  String get hcaptcha_webviewGet => 'WebView 獲取';
+
+  @override
+  String get hcaptcha_pasteCookie => '貼上 Cookie';
+
+  @override
+  String get hcaptcha_clear => '清除';
+
+  @override
+  String get hcaptcha_clearConfirm => '確定要清除 hCaptcha 無障礙 Cookie 嗎？';
+
+  @override
+  String get hcaptcha_pasteDialogTitle => '貼上 hCaptcha Cookie';
+
+  @override
+  String get hcaptcha_pasteDialogDesc =>
+      '在瀏覽器中訪問 hCaptcha 無障礙頁面註冊後，從瀏覽器開發者工具中複製名為 hc_accessibility 的 Cookie 值貼上到下方。';
+
+  @override
+  String get hcaptcha_pasteDialogHint => '請輸入 hc_accessibility Cookie 值';
+
+  @override
+  String get hcaptcha_cookieSaved => 'hCaptcha 無障礙 Cookie 已保存';
+
+  @override
+  String get hcaptcha_cookieCleared => 'hCaptcha 無障礙 Cookie 已清除';
+
+  @override
+  String get hcaptcha_cookieNotFound => '未找到 hCaptcha 無障礙 Cookie，請先完成註冊';
+
+  @override
+  String get hcaptcha_webviewTitle => 'hCaptcha 無障礙';
+
+  @override
+  String get hcaptcha_done => '完成';
+
+  @override
+  String get hcaptcha_pasteLink => '貼上登錄鏈接';
+
+  @override
+  String get hcaptcha_pasteLinkInvalid => '剪貼板中沒有有效的 hCaptcha 鏈接';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -15579,4 +15689,59 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get template_tooltip => '範本';
+
+  @override
+  String get hcaptcha_title => 'hCaptcha 無障礙';
+
+  @override
+  String get hcaptcha_subtitle => '視障使用者可跳過 hCaptcha 驗證';
+
+  @override
+  String get hcaptcha_cookieSet => 'Cookie 已設定 ✓';
+
+  @override
+  String get hcaptcha_cookieNotSet => 'Cookie 未設定';
+
+  @override
+  String get hcaptcha_webviewGet => 'WebView 取得';
+
+  @override
+  String get hcaptcha_pasteCookie => '貼上 Cookie';
+
+  @override
+  String get hcaptcha_clear => '清除';
+
+  @override
+  String get hcaptcha_clearConfirm => '確定要清除 hCaptcha 無障礙 Cookie 嗎？';
+
+  @override
+  String get hcaptcha_pasteDialogTitle => '貼上 hCaptcha Cookie';
+
+  @override
+  String get hcaptcha_pasteDialogDesc =>
+      '在瀏覽器中造訪 hCaptcha 無障礙頁面註冊後，從瀏覽器開發人員工具中複製名為 hc_accessibility 的 Cookie 值貼到下方。';
+
+  @override
+  String get hcaptcha_pasteDialogHint => '請輸入 hc_accessibility Cookie 值';
+
+  @override
+  String get hcaptcha_cookieSaved => 'hCaptcha 無障礙 Cookie 已儲存';
+
+  @override
+  String get hcaptcha_cookieCleared => 'hCaptcha 無障礙 Cookie 已清除';
+
+  @override
+  String get hcaptcha_cookieNotFound => '未找到 hCaptcha 無障礙 Cookie，請先完成註冊';
+
+  @override
+  String get hcaptcha_webviewTitle => 'hCaptcha 無障礙';
+
+  @override
+  String get hcaptcha_done => '完成';
+
+  @override
+  String get hcaptcha_pasteLink => '貼上登入連結';
+
+  @override
+  String get hcaptcha_pasteLinkInvalid => '剪貼簿中沒有有效的 hCaptcha 連結';
 }
