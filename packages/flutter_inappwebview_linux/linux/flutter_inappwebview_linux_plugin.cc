@@ -79,7 +79,21 @@ void flutter_inappwebview_linux_plugin_register_with_registrar(FlPluginRegistrar
   // This must happen before any WPEDisplay is created, because WebKit's WebProcess
   // inherits environment variables at spawn time. Setting LIBGL_ALWAYS_SOFTWARE
   // after WebProcess starts has no effect.
+  g_message(
+      "flutter_inappwebview_linux: register_with_registrar start (sandbox=%s, libgl_sw=%s)",
+      g_getenv("WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS") != nullptr
+          ? g_getenv("WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS")
+          : "<unset>",
+      g_getenv("LIBGL_ALWAYS_SOFTWARE") != nullptr ? g_getenv("LIBGL_ALWAYS_SOFTWARE")
+                                                    : "<unset>");
   flutter_inappwebview_plugin::ApplySoftwareRenderingIfNeeded();
+  g_message(
+      "flutter_inappwebview_linux: post-preflight rendering env (libgl_sw=%s, skip_dmabuf=%s)",
+      g_getenv("LIBGL_ALWAYS_SOFTWARE") != nullptr ? g_getenv("LIBGL_ALWAYS_SOFTWARE")
+                                                    : "<unset>",
+      g_getenv("FLUTTER_INAPPWEBVIEW_SKIP_DMABUF_CHECK") != nullptr
+          ? g_getenv("FLUTTER_INAPPWEBVIEW_SKIP_DMABUF_CHECK")
+          : "<unset>");
 
   FlutterInappwebviewLinuxPlugin* plugin = FLUTTER_INAPPWEBVIEW_LINUX_PLUGIN(
       g_object_new(flutter_inappwebview_linux_plugin_get_type(), nullptr));

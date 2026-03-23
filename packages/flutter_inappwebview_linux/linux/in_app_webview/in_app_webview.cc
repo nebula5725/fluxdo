@@ -126,6 +126,11 @@ namespace flutter_inappwebview_plugin {
 
 namespace {
 
+const char* SafeEnv(const char* key) {
+  const char* value = g_getenv(key);
+  return value != nullptr ? value : "<unset>";
+}
+
 // WPE modifier mask - matches wpe_input_modifier enum from wpe/input.h
 // Control = bit 0 (1), Shift = bit 1 (2), Alt = bit 2 (4), Meta = bit 3 (8)
 // These are not used directly in C++ code - modifiers come from Dart already in WPE format
@@ -238,6 +243,10 @@ InAppWebView::InAppWebView(FlPluginRegistrar* registrar, FlBinaryMessenger* mess
                            const InAppWebViewCreationParams& params)
     : plugin_(params.plugin), registrar_(registrar), messenger_(messenger), gtk_window_(params.gtkWindow), fl_view_(params.flView), manager_(params.manager), id_(id), settings_(params.initialSettings),
       initial_user_scripts_(params.initialUserScripts) {
+  g_message(
+      "InAppWebView[%ld]: ctor start (window=%p, fl_view=%p, sandbox=%s, libgl_sw=%s)",
+      id_, gtk_window_, fl_view_, SafeEnv("WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS"),
+      SafeEnv("LIBGL_ALWAYS_SOFTWARE"));
   js_bridge_secret_ = GenerateRandomSecret();
   
   if (params.windowId.has_value()) {
@@ -510,6 +519,9 @@ void InAppWebView::InitWpeBackend() {
     return;
   }
 
+  g_message("InAppWebView[%ld]: InitWpeBackend start (libgl_sw=%s)", id_,
+            SafeEnv("LIBGL_ALWAYS_SOFTWARE"));
+
 #ifdef HAVE_WPE_PLATFORM
   // === WPEPlatform API (Modern) ===
   
@@ -525,6 +537,7 @@ void InAppWebView::InitWpeBackend() {
     errorLog("InAppWebView: Failed to create WPEDisplayHeadless");
     return;
   }
+  g_message("InAppWebView[%ld]: WPEPlatform headless display created (%p)", id_, wpe_display_);
   
   // Connect the display
   if (!wpe_display_connect(wpe_display_, &error)) {
@@ -534,12 +547,16 @@ void InAppWebView::InitWpeBackend() {
     g_clear_object(&wpe_display_);
     return;
   }
+  g_message("InAppWebView[%ld]: WPEPlatform display connected (%p)", id_, wpe_display_);
   
   // Get EGL display from WPEDisplay for texture operations
   egl_display_ = wpe_display_get_egl_display(wpe_display_, &error);
   if (egl_display_ == nullptr) {
     // Software rendering mode - no EGL display available
     g_clear_error(&error);
+    g_message("InAppWebView[%ld]: WPEPlatform EGL display unavailable, likely software path", id_);
+  } else {
+    g_message("InAppWebView[%ld]: WPEPlatform EGL display acquired (%p)", id_, egl_display_);
   }
   
   // Note: The WebView will be created in InitWebView() using the "display" property
@@ -661,6 +678,8 @@ void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
     errorLog("InAppWebView: Cannot create webview without WPEDisplay");
     return;
   }
+
+  g_message("InAppWebView[%ld]: InitWebView (WPEPlatform) start (display=%p)", id_, wpe_display_);
   
   // Create WebKit settings
   WebKitSettings* settings = webkit_settings_new();
@@ -720,6 +739,7 @@ void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
     }
     return;
   }
+  g_message("InAppWebView[%ld]: WebKitWebView created (%p)", id_, webview_);
   
   // Get WPEView from the WebView (created automatically by WebKit)
   wpe_view_ = webkit_web_view_get_wpe_view(webview_);
@@ -729,6 +749,7 @@ void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
     webview_ = nullptr;
     return;
   }
+  g_message("InAppWebView[%ld]: WPEView acquired (%p)", id_, wpe_view_);
   
   // Note: Scale factor in WPEPlatform is read from the display, not set directly
   // The WPEDisplay handles scale factor automatically based on the output
@@ -743,6 +764,7 @@ void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
   
   // Get toplevel for size management (need this before setting scale)
   wpe_toplevel_ = wpe_view_get_toplevel(wpe_view_);
+  g_message("InAppWebView[%ld]: WPEToplevel acquired (%p)", id_, wpe_toplevel_);
   
   // WPEDisplayHeadless doesn't track real display scale, so we need to get it from GTK
   // and manually notify WPE when it changes
@@ -784,13 +806,16 @@ void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
   
   // Map the view to start rendering
   wpe_view_map(wpe_view_);
+  g_message("InAppWebView[%ld]: WPEView mapped", id_);
   
   // Set focus so the view starts rendering and receiving input
   wpe_view_focus_in(wpe_view_);
+  g_message("InAppWebView[%ld]: WPEView focused", id_);
   
   // Resize toplevel (already obtained earlier for scale setup)
   if (wpe_toplevel_ != nullptr) {
     wpe_toplevel_resize(wpe_toplevel_, width_, height_);
+    g_message("InAppWebView[%ld]: WPEToplevel resized to %dx%d", id_, width_, height_);
   }
   
   // Apply ITP setting if configured
@@ -942,6 +967,7 @@ void InAppWebView::RegisterEventHandlers() {
   g_signal_connect(webview_, "mouse-target-changed", G_CALLBACK(OnMouseTargetChanged), this);
   g_signal_connect(webview_, "create", G_CALLBACK(OnCreateWebView), this);
   g_signal_connect(webview_, "web-process-terminated", G_CALLBACK(OnWebProcessTerminated), this);
+  g_message("InAppWebView[%ld]: Event handlers registered (webview=%p)", id_, webview_);
   g_signal_connect(webview_, "run-file-chooser", G_CALLBACK(OnRunFileChooser), this);
   g_signal_connect(webview_, "show-option-menu", G_CALLBACK(OnShowOptionMenu), this);
 
@@ -1235,6 +1261,9 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
   if (buffer == nullptr) {
     return;
   }
+
+  static std::atomic<uint64_t> rendered_buffer_log_count{0};
+  const uint64_t render_index = rendered_buffer_log_count.fetch_add(1, std::memory_order_relaxed);
   
   // Don't process buffers during destruction
   if (is_disposing_.load()) {
@@ -1248,10 +1277,18 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
   // Get buffer dimensions
   uint32_t buf_width = static_cast<uint32_t>(wpe_buffer_get_width(buffer));
   uint32_t buf_height = static_cast<uint32_t>(wpe_buffer_get_height(buffer));
+
+  if (render_index < 5) {
+    g_message(
+        "InAppWebView[%ld]: buffer-rendered #%" G_GUINT64_FORMAT
+        " (buffer=%p, %ux%u, egl_display=%p)",
+        id_, render_index + 1, buffer, buf_width, buf_height, egl_display_);
+  }
   
   
   WPEBuffer* previous_buffer = nullptr;
   bool buffer_handled = false;
+  bool keep_buffer_until_next_frame = false;
   
   // Track EGL import failures to avoid repeated attempts
   // Static because if EGL fails once, it will likely keep failing (e.g., no GPU)
@@ -1294,11 +1331,20 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
         current_buffer_width_ = buf_width;
         current_buffer_height_ = buf_height;
         buffer_handled = true;
+        keep_buffer_until_next_frame = true;
+        if (render_index < 5) {
+          g_message("InAppWebView[%ld]: buffer #%" G_GUINT64_FORMAT
+                    " imported as EGL image (%p)",
+                    id_, render_index + 1, egl_image);
+        }
       } else {
         // Mark EGL as permanently failed so we don't keep trying
         // This is common in VMs or software-only environments
         egl_import_failed_permanently = true;
         if (error != nullptr) {
+          g_warning("InAppWebView[%ld]: buffer #%" G_GUINT64_FORMAT
+                    " EGL import failed: %s",
+                    id_, render_index + 1, error->message);
           g_clear_error(&error);
         }
       }
@@ -1350,6 +1396,10 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
           current_buffer_width_ = buf_width;
           current_buffer_height_ = buf_height;
           buffer_handled = true;
+          if (render_index < 5) {
+            g_message("InAppWebView[%ld]: buffer #%" G_GUINT64_FORMAT
+                      " handled via SHM import", id_, render_index + 1);
+          }
         }
         // Note: Don't unref data - it's borrowed from the buffer
       }
@@ -1394,8 +1444,15 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
         current_buffer_width_ = buf_width;
         current_buffer_height_ = buf_height;
         buffer_handled = true;
+        if (render_index < 5) {
+          g_message("InAppWebView[%ld]: buffer #%" G_GUINT64_FORMAT
+                    " handled via generic pixel import", id_, render_index + 1);
+        }
       } else {
         if (error != nullptr) {
+          g_warning("InAppWebView[%ld]: buffer #%" G_GUINT64_FORMAT
+                    " generic pixel import failed: %s",
+                    id_, render_index + 1, error->message);
           g_clear_error(&error);
         }
       }
@@ -1404,21 +1461,55 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
     if (!buffer_handled) {
       debugLog("ERROR: No rendering method succeeded!");
     }
-    
-    // Store reference to current buffer - we keep it until the NEXT frame arrives
-    // This ensures the EGL image's backing DMA-BUF memory stays valid
-    current_buffer_ = buffer;
+
+    if (keep_buffer_until_next_frame) {
+      // Only the EGL-image path needs to retain the buffer until the next frame.
+      // For SHM/generic pixel imports we have already copied the pixels out.
+      current_buffer_ = buffer;
+    } else {
+      current_buffer_ = nullptr;
+    }
   }
-  
+
+  if (buffer_handled && !keep_buffer_until_next_frame && wpe_view_ != nullptr && WPE_IS_BUFFER(buffer)) {
+    if (render_index < 5) {
+      g_message("InAppWebView[%ld]: releasing current copied buffer for frame #%" G_GUINT64_FORMAT
+                " immediately (buffer=%p, view=%p)",
+                id_, render_index + 1, buffer, wpe_view_);
+    }
+    wpe_view_buffer_released(wpe_view_, buffer);
+    if (render_index < 5) {
+      g_message("InAppWebView[%ld]: released current copied buffer for frame #%" G_GUINT64_FORMAT,
+                id_, render_index + 1);
+    }
+  }
+
   // Release the PREVIOUS buffer now that we have a new one
   // The previous EGL image has been destroyed and we have a new frame,
   // so it's safe to let WPE reuse the old buffer's memory
   if (previous_buffer != nullptr && wpe_view_ != nullptr && WPE_IS_BUFFER(previous_buffer)) {
+    if (render_index < 5) {
+      g_message("InAppWebView[%ld]: releasing previous buffer after frame #%" G_GUINT64_FORMAT
+                " (previous=%p, view=%p)",
+                id_, render_index + 1, previous_buffer, wpe_view_);
+    }
     wpe_view_buffer_released(wpe_view_, previous_buffer);
+    if (render_index < 5) {
+      g_message("InAppWebView[%ld]: released previous buffer after frame #%" G_GUINT64_FORMAT,
+                id_, render_index + 1);
+    }
   }
   
   if (buffer_handled && on_frame_available_) {
+    if (render_index < 5) {
+      g_message("InAppWebView[%ld]: notifying Flutter about frame #%" G_GUINT64_FORMAT,
+                id_, render_index + 1);
+    }
     on_frame_available_();
+    if (render_index < 5) {
+      g_message("InAppWebView[%ld]: Flutter notified for frame #%" G_GUINT64_FORMAT,
+                id_, render_index + 1);
+    }
   }
 }
 #endif
@@ -6689,6 +6780,11 @@ void InAppWebView::OnWebProcessTerminated(WebKitWebView* web_view,
 
   g_warning("InAppWebView[%ld]: WebProcess terminated (reason=%s, didCrash=%s)",
             self->id_, reason_str, didCrash ? "true" : "false");
+  g_warning(
+      "InAppWebView[%ld]: termination state (webview=%p, wpe_display=%p, wpe_view=%p, "
+      "wpe_toplevel=%p, egl_display=%p, current_buffer=%p, current_egl_image=%p)",
+      self->id_, self->webview_, self->wpe_display_, self->wpe_view_, self->wpe_toplevel_,
+      self->egl_display_, self->current_buffer_, self->current_egl_image_);
 
 #ifdef HAVE_WPE_BACKEND_LEGACY
   // IMPORTANT: When WebProcess crashes (especially from "Failed to bind wl_compositor"),
