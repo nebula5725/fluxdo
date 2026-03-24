@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart' as inappwebview;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -559,9 +559,12 @@ class NetworkSettingsService {
   /// 获取当前活动的代理端口
   int? get _activeProxyPort => _rustProxyService.port;
 
+  bool _webViewProxySet = false;
+
   Future<void> _applyWebViewProxy() async {
     if (!shouldRunLocalProxy) return;
-    if (!Platform.isAndroid) return;
+    // macOS 14 以下调用 setProxyOverride 可能报错，保险起见判断一下
+    if (!Platform.isAndroid && !await isMacOS14OrAbove()) return;
     final port = _activeProxyPort;
     if (port == null) return;
     try {
@@ -572,14 +575,28 @@ class NetworkSettingsService {
           ],
         ),
       );
+      _webViewProxySet = true;
     } catch (_) {}
   }
 
   Future<void> _clearWebViewProxy() async {
-    if (!Platform.isAndroid) return;
+    if (!_webViewProxySet) return;
+    if (!Platform.isAndroid && !await isMacOS14OrAbove()) return;
     try {
       await inappwebview.ProxyController.instance().clearProxyOverride();
+      _webViewProxySet = false;
     } catch (_) {}
+  }
+
+  static bool? _isMacOS14OrAboveCache;
+
+  Future<bool> isMacOS14OrAbove() async {
+    if (!Platform.isMacOS) return false;
+    if (_isMacOS14OrAboveCache != null) return _isMacOS14OrAboveCache!;
+    final info = await DeviceInfoPlugin().macOsInfo;
+    // Darwin 23 对应 macOS 14 (Sonoma)
+    _isMacOS14OrAboveCache = info.majorVersion >= 23;
+    return _isMacOS14OrAboveCache!;
   }
 
   void _touch() {
