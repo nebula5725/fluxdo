@@ -12,6 +12,8 @@ import java.io.BufferedOutputStream
 import java.io.ByteArrayOutputStream
 import java.io.EOFException
 import java.io.IOException
+import java.math.BigDecimal
+import java.math.BigInteger
 import java.net.URI
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
@@ -364,7 +366,34 @@ class AndroidCdpBridge {
             null, JSONObject.NULL -> null
             is JSONObject -> jsonObjectToMap(value)
             is JSONArray -> jsonArrayToList(value)
+            is BigDecimal -> normalizeNumber(value)
+            is BigInteger -> normalizeNumber(value)
+            is Number -> normalizeNumber(value)
             else -> value
+        }
+    }
+
+    private fun normalizeNumber(value: Number): Any {
+        return when (value) {
+            is Byte, is Short, is Int, is Long, is Float, is Double -> value
+            is BigInteger -> {
+                val longValue = value.toLong()
+                if (BigInteger.valueOf(longValue) == value) longValue else value.toDouble()
+            }
+            is BigDecimal -> {
+                value.stripTrailingZeros()
+                    .let { normalized ->
+                        try {
+                            normalized.longValueExact()
+                        } catch (_: ArithmeticException) {
+                            normalized.toDouble()
+                        }
+                    }
+            }
+            else -> {
+                val longValue = value.toLong()
+                if (longValue.toDouble() == value.toDouble()) longValue else value.toDouble()
+            }
         }
     }
 

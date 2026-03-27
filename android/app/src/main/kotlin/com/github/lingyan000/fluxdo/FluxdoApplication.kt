@@ -1,6 +1,8 @@
 package com.github.lingyan000.fluxdo
 
 import android.app.Application
+import android.util.Log
+import android.webkit.WebView
 import com.google.firebase.FirebaseApp
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 
@@ -33,6 +35,12 @@ class FluxdoApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         appInstance = this
+        try {
+            WebView.setWebContentsDebuggingEnabled(true)
+            Log.i("AndroidCdp", "WebView debugging enabled in Application.onCreate")
+        } catch (e: Throwable) {
+            Log.e("AndroidCdp", "Failed to enable WebView debugging early: ${e.message}", e)
+        }
         // 不在此处初始化 Firebase，等待用户主动开启
     }
 }
